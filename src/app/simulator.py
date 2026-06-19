@@ -1,12 +1,14 @@
 """Punto de entrada de la app — Optimizador de Mezclas RAEE.
 
-Interfaz en Python (Streamlit) con navegación por páginas:
+Interfaz en Python (Streamlit) con un **panel de navegación propio** (no depende
+del navegador ni de la barra lateral), siempre visible:
 
-- **Panel**         resumen ejecutivo: precisión del modelo y valor del optimizador.
-- **Simulador**     arma una mezcla a mano y ve el resultado en vivo (Fase 1).
-- **Optimizador**   el sistema arma las mezclas óptimas y explica por qué (Fase 2).
-- **Histórico**     cada lote real vs. la mezcla óptima.
-- **Caso de negocio** cuantifica el valor para fijarle precio al sistema.
+- **Panel**       resumen ejecutivo: precisión del modelo y valor del optimizador.
+- **Inventario**  editar y cargar el stock en tiempo real (fuente de verdad).
+- **Simulador**   arma una mezcla a mano y ve el resultado en vivo (Fase 1).
+- **Optimizador** el sistema arma las mezclas óptimas y explica por qué (Fase 2).
+- **Histórico**   cada lote real vs. la mezcla óptima, con el cálculo a la vista.
+- **Negocio**     cuantifica el valor para fijarle precio al sistema.
 
 Ejecutar:  streamlit run src/app/simulator.py
 """
@@ -26,7 +28,14 @@ import streamlit as st
 
 from app.sidebar import render_sidebar
 from app.ui import inject_css
-from app.views import historico, negocio, optimizador, panel, simulador
+from app.views import (
+    historico,
+    inventario,
+    negocio,
+    optimizador,
+    panel,
+    simulador,
+)
 
 st.set_page_config(
     page_title="Optimizador de Mezclas RAEE",
@@ -36,17 +45,35 @@ st.set_page_config(
 )
 inject_css()
 
-# Barra lateral compartida (precios, términos, modo privado) — antes de navegar.
+# Barra lateral compartida (precios, términos, modo privado).
 render_sidebar()
 
-nav = st.navigation(
-    [
-        st.Page(panel.render, title="Panel", icon="📊", url_path="panel", default=True),
-        st.Page(simulador.render, title="Simulador", icon="🧪", url_path="simulador"),
-        st.Page(optimizador.render, title="Optimizador", icon="🎯", url_path="optimizador"),
-        st.Page(historico.render, title="Histórico", icon="🗂️", url_path="historico"),
-        st.Page(negocio.render, title="Caso de negocio", icon="💼", url_path="negocio"),
-    ],
-    position="top",  # pestañas horizontales arriba: siempre visibles (clave en celular)
+# --------------------------------------------------------------------------- #
+# Panel de navegación propio (pills): siempre visible, ideal para celular.
+# --------------------------------------------------------------------------- #
+MODULES = {
+    "Panel": ("📊", panel.render),
+    "Inventario": ("📦", inventario.render),
+    "Simulador": ("🧪", simulador.render),
+    "Optimizador": ("🎯", optimizador.render),
+    "Histórico": ("🗂️", historico.render),
+    "Negocio": ("💼", negocio.render),
+}
+_OPTIONS = list(MODULES)
+
+choice = st.pills(
+    "Navegación",
+    _OPTIONS,
+    default=_OPTIONS[0],
+    selection_mode="single",
+    format_func=lambda k: f"{MODULES[k][0]} {k}",
+    key="nav_module",
+    label_visibility="collapsed",
+    width="stretch",
 )
-nav.run()
+if not choice:  # si se deselecciona, quedate en el módulo actual
+    choice = st.session_state.get("_last_module", _OPTIONS[0])
+st.session_state["_last_module"] = choice
+
+st.divider()
+MODULES[choice][1]()

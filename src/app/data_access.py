@@ -16,6 +16,7 @@ from pathlib import Path
 import streamlit as st
 
 from data.bootstrap import default_inventory
+from data.inventory_store import load_saved_state
 from domain.models import InventoryItem, default_prices, default_terms
 from domain.valuation import BlendComponent, value_blend
 from optimize.optimizer import optimize_partition
@@ -35,8 +36,22 @@ def history_analysis() -> dict:
 
 @st.cache_data(show_spinner=False)
 def inventory_items() -> list[InventoryItem]:
-    """Inventario RAEE real con leyes estimadas (con stock). Las 40 pilas."""
+    """Inventario RAEE actual: el guardado por el usuario, o el real del xlsx.
+
+    Si el usuario editó/cargó inventario desde el módulo Inventario, esa versión
+    persistida manda (fuente de verdad). Si no, se usa el inventario real con
+    leyes estimadas.
+    """
+    saved = load_saved_state()
+    if saved is not None:
+        return [it for it in saved if it.quantity_kg > 0]
     return default_inventory(with_stock_only=True)
+
+
+def invalidate_caches() -> None:
+    """Limpia los cachés tras editar/cargar inventario, para refrescar todo."""
+    st.cache_data.clear()
+    st.cache_resource.clear()
 
 
 def _has_grade(it: InventoryItem) -> bool:

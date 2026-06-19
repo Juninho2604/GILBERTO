@@ -7,7 +7,15 @@ import streamlit as st
 
 from app.data_access import history_analysis
 from app.ui import GOOD, brand, kpi, usd, why
-from app.views.components import components_table, explanation_block
+from app.views.components import (
+    charges_breakdown,
+    components_table,
+    explanation_block,
+    lot_header_metrics,
+    metal_table,
+)
+from domain.models import default_prices, default_terms
+from domain.valuation import value_lot
 
 _METAL_NAME = {"AU": "oro", "AG": "plata", "PD": "paladio", "PT": "platino"}
 
@@ -50,6 +58,13 @@ def render() -> None:
     st.write("")
 
     # --- Tabla resumen ----------------------------------------------------- #
+    st.markdown("##### Lote por lote")
+    st.caption(
+        "**Pago real** = fórmula de la refinería (§3) sobre las leyes **medidas** "
+        "de cada lote, a precios de referencia. **Óptimo** = lo que pagaría la "
+        "mejor partición de ese mismo material. Tocá un lote abajo para ver el "
+        "cálculo paso a paso."
+    )
     rows = []
     for L in a["lots"]:
         rows.append(
@@ -93,6 +108,37 @@ def render() -> None:
     m2.metric("Modelo 'tal cual'", usd(L["model_aswas_usd"] or 0))
     m3.metric("Modelo óptimo", usd(L["model_optimal_usd"] or 0),
               delta=f"+{usd(L['extra_usd'] or 0)}")
+
+    # --- Transparencia: cómo se calcula el $ de este lote ------------------ #
+    with st.expander("🧮 ¿Cómo se calcula este precio? (paso a paso)", expanded=False):
+        prices, terms = default_prices(), default_terms()
+        v = value_lot(
+            wmt=L["wmt"], moisture=L["moisture"],
+            grades=L["actual_grades"], prices=prices, terms=terms,
+        )
+        st.caption(
+            f"Se aplica la **fórmula de la refinería (§3)** sobre las **leyes "
+            f"medidas** del lote, a **precios de referencia**. Peso húmedo "
+            f"WMT = {L['wmt']:,.0f} kg; seco DMT = WMT×(1−humedad) = "
+            f"{v.dmt:,.0f} kg. Para cada metal: contenido → se descuenta la "
+            f"deducción por tonelada (recuperación RR) → se valoriza al precio "
+            f"menos el cargo de refinación. Al final se restan los cargos por peso."
+        )
+        lot_header_metrics(v)
+        st.write("")
+        cc1, cc2 = st.columns([1.4, 1])
+        with cc1:
+            st.caption("Metal por metal (medido)")
+            metal_table(v)
+        with cc2:
+            st.caption("Metal total − cargos")
+            charges_breakdown(v)
+        st.caption(
+            "⚠️ Es lo que **pagaría la refinería hoy a estos precios** por esas "
+            "leyes; no necesariamente lo que se pagó el día del envío (los "
+            "precios varían). Cambiá los precios en la barra lateral para otro "
+            "escenario del Simulador."
+        )
 
     st.caption("Pilas que formaron el lote (reconstruidas desde la receta)")
     components_table(L["components"], private)

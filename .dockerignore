@@ -6,3 +6,4 @@ __pycache__
 venv
 *.egg-info
 .streamlit/secrets.toml
+data/inventory_state.json

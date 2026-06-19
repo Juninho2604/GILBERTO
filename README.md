@@ -79,7 +79,7 @@ src/
     ui.py            # sistema de diseño (CSS, KPIs, etiquetas confidenciales)
     sidebar.py       # precios, términos del contrato y modo privado
     data_access.py   # carga cacheada (histórico, inventario, óptimo)
-    views/           # panel · simulador · optimizador · historico · negocio
+    views/           # panel · inventario · simulador · optimizador · historico · negocio
     report.py        # reporte de análisis de extremo a extremo (CLI)
 data/
   inventory.xlsx · refining_history.xlsx · estimated_grades.csv
