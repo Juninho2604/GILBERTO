@@ -35,7 +35,8 @@ def render() -> None:
             usd(opt["best_usd"]),
             delta=f"en {opt['best_num_lots']} lote(s)",
             delta_color=MUTED,
-            hint=f"{opt['n_items']} pilas · {opt['total_stock_kg']:,.0f} kg en inventario.",
+            hint=f"{opt['n_graded']} pilas con ley · {opt['graded_stock_kg']:,.0f} kg "
+            f"(de {opt['n_items']} en stock).",
         )
     with c3:
         kpi(

@@ -35,8 +35,24 @@ def history_analysis() -> dict:
 
 @st.cache_data(show_spinner=False)
 def inventory_items() -> list[InventoryItem]:
-    """Inventario RAEE real con leyes estimadas (con stock)."""
+    """Inventario RAEE real con leyes estimadas (con stock). Las 40 pilas."""
     return default_inventory(with_stock_only=True)
+
+
+def _has_grade(it: InventoryItem) -> bool:
+    return max(it.grade_cu, it.grade_au, it.grade_ag, it.grade_pt, it.grade_pd) > 0
+
+
+@st.cache_data(show_spinner=False)
+def optimizable_items() -> list[InventoryItem]:
+    """Solo las pilas con ley conocida (estimada).
+
+    Las pilas sin ensayo tienen ley 0: el optimizador no puede valorizarlas y
+    meterlas en una mezcla solo agregaría peso muerto y cargos. Se excluyen del
+    optimizador y de las comparaciones para que el número sea honesto
+    (manzanas con manzanas), no inflado por datos faltantes.
+    """
+    return [it for it in inventory_items() if _has_grade(it)]
 
 
 @st.cache_resource(show_spinner=False)
@@ -44,10 +60,11 @@ def default_optimum() -> dict:
     """Óptimo del inventario actual con precios/términos por defecto (panel).
 
     Compara las estrategias simples (separado / una sola mezcla) contra la mejor
-    partición, para el titular del panel. Cacheado: corre una vez por sesión.
+    partición, **sobre el mismo universo de pilas con ley** (sin peso muerto de
+    pilas sin ensayo). Cacheado: corre una vez por sesión.
     """
     prices, terms = default_prices(), default_terms()
-    items = inventory_items()
+    items = optimizable_items()
 
     separate = sum(
         value_blend([BlendComponent(it, it.quantity_kg)], prices, terms).net_value_usd
@@ -75,6 +92,8 @@ def default_optimum() -> dict:
         "gain_vs_single_pct": 100.0 * (best_usd - single) / single if single else 0.0,
         "gain_vs_best_simple_usd": best_usd - baseline,
         "gain_vs_best_simple_pct": 100.0 * (best_usd - baseline) / baseline if baseline else 0.0,
-        "total_stock_kg": sum(it.quantity_kg for it in items),
-        "n_items": len(items),
+        "graded_stock_kg": sum(it.quantity_kg for it in items),
+        "n_graded": len(items),
+        "total_stock_kg": sum(it.quantity_kg for it in inventory_items()),
+        "n_items": len(inventory_items()),
     }

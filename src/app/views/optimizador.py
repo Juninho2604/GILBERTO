@@ -5,7 +5,7 @@ from __future__ import annotations
 import streamlit as st
 
 from analysis.explain import explain_partition
-from app.data_access import inventory_items
+from app.data_access import optimizable_items
 from app.ui import brand, usd, usd2
 from app.views.components import (
     components_table,
@@ -30,7 +30,7 @@ def render() -> None:
     )
     st.write("")
 
-    items = inventory_items()
+    items = optimizable_items()  # solo pilas con ley (sin peso muerto sin ensayo)
 
     c1, c2, c3 = st.columns([1, 1, 1])
     num_lots = c1.slider("Cantidad de lotes", 1, 4, 2)
