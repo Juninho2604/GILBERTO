@@ -8,34 +8,54 @@ El brief completo del proyecto está en [`CLAUDE.md`](./CLAUDE.md).
 
 ## Estado
 
-**Fase 1 — Simulador (MVP): implementada.**
+**Fase 1 (Simulador) y Fase 2 (Optimizador): implementadas.**
 
 - ✅ Núcleo de valorización (`src/domain/valuation.py`), puro y testeado.
-- ✅ Modelo de datos (`src/domain/models.py`) con términos del contrato
-  **parametrizables** (nada hardcodeado).
-- ✅ Mezclas: leyes del lote por promedio ponderado por peso seco (sección 3.6).
+- ✅ Modelo de datos con términos del contrato **parametrizables**.
 - ✅ Test de aceptación del **Apéndice A** reproducido exactamente.
-- ✅ Simulador en Streamlit con inventario, leyes, precios y términos editables
-  y resultado en vivo.
+- ✅ Carga del **inventario real** y del **histórico de 53 lotes** desde los `.xlsx`.
+- ✅ **Estimación de leyes** (sección 6) por mínimos cuadrados desde el
+  histórico: **25/40** pilas con stock cubiertas (15 pendientes de laboratorio),
+  validada reconstruyendo los lotes (error mediano Au ~5%, Cu ~2%).
+- ✅ **Optimizador (Fase 2)** MILP que reparte el inventario en lotes para
+  maximizar el pago de la refinería.
+- ✅ Simulador + Optimizador en una app Streamlit con dos pestañas.
 
-**Pendiente (bloqueante de la Fase 2):** las **leyes por pila** no existen en el
-inventario real. Hay que cargarlas por laboratorio o estimarlas desde los 53
-lotes históricos (sección 6). El simulador ya permite editarlas y arranca con
-una pila de demo (Apéndice A) más los mayores volúmenes con ley pendiente.
+**El objetivo del optimizador** (definido por el usuario): encontrar las mezclas
+óptimas para que la refinería pague lo máximo, aprovechando cada material. El
+hallazgo clave: como el oro domina y su deducción es **por tonelada**, conviene
+**no diluir** las pilas ricas en oro con relleno pobre. Repartir el inventario
+en **2 lotes** (uno rico a ~175 g/t de Au, otro de relleno) paga ~$615k vs.
+~$606k de una sola mezcla (**+1,5%**), y supera también a enviar todo por
+separado ($612k).
+
+> ⚠️ Las leyes son **estimadas** y están a validar con ensayos reales. Varias
+> preguntas abiertas (sección 7) afectan el óptimo: tamaño mínimo de lote, si el
+> platino se paga, y si los términos del contrato son fijos o negociados.
 
 ## Estructura
 
 ```
 src/
   domain/
-    models.py      # InventoryItem, MetalPrices, ContractTerms, RecoveryRule
-    valuation.py   # LA FÓRMULA (sección 3): value_lot / value_blend
+    models.py        # InventoryItem, MetalPrices, ContractTerms, RecoveryRule
+    valuation.py     # LA FÓRMULA (sección 3): value_lot / value_blend
   data/
-    seed.py        # datos de arranque (sección 10) mientras no haya xlsx
+    load_inventory.py   # parsea inventory.xlsx
+    load_history.py     # parsea refining_history.xlsx (53 lotes)
+    recipes.py          # parser de recetas históricas
+    estimate_grades.py  # estimación de leyes por regresión (sección 6)
+    build_grade_table.py# genera data/estimated_grades.csv
+    bootstrap.py / seed.py
+  optimize/
+    optimizer.py     # Fase 2: optimize_blend / optimize_partition (MILP, PuLP)
   app/
-    simulator.py   # UI Streamlit (Fase 1)
+    simulator.py     # UI Streamlit (Simulador + Optimizador)
+    report.py        # reporte de análisis de extremo a extremo (CLI)
+data/
+  inventory.xlsx · refining_history.xlsx · estimated_grades.csv
 tests/
-  test_valuation.py  # Apéndice A + RR + mezclas
+  test_valuation.py · test_recipes.py · test_data_pipeline.py · test_optimizer.py
 ```
 
 ## Uso
@@ -49,8 +69,14 @@ pip install -e ".[dev]"
 # Correr los tests (incluye el test de aceptación del Apéndice A)
 pytest
 
-# Lanzar el simulador
+# Lanzar el simulador + optimizador
 streamlit run src/app/simulator.py
+
+# Reporte de análisis de extremo a extremo por consola
+python -m app.report          # (con PYTHONPATH=src, o tras `pip install -e .`)
+
+# Regenerar la tabla de leyes estimadas (data/estimated_grades.csv)
+python -m data.build_grade_table
 ```
 
 En el simulador, cargá un valor en la columna **blend_kg** de las pilas que
@@ -73,9 +99,12 @@ print(result.net_value_usd, result.result_per_kg)
 
 ## Próximos pasos
 
-1. `data/load_inventory.py` — parsear `inventory.xlsx` real.
-2. `data/estimate_grades.py` — estimar leyes desde lotes históricos (sección 6)
-   y validarlas contra los ensayos reales.
-3. Confirmar con Gilberto las preguntas abiertas (sección 7): reglas de validez,
-   objetivo del optimizador, términos del contrato, bug de Cu, Pt, humedad.
-4. **Fase 2** — optimizador LP/MILP (`PuLP`/`OR-Tools`).
+1. **Validar las leyes estimadas** contra ensayos de laboratorio (las 25
+   estimadas) y **medir las 15 pendientes** que no aparecen en recetas.
+2. Confirmar con Gilberto las preguntas abiertas (sección 7) que cambian el
+   óptimo: **tamaño mínimo/objetivo de lote**, si el **platino se paga**, y si
+   los términos del contrato son fijos o negociados por envío.
+3. Afinar el optimizador con las reglas reales de JX (mínimos/máximos de ley,
+   penalización de contaminantes, rechazo por tamaño) cuando se conozcan.
+4. Mejorar la separación de pilas que hoy quedan en grupos ambiguos
+   (`12 + 998`, `37 + 38`, etc.) pidiendo los kg de cada componente.

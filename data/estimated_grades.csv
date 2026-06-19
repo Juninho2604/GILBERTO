@@ -1,0 +1,35 @@
+code,name,stock_kg,grade_cu,grade_au,grade_ag,grade_pt,grade_pd,confidence,n_pure_lots,n_recipes,note
+001,Bajo Grado Marron,13329.97,0.1053,28.0,396.4,0.0,11.1,estimated,0,1,regresión sobre recetas resolubles
+002,Bajo Grado Verde,2809.38,0.218,57.9,821.1,0.0,23.0,estimated,0,1,regresión sobre recetas resolubles
+003,Tarjeta Madre PIII - Verde/Amarilla,715.47,0.2114,187.2,570.6,0.0,31.8,assumed,0,3,grupo base ambiguo; reparto equitativo (supuesto)
+004,Tarjeta Madre PIII - Colores,284.14,0.2114,187.2,570.6,0.0,31.8,assumed,0,3,grupo base ambiguo; reparto equitativo (supuesto)
+006,Tarjeta Madre PIV - Verdes/Amarillo 1VGA,1794.21,0.2193,111.2,703.5,0.0,5.1,direct,2,3,medición directa (2 lote/s puro/s)
+008,Tarjeta Madre PIV - Doble Socket,193.67,0.195,30.0,529.3,0.0,2.7,estimated,0,1,regresión sobre recetas resolubles
+009,Boards Tipo 1,2923.97,0.2516,234.6,1414.3,0.0,54.0,direct,3,3,medición directa (3 lote/s puro/s)
+011,Boards Tipo 1 - Lectora,280.07,0.182,220.2,2880.7,0.0,23.7,direct,3,5,medición directa (3 lote/s puro/s)
+012,Boards Tipo 2,3479.11,0.2121,154.3,970.8,0.0,58.8,assumed,0,5,grupo base ambiguo; reparto equitativo (supuesto)
+014,Boards Tipo 3,4205.56,0.0526,14.0,198.2,0.0,5.5,estimated,0,1,regresión sobre recetas resolubles
+015,Centrales Telefonicas,2922.81,0.3045,294.4,1577.4,0.0,54.3,estimated,0,4,regresión sobre recetas resolubles
+016,Tarjeta Filo Dorado limpio sin hierro,1265.99,0.2343,207.1,982.3,0.0,32.5,direct,3,3,medición directa (3 lote/s puro/s)
+022,Tarjeta de Disco Duro,120.13,0.0,335.0,0.0,0.0,365.9,estimated,0,4,regresión sobre recetas resolubles
+025,Memorias Plateadas,2.69,0.1503,341.8,2256.0,0.0,162.1,direct,1,1,medición directa (1 lote/s puro/s)
+026,Slot Processors,4.76,0.0,0.0,0.0,0.0,1882.0,estimated,0,1,regresión sobre recetas resolubles
+027,Procesadores Plasticos (Fibra),5.83,0.3923,1150.9,112.0,0.0,43.5,direct,3,3,medición directa (3 lote/s puro/s)
+028,Procesadores Plasticos (Fibra) Base de Aluminio,51.06,0.8479,288.8,48.0,0.0,5.5,direct,2,2,medición directa (2 lote/s puro/s)
+029,Procesadores Plasticos (Fibra) Negros,0.66,0.1355,4240.8,5263.0,0.0,22.5,assumed,0,3,grupo base ambiguo; reparto equitativo (supuesto)
+030,Procesadores Ceramicos,0.81,0.1355,4240.8,5263.0,0.0,22.5,assumed,0,3,grupo base ambiguo; reparto equitativo (supuesto)
+031,Procesadores Ceramicos con Base de Aluminio,1.11,0.1355,4240.8,5263.0,0.0,22.5,assumed,0,3,grupo base ambiguo; reparto equitativo (supuesto)
+032,Procesadores Ceramicos Centro Dorado,2.12,0.1355,4240.8,5263.0,0.0,22.5,assumed,0,3,grupo base ambiguo; reparto equitativo (supuesto)
+033,"Procesadores AMD K5, 186, 286, 386, 486 (Dorado)",0.0,0.1355,4240.8,5263.0,0.0,22.5,assumed,0,3,grupo base ambiguo; reparto equitativo (supuesto)
+037,Tarjeta Madre PIV - Verde/Amarillo 2VGA,478.63,0.2122,158.5,504.7,0.0,4.6,assumed,0,3,grupo base ambiguo; reparto equitativo (supuesto)
+038,Tarjeta Madre PIV - Colores 2VGA,1413.14,0.2122,158.5,504.7,0.0,4.6,assumed,0,3,grupo base ambiguo; reparto equitativo (supuesto)
+041,Credicard,100.8,0.7701,370.7,0.0,0.0,0.0,estimated,0,1,regresión sobre recetas resolubles
+049,Peine Macho,0.0,0.3592,319.0,134.0,0.0,62.6,direct,1,1,medición directa (1 lote/s puro/s)
+050,Peine Hembra,0.0,0.2981,358.4,157.0,0.0,204.1,direct,1,1,medición directa (1 lote/s puro/s)
+052,Tarjeta de Celular Smartphone,0.0,0.3628,597.2,2170.0,0.0,46.5,direct,2,2,medición directa (2 lote/s puro/s)
+053,Tarjeta de Celular Tactil,0.0,0.3648,750.3,2501.2,0.0,58.2,direct,4,4,medición directa (4 lote/s puro/s)
+054,Tarjeta de Celular Chino,0.0,0.3434,481.5,1927.0,0.0,33.6,direct,4,4,medición directa (4 lote/s puro/s)
+106,Cable Box 2 BGA,0.0,0.2283,326.9,672.0,0.0,17.9,assumed,0,1,grupo base ambiguo; reparto equitativo (supuesto)
+107,Cable Box 3 BGA,0.0,0.2283,326.9,672.0,0.0,17.9,assumed,0,1,grupo base ambiguo; reparto equitativo (supuesto)
+108,Cable Box 4 BGA,0.0,0.2283,326.9,672.0,0.0,17.9,assumed,0,1,grupo base ambiguo; reparto equitativo (supuesto)
+998,Tipo 2 Especial,292.91,0.2121,154.3,970.8,0.0,58.8,assumed,0,5,grupo base ambiguo; reparto equitativo (supuesto)

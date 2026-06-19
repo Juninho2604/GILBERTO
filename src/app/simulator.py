@@ -21,7 +21,7 @@ if str(SRC) not in sys.path:
 import pandas as pd
 import streamlit as st
 
-from data.seed import seed_inventory
+from data.bootstrap import default_inventory
 from domain.models import (
     METALS,
     Category,
@@ -34,6 +34,7 @@ from domain.models import (
     default_terms,
 )
 from domain.valuation import BlendComponent, value_blend
+from optimize.optimizer import optimize_blend, optimize_partition
 
 st.set_page_config(page_title="Optimizador de Mezclas RAEE", layout="wide")
 
@@ -66,11 +67,22 @@ def _inventory_to_df(items: list[InventoryItem]) -> pd.DataFrame:
 
 def _init_state() -> None:
     if "inventory_df" not in st.session_state:
-        st.session_state.inventory_df = _inventory_to_df(seed_inventory())
+        st.session_state.inventory_df = _inventory_to_df(default_inventory())
     if "prices" not in st.session_state:
         st.session_state.prices = default_prices()
     if "terms" not in st.session_state:
         st.session_state.terms = default_terms()
+
+
+def _df_to_items(df: pd.DataFrame) -> list[InventoryItem]:
+    """Convierte el inventario editado de la UI en ítems de dominio."""
+    items = []
+    for _, row in df.iterrows():
+        try:
+            items.append(_row_to_item(row))
+        except (TypeError, ValueError):
+            continue
+    return items
 
 
 def _row_to_item(row) -> InventoryItem:
@@ -150,27 +162,18 @@ def _sidebar_prices_and_terms() -> tuple[MetalPrices, ContractTerms]:
 # --------------------------------------------------------------------------- #
 # App
 # --------------------------------------------------------------------------- #
-def main() -> None:
-    _init_state()
-    st.title("Optimizador de Mezclas RAEE — Simulador (Fase 1)")
-    st.caption(
-        "Servicios Megabytes, C.A. · Editá inventario, leyes, precios y términos; "
-        "elegí cuánto de cada pila entra en la mezcla (columna **blend_kg**) y mirá "
-        "el resultado en vivo. Las leyes faltan en los datos reales: cargalas o "
-        "estimalas (sección 6)."
-    )
-
-    prices, terms = _sidebar_prices_and_terms()
-
+def _inventory_editor() -> pd.DataFrame:
     st.subheader("Inventario (editable, incluidas las leyes)")
     st.caption(
-        "grade_cu en fracción (0.21 = 21%); Au/Ag/Pt/Pd en g/t. "
-        "**blend_kg** = cuánto de esa pila entra en la mezcla."
+        "Cargado del inventario real con **leyes estimadas** desde el histórico "
+        "(sección 6). grade_cu en fracción (0.21 = 21%); Au/Ag/Pt/Pd en g/t. "
+        "**blend_kg** = cuánto de esa pila entra en la mezcla manual."
     )
     edited = st.data_editor(
         st.session_state.inventory_df,
         num_rows="dynamic",
-        use_container_width=True,
+        width="stretch",
+        height=380,
         key="inv_editor",
         column_config={
             "grade_source": st.column_config.SelectboxColumn(
@@ -180,8 +183,46 @@ def main() -> None:
         },
     )
     st.session_state.inventory_df = edited
+    return edited
 
-    # Construye la mezcla a partir de las filas con blend_kg > 0.
+
+def _render_lot_result(result, *, key: str) -> None:
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Valor neto (USD)", USD(result.net_value_usd))
+    c2.metric("USD / kg", f"{result.result_per_kg:,.2f}")
+    c3.metric("WMT (kg)", f"{result.wmt:,.1f}")
+    c4.metric("DMT (kg)", f"{result.dmt:,.1f}")
+
+    metal_rows = []
+    for m in METALS:
+        r = result.metals[m]
+        unit = "fracción" if m == "CU" else "g/t"
+        content_unit = "kg" if m == "CU" else "g"
+        metal_rows.append(
+            {
+                "metal": m,
+                f"ley ({unit})": round(r.grade, 4),
+                f"contenido ({content_unit})": round(r.content, 2),
+                "RR": round(r.rr, 4),
+                f"recuperado ({content_unit})": round(r.recovered, 2),
+                "monto USD": round(r.amount_usd, 2),
+            }
+        )
+    st.dataframe(pd.DataFrame(metal_rows), width="stretch", hide_index=True)
+    charges = pd.DataFrame(
+        [
+            {"concepto": "Metal total", "USD": round(result.metal_total, 2)},
+            {"concepto": "− Treatment", "USD": -round(result.treatment_charge, 2)},
+            {"concepto": "− Shredding", "USD": -round(result.shredding_charge, 2)},
+            {"concepto": "− Min lot charge", "USD": -round(result.min_lot_charge, 2)},
+            {"concepto": "− Moisture penalty", "USD": -round(result.moisture_penalty, 2)},
+            {"concepto": "= Valor neto", "USD": round(result.net_value_usd, 2)},
+        ]
+    )
+    st.dataframe(charges, width="stretch", hide_index=True)
+
+
+def _tab_simulator(edited: pd.DataFrame, prices: MetalPrices, terms: ContractTerms) -> None:
     components: list[BlendComponent] = []
     warnings: list[str] = []
     for _, row in edited.iterrows():
@@ -204,51 +245,84 @@ def main() -> None:
 
     if not components:
         st.info(
-            "Cargá una cantidad en **blend_kg** para al menos una pila. "
-            "Tip: poné 5184 en el *Lote Apéndice A (demo)* para reproducir el "
-            "test de aceptación (net ≈ $70.335,68 · 13,57 USD/kg)."
+            "Cargá una cantidad en **blend_kg** para al menos una pila y mirá el "
+            "resultado en vivo. (O usá la pestaña **Optimizador** para que el "
+            "sistema arme las mezclas óptimas solo.)"
         )
         return
 
-    result = value_blend(components, prices, terms)
-
     st.subheader("Resultado de la mezcla")
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Valor neto (USD)", USD(result.net_value_usd))
-    c2.metric("USD / kg", f"{result.result_per_kg:,.2f}")
-    c3.metric("WMT (kg)", f"{result.wmt:,.1f}")
-    c4.metric("DMT (kg)", f"{result.dmt:,.1f}")
+    _render_lot_result(value_blend(components, prices, terms), key="sim")
 
-    metal_rows = []
-    for m in METALS:
-        r = result.metals[m]
-        unit = "fracción" if m == "CU" else "g/t"
-        content_unit = "kg" if m == "CU" else "g"
-        metal_rows.append(
-            {
-                "metal": m,
-                f"ley ({unit})": round(r.grade, 4),
-                f"contenido ({content_unit})": round(r.content, 2),
-                "RR": round(r.rr, 4),
-                f"recuperado ({content_unit})": round(r.recovered, 2),
-                "monto USD": round(r.amount_usd, 2),
-            }
-        )
-    st.markdown("**Por metal**")
-    st.dataframe(pd.DataFrame(metal_rows), use_container_width=True, hide_index=True)
 
-    st.markdown("**Cargos y totales**")
-    charges = pd.DataFrame(
-        [
-            {"concepto": "Metal total", "USD": round(result.metal_total, 2)},
-            {"concepto": "− Treatment", "USD": -round(result.treatment_charge, 2)},
-            {"concepto": "− Shredding", "USD": -round(result.shredding_charge, 2)},
-            {"concepto": "− Min lot charge", "USD": -round(result.min_lot_charge, 2)},
-            {"concepto": "− Moisture penalty", "USD": -round(result.moisture_penalty, 2)},
-            {"concepto": "= Valor neto", "USD": round(result.net_value_usd, 2)},
-        ]
+def _tab_optimizer(edited: pd.DataFrame, prices: MetalPrices, terms: ContractTerms) -> None:
+    st.subheader("Optimizador de mezclas (Fase 2)")
+    st.caption(
+        "Reparte todo el inventario en lotes para que la refinería pague lo "
+        "máximo. Clave: **no diluir** las pilas ricas en oro con relleno pobre "
+        "(la deducción de 7 g/t de Au se aplica sobre toda la masa)."
     )
-    st.dataframe(charges, use_container_width=True, hide_index=True)
+    c1, c2, c3 = st.columns(3)
+    num_lots = c1.slider("Cantidad de lotes", 1, 4, 2)
+    min_lot_kg = c2.number_input("Tamaño mínimo por lote (kg)", value=0.0, step=100.0)
+    run = c3.button("▶ Optimizar", type="primary", width="stretch")
+
+    if not run:
+        st.info("Ajustá los parámetros y tocá **Optimizar**.")
+        return
+
+    items = [it for it in _df_to_items(edited) if it.quantity_kg > 0]
+    with st.spinner("Resolviendo MILP…"):
+        res = optimize_partition(
+            items, prices, terms, num_lots=num_lots, min_lot_kg=min_lot_kg
+        )
+    if not res.lots:
+        st.warning(f"Sin solución (status={res.status}).")
+        return
+
+    st.success(
+        f"Status: {res.status} · **Valor total: {USD(res.net_value_usd)}** "
+        f"en {len(res.lots)} lote(s)."
+    )
+    for i, lot in enumerate(res.lots, 1):
+        v = lot.valuation
+        with st.expander(
+            f"Lote {i} — {lot.total_weight_kg:,.0f} kg · "
+            f"{USD(v.net_value_usd)} ({v.result_per_kg:.2f} USD/kg) · "
+            f"Au {v.metals['AU'].grade:.0f} g/t",
+            expanded=(i == 1),
+        ):
+            comp_df = pd.DataFrame(
+                [
+                    {"code": p.item.code, "name": p.item.name, "kg": round(p.weight_kg, 1)}
+                    for p in lot.components
+                ]
+            )
+            st.dataframe(comp_df, width="stretch", hide_index=True)
+            _render_lot_result(v, key=f"opt{i}")
+    if res.leftover:
+        st.caption(
+            "Material sin asignar (no conviene enviarlo): "
+            + ", ".join(f"{c}={kg:,.0f}kg" for c, kg in res.leftover.items())
+        )
+
+
+def main() -> None:
+    _init_state()
+    st.title("Optimizador de Mezclas RAEE")
+    st.caption(
+        "Servicios Megabytes, C.A. · **Simulador** (Fase 1) para iterar mezclas "
+        "a mano y **Optimizador** (Fase 2) para que el sistema las arme solo."
+    )
+
+    prices, terms = _sidebar_prices_and_terms()
+    edited = _inventory_editor()
+
+    tab_sim, tab_opt = st.tabs(["🧪 Simulador", "🎯 Optimizador"])
+    with tab_sim:
+        _tab_simulator(edited, prices, terms)
+    with tab_opt:
+        _tab_optimizer(edited, prices, terms)
 
 
 if __name__ == "__main__":

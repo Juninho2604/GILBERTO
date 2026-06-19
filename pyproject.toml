@@ -11,12 +11,13 @@ requires-python = ">=3.10"
 dependencies = [
     "pandas>=2.0",
     "openpyxl>=3.1",
+    "numpy>=1.24",
     "streamlit>=1.30",
+    "pulp>=2.7",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
-optimize = ["pulp>=2.7"]  # Fase 2 (LP/MILP)
 
 [tool.setuptools.packages.find]
 where = ["src"]
