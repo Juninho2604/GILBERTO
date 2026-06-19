@@ -12,6 +12,7 @@ from app.logistics import (
     CONTAINERS,
     DEFAULT_FINAL_LOT_KG,
     containers_needed,
+    pack_lots,
 )
 from app.ui import brand, usd, usd2
 from app.views.components import (
@@ -113,11 +114,32 @@ def render() -> None:
     k3.metric("Contenedores", f"{plan.n_containers}")
     k4.metric("Llenado prom.", f"{plan.fill_pct_avg:.0f}%")
     st.caption(
-        f"Cada lote ≤ tope de **{final_lot_kg/1000:,.1f} t** (lote final de Miami). "
-        f"Contenedor de **{container_kg/1000:,.1f} t**: se necesitan "
-        f"**{plan.n_containers}** (último al {plan.fill_pct_last:.0f}%). "
-        "Cada lote entra completo en un contenedor."
+        f"Cada **lote final** ≤ **{final_lot_kg/1000:,.1f} t** (se arma en Miami y lo "
+        f"valoriza la refinería). Cada **contenedor** de **{container_kg/1000:,.1f} t** "
+        "lleva 1 lote final + **anticipo**: material del próximo lote que viaja para "
+        "aprovechar el espacio y espera en Miami para el siguiente armado."
     )
+
+    # Plan de contenedores (lote final + anticipo).
+    loads = pack_lots([l.total_weight_kg for l in res.lots], container_kg, final_lot_kg)
+    import pandas as pd
+
+    rows = []
+    for c in loads:
+        principal = "  +  ".join(
+            f"Lote {n}: {kg/1000:,.1f} t" for n, kg, anti in c.segments if not anti
+        )
+        anticipo = "  +  ".join(
+            f"Lote {n}: {kg/1000:,.1f} t" for n, kg, anti in c.segments if anti
+        )
+        rows.append({
+            "Contenedor": f"#{c.index}",
+            "Lote final": principal or "—",
+            "Anticipo (espera en Miami)": anticipo or "—",
+            "Carga": f"{c.total_kg/1000:,.1f} t",
+            "Llenado": f"{c.fill_pct:.0f}%",
+        })
+    st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
     st.write("")
 
     # --- Por qué es la mejor decisión ------------------------------------- #

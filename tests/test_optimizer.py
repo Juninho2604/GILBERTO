@@ -19,6 +19,20 @@ def _item(code, **kw):
     return InventoryItem(code=code, name=code, **kw)
 
 
+def test_pack_lots_container_plan():
+    """Empaqueta: contenedor = 1 lote final + anticipo, sin pasar la capacidad."""
+    from app.logistics import pack_lots
+
+    loads = pack_lots([18_500, 11_525, 11_525], container_kg=23_000, final_lot_kg=18_500)
+    assert all(c.total_kg <= 23_000 + 1.0 for c in loads)
+    # El primer contenedor completa el lote 1 y mete anticipo del lote 2.
+    c1 = loads[0]
+    assert any(n == 1 and not anti for n, _, anti in c1.segments)
+    assert any(anti for _, _, anti in c1.segments)  # hay anticipo
+    # Conserva el peso total.
+    assert sum(c.total_kg for c in loads) == pytest.approx(18_500 + 11_525 + 11_525)
+
+
 def test_partition_respects_max_lot_kg():
     """Ningún lote debe superar el tope físico (contenedor / lote final)."""
     prices, terms = default_prices(), default_terms()
