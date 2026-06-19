@@ -32,7 +32,7 @@ st.set_page_config(
     page_title="Optimizador de Mezclas RAEE",
     page_icon="♻️",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="auto",  # se colapsa solo en celular; abierto en escritorio
 )
 inject_css()
 
@@ -46,6 +46,7 @@ nav = st.navigation(
         st.Page(optimizador.render, title="Optimizador", icon="🎯", url_path="optimizador"),
         st.Page(historico.render, title="Histórico", icon="🗂️", url_path="historico"),
         st.Page(negocio.render, title="Caso de negocio", icon="💼", url_path="negocio"),
-    ]
+    ],
+    position="top",  # pestañas horizontales arriba: siempre visibles (clave en celular)
 )
 nav.run()
