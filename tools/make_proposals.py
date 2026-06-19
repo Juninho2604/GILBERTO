@@ -83,7 +83,13 @@ class Proposal(FPDF):
             self.set_font("Helvetica", "", 10)
         self.ln(3)
 
+    def _ensure(self, h: float):
+        """Salta de pagina si no entra un bloque de alto ``h``."""
+        if self.get_y() + h > self.h - self.b_margin:
+            self.add_page()
+
     def section(self, title: str):
+        self._ensure(16)
         self.ln(2)
         self.set_text_color(*ACCENT)
         self.set_font("Helvetica", "B", 12)
@@ -111,50 +117,47 @@ class Proposal(FPDF):
             lead_w = self.get_string_width(s(bold_lead) + " ")
             self.cell(lead_w, 5.6, s(bold_lead))
             self.set_font("Helvetica", "", 10.5)
-            self.multi_cell(0, 5.6, s(text))
+            self.multi_cell(0, 5.6, s(text), align="L")
         else:
             self.set_font("Helvetica", "", 10.5)
             self.set_text_color(*INK)
-            self.multi_cell(0, 5.6, s(text))
+            self.multi_cell(0, 5.6, s(text), align="L")
         self.ln(0.6)
 
     def price_row(self, concept: str, amount: str, note: str = "", highlight=False):
-        h = 9
-        x0, y0 = 18, self.get_y()
+        self._ensure(24 if note else 11)
         if highlight:
-            self.set_fill_color(*LIGHT)
-            self.rect(x0, y0, 174, h, "F")
-        self.set_xy(x0 + 3, y0)
+            self.set_fill_color(*ACCENT)
+            self.rect(18, self.get_y() + 1, 1.6, 6, "F")  # barra de acento (no se rompe)
+        self.set_x(22 if highlight else 18)
         self.set_text_color(*INK)
         self.set_font("Helvetica", "B" if highlight else "", 10.5)
-        self.cell(96, h, s(concept))
-        self.set_text_color(*ACCENT if highlight else INK)
-        self.set_font("Helvetica", "B", 11)
-        self.cell(34, h, s(amount), align="R")
-        self.set_text_color(*MUTED)
-        self.set_font("Helvetica", "", 8.5)
-        self.set_xy(x0 + 3, y0 + h - 0.5)
-        self.set_y(y0 + h)
+        self.cell(126 if highlight else 130, 8, s(concept))
+        self.set_text_color(*(ACCENT if highlight else INK))
+        self.set_font("Helvetica", "B", 11.5)
+        self.cell(44, 8, s(amount), align="R", ln=1)
         if note:
-            self.set_x(x0 + 3)
+            self.set_x(22 if highlight else 18)
             self.set_text_color(*MUTED)
-            self.set_font("Helvetica", "", 8.5)
-            self.multi_cell(174, 4.6, s(note))
-        self.ln(1)
+            self.set_font("Helvetica", "", 8.7)
+            self.multi_cell(170, 4.6, s(note), align="L")
+        self.set_draw_color(232, 236, 242)
+        self.line(18, self.get_y() + 1.5, 192, self.get_y() + 1.5)
+        self.ln(3.5)
 
     def callout(self, text: str):
-        self.ln(1)
-        x0, y0 = 18, self.get_y()
-        self.set_fill_color(*LIGHT)
-        self.set_draw_color(*ACCENT)
         self.set_font("Helvetica", "", 10)
-        self.set_xy(x0 + 4, y0 + 3)
+        # estimacion de alto para no cortar el bloque entre paginas
+        approx_lines = max(2, int(self.get_string_width(s(text)) / 160) + 1)
+        self._ensure(approx_lines * 5.4 + 8)
+        x0, y0 = 18, self.get_y()
+        self.set_xy(x0 + 5, y0 + 3)
         self.set_text_color(*INK)
-        # medir alto aproximado
-        self.multi_cell(166, 5.4, s(text))
+        self.multi_cell(164, 5.4, s(text))
         y1 = self.get_y()
+        self.set_fill_color(*ACCENT)
         self.rect(x0, y0, 1.6, y1 - y0 + 3, "F")  # barra de acento
-        self.ln(3)
+        self.ln(4)
 
 
 def build_model_proposal() -> Path:
@@ -196,19 +199,39 @@ def build_model_proposal() -> Path:
     p.bullet("decisiones en segundos y auditables, en vez de planillas a mano.", "Velocidad y control:")
 
     p.section("4. Inversion")
-    p.price_row("Construccion e implementacion", "$2.500", "Pago unico. Despliegue, carga de datos reales, validacion y capacitacion.", highlight=True)
+    p.price_row("Construccion e implementacion", "$2.500", "Pago unico. Despliegue en el servidor, carga de datos reales, validacion y capacitacion del operario que arma los lotes.", highlight=True)
     p.price_row("Mensualidad", "$300 / mes", "Hosting, soporte, actualizaciones y mejoras del modelo.")
-    p.price_row("Fee de exito", "5%", "Sobre el rendimiento extra DOCUMENTADO que genere el modelo frente a la practica actual.", highlight=True)
+    p.price_row("Piloto (meses 1 y 2)", "Sin fee", "Modo acompanamiento: el sistema guia el armado de lotes y se mide prediccion vs. liquidacion real. Sin fee de exito.")
+    p.price_row("Fee de exito (desde mes 3)", "5%", "Unicamente sobre el METAL SUB-UMBRAL rescatado y confirmado por la liquidacion de la refineria. Con tope mensual.", highlight=True)
     p.callout(
-        "ROI: sobre un volumen anual del orden de los 3 millones de USD que pasan por "
-        "la refineria, el costo del sistema representa una fraccion minima. Una sola "
-        "mezcla mejor armada, o un lote sub-umbral rescatado, ya cubre el ano."
+        "El costo fijo es una fraccion minima del volumen anual que pasa por la "
+        "refineria. El fee de exito es deliberadamente acotado: solo se cobra "
+        "cuando el sistema rescata, de forma comprobable, metal que de otro modo "
+        "habria pagado $0."
     )
 
-    p.section("5. Condiciones y proximos pasos")
-    p.bullet("El fee de exito se liquida sobre mejoras medibles y acordadas con el cliente.")
-    p.bullet("Las leyes estimadas se reemplazan por ensayos de laboratorio a medida que esten disponibles.")
-    p.bullet("Precios en USD. La mensualidad se factura por adelantado.")
+    p.section("5. Como se mide el fee (material sub-umbral)")
+    p.para(
+        "La refineria descuenta una deduccion por tonelada (p. ej. 100 g/t de "
+        "plata, 18 g/t de paladio) antes de pagar. Una pila por debajo de ese "
+        "umbral paga $0. Mezclada segun el sistema, el lote supera el umbral y ese "
+        "metal se cobra. Ese metal rescatado es 100% atribuible al modelo y es lo "
+        "unico sobre lo que se cobra el fee."
+    )
+    p.bullet("el operario arma el lote en el sistema (como ya esta planeado); la liquidacion llega igual. No hay tarea adicional para Gilberto ni su gente.", "Cero doble trabajo:")
+    p.bullet("el fee se calcula solo sobre lo que la liquidacion de la refineria confirma como pagado.", "Confirmado por la refineria:")
+    p.bullet("reconciliacion mensual firmada por ambas partes, con tope.", "Transparente:")
+
+    p.section("6. Por que se puede confiar")
+    p.bullet("reproduce el pago real de la refineria con +/-3%, validado sobre 53 lotes historicos.", "Validado:")
+    p.bullet("el sistema propone y explica; Gilberto y su operario aprueban cada lote. Nunca se envia algo que no se entienda.", "Humano al mando:")
+    p.bullet("alertas antes de enviar: metal sub-umbral, lote sobre-diluido, leyes de baja confianza.", "Guardrails:")
+    p.bullet("las pilas ricas se confirman con ensayo de laboratorio antes de un envio grande.", "Sin apuestas:")
+
+    p.section("7. Proximos pasos")
+    p.bullet("Desplegar el sistema y cargar el inventario y los terminos reales.")
+    p.bullet("Piloto de 2 meses midiendo prediccion vs. liquidacion, sin fee.")
+    p.bullet("Desde el mes 3, fee del 5% sobre el metal sub-umbral rescatado y confirmado.")
 
     OUT.mkdir(parents=True, exist_ok=True)
     path = OUT / "Propuesta_Modelo_Optimizacion_RAEE.pdf"
