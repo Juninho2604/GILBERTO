@@ -8,7 +8,6 @@ del navegador ni de la barra lateral), siempre visible:
 - **Simulador**   arma una mezcla a mano y ve el resultado en vivo (Fase 1).
 - **Optimizador** el sistema arma las mezclas óptimas y explica por qué (Fase 2).
 - **Histórico**   cada lote real vs. la mezcla óptima, con el cálculo a la vista.
-- **Negocio**     cuantifica el valor para fijarle precio al sistema.
 
 Ejecutar:  streamlit run src/app/simulator.py
 """
@@ -31,7 +30,6 @@ from app.ui import inject_css
 from app.views import (
     historico,
     inventario,
-    negocio,
     optimizador,
     panel,
     simulador,
@@ -57,7 +55,6 @@ MODULES = {
     "Simulador": ("🧪", simulador.render),
     "Optimizador": ("🎯", optimizador.render),
     "Histórico": ("🗂️", historico.render),
-    "Negocio": ("💼", negocio.render),
 }
 _OPTIONS = list(MODULES)
 
