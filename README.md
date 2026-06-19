@@ -8,7 +8,8 @@ El brief completo del proyecto está en [`CLAUDE.md`](./CLAUDE.md).
 
 ## Estado
 
-**Fase 1 (Simulador) y Fase 2 (Optimizador): implementadas.**
+**Fase 1 (Simulador) y Fase 2 (Optimizador): implementadas. Interfaz pulida en
+Python (Streamlit), 100% sin frontend JS.**
 
 - ✅ Núcleo de valorización (`src/domain/valuation.py`), puro y testeado.
 - ✅ Modelo de datos con términos del contrato **parametrizables**.
@@ -19,7 +20,27 @@ El brief completo del proyecto está en [`CLAUDE.md`](./CLAUDE.md).
   validada reconstruyendo los lotes (error mediano Au ~5%, Cu ~2%).
 - ✅ **Optimizador (Fase 2)** MILP que reparte el inventario en lotes para
   maximizar el pago de la refinería.
-- ✅ Simulador + Optimizador en una app Streamlit con dos pestañas.
+- ✅ **Motor de explicación** (`src/analysis/explain.py`): cada optimización
+  dice *por qué* es la mejor decisión, en términos del contrato.
+- ✅ **Estudio del histórico** (`src/analysis/historical.py`): compara cada lote
+  real contra la mezcla óptima y cuantifica cuánto se hubiera ganado de más.
+- ✅ **Interfaz de 5 páginas** (Panel · Simulador · Optimizador · Histórico ·
+  Caso de negocio) con diseño propio, modo privado y deploy dockerizado.
+
+### Confidencialidad
+
+Las pilas se muestran **por número** (la leyenda de Gilberto: `#1`, `#2`, `#14`…)
+y el nombre real solo aparece si se activa el **modo privado** en la barra
+lateral (apagado por defecto). Así una demo no filtra materiales ni fórmulas.
+
+### Honestidad del caso de negocio
+
+El estudio del histórico es deliberadamente **honesto**: re-optimizar cada lote
+que Gilberto ya envió solo agrega **+0,1%** — sus mezclas ya eran casi óptimas, y
+el modelo lo confirma (fidelidad a nivel dinero: **±3%** vs. el pago real). El
+valor del optimizador aparece **hacia adelante**, sobre el stock acumulado
+(**+1,5%**, ~$9k por ciclo vs. una sola mezcla), más el **metal sub-umbral**
+(Ag/Pd que históricamente pagó $0, ~$12,6k) que el sistema detecta para no perderlo.
 
 **El objetivo del optimizador** (definido por el usuario): encontrar las mezclas
 óptimas para que la refinería pague lo máximo, aprovechando cada material. El
@@ -49,13 +70,23 @@ src/
     bootstrap.py / seed.py
   optimize/
     optimizer.py     # Fase 2: optimize_blend / optimize_partition (MILP, PuLP)
+  analysis/
+    explain.py       # por qué una partición es la mejor decisión
+    historical.py    # estudio del histórico (real vs. óptimo, % extra)
+    build_analysis.py# precomputa data/history_analysis.json para la UI
   app/
-    simulator.py     # UI Streamlit (Simulador + Optimizador)
+    simulator.py     # entrada Streamlit (navegación de 5 páginas)
+    ui.py            # sistema de diseño (CSS, KPIs, etiquetas confidenciales)
+    sidebar.py       # precios, términos del contrato y modo privado
+    data_access.py   # carga cacheada (histórico, inventario, óptimo)
+    views/           # panel · simulador · optimizador · historico · negocio
     report.py        # reporte de análisis de extremo a extremo (CLI)
 data/
   inventory.xlsx · refining_history.xlsx · estimated_grades.csv
+  history_analysis.json   # artefacto precomputado del estudio del histórico
 tests/
-  test_valuation.py · test_recipes.py · test_data_pipeline.py · test_optimizer.py
+  test_valuation.py · test_recipes.py · test_data_pipeline.py
+  test_optimizer.py · test_analysis.py
 ```
 
 ## Uso
@@ -69,19 +100,35 @@ pip install -e ".[dev]"
 # Correr los tests (incluye el test de aceptación del Apéndice A)
 pytest
 
-# Lanzar el simulador + optimizador
+# Lanzar la app (Panel · Simulador · Optimizador · Histórico · Caso de negocio)
 streamlit run src/app/simulator.py
 
 # Reporte de análisis de extremo a extremo por consola
 python -m app.report          # (con PYTHONPATH=src, o tras `pip install -e .`)
 
+# Regenerar el artefacto del histórico (tras cambiar leyes/precios/términos)
+python -m analysis.build_analysis
+
 # Regenerar la tabla de leyes estimadas (data/estimated_grades.csv)
 python -m data.build_grade_table
 ```
 
-En el simulador, cargá un valor en la columna **blend_kg** de las pilas que
-querés mezclar. Para reproducir el Apéndice A, poné `5184` en la fila
-*Lote Apéndice A (demo)* → debería dar **net ≈ $70.335,68** y **13,57 USD/kg**.
+En el **Simulador**, cargá un valor en la columna **blend_kg** de las pilas que
+querés mezclar y mirá el resultado en vivo. El **Optimizador** arma las mezclas
+solo y explica por qué. El **Histórico** compara cada lote real con su óptimo, y
+el **Caso de negocio** proyecta el valor para fijarle precio al sistema.
+
+## Deploy en un VPS (Docker)
+
+```bash
+docker compose up -d --build        # queda en http://<tu-vps>:8501
+# o sin compose:
+docker build -t raee-optimizer . && docker run -d -p 8501:8501 raee-optimizer
+```
+
+Poné un reverse proxy (nginx/Caddy) delante para HTTPS. El artefacto del
+histórico (`data/history_analysis.json`) viaja en la imagen; para regenerarlo:
+`docker compose exec raee-optimizer python -m analysis.build_analysis`.
 
 ## Uso del núcleo desde código
 

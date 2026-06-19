@@ -1,0 +1,4755 @@
+{
+  "n_lots": 53,
+  "n_resolvable": 36,
+  "actual_total_usd": 2960930.604255779,
+  "actual_total_resolvable_usd": 2263999.0989247565,
+  "model_baseline_usd": 2334551.48901556,
+  "model_optimal_usd": 2336469.594243392,
+  "extra_usd": 1918.105227831751,
+  "extra_pct": 0.08216161591880686,
+  "precision": [
+    {
+      "metal": "CU",
+      "n": 36,
+      "median_abs_err_pct": 2.0,
+      "mean_abs_err_pct": 4.5
+    },
+    {
+      "metal": "AU",
+      "n": 36,
+      "median_abs_err_pct": 5.4,
+      "mean_abs_err_pct": 5.7
+    },
+    {
+      "metal": "AG",
+      "n": 36,
+      "median_abs_err_pct": 8.0,
+      "mean_abs_err_pct": 18.9
+    },
+    {
+      "metal": "PD",
+      "n": 36,
+      "median_abs_err_pct": 9.6,
+      "mean_abs_err_pct": 15.2
+    }
+  ],
+  "money_fidelity_pct": 3.1,
+  "sub_threshold_total_usd": 12606.949289016462,
+  "coverage": {
+    "stocked_items": 40,
+    "covered": 25,
+    "pending": 15
+  },
+  "lots": [
+    {
+      "customer_lot": 861,
+      "jx_lot": 1886,
+      "recipe_raw": "6 + 8*33%",
+      "resolvable": true,
+      "n_components": 2,
+      "wmt": 5184.0,
+      "moisture": 0.009,
+      "dmt": 5137.344,
+      "actual_grades": {
+        "CU": 0.2113,
+        "AU": 84.4,
+        "AG": 646.0,
+        "PT": 0.0,
+        "PD": 4.3
+      },
+      "actual_net_usd": 70335.6779745121,
+      "actual_per_kg": 13.567839115453724,
+      "model_aswas_usd": 70335.67797450947,
+      "model_optimal_usd": 70335.67797450948,
+      "optimal_num_lots": 1,
+      "extra_usd": 1.4551915228366852e-11,
+      "extra_pct": 2.0689237165867156e-14,
+      "components": [
+        {
+          "code": "006",
+          "name": "Tarjeta Madre PIV - Verdes/Amarillo 1VGA",
+          "kg": 3473.3,
+          "grade_au": 111.2,
+          "grade_ag": 704.0,
+          "grade_cu": 0.2193,
+          "grade_pd": 5.1
+        },
+        {
+          "code": "008",
+          "name": "Tarjeta Madre PIV - Doble Socket",
+          "kg": 1710.7,
+          "grade_au": 30.0,
+          "grade_ag": 529.0,
+          "grade_cu": 0.195,
+          "grade_pd": 2.7
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $70,336.",
+        "reference_single_usd": 70335.67797450947,
+        "partition_usd": 70335.67797450948,
+        "gain_usd": 1.4551915228366852e-11,
+        "gain_pct": 2.0689237165867156e-14,
+        "lots": [
+          {
+            "role": "mixto",
+            "net_usd": 70335.67797450948,
+            "per_kg": 13.567839115453218,
+            "wmt": 5184.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.21129999999999646,
+                "rr": 0.858021769995265,
+                "amount_usd": 10714.63538057048,
+                "status": "productive",
+                "headline": "Cobre: recupera 86% → $10,715."
+              },
+              {
+                "metal": "AU",
+                "grade": 84.39999999999694,
+                "rr": 0.9170616113744046,
+                "amount_usd": 57464.59711127629,
+                "status": "productive",
+                "headline": "Oro: recupera 92% → $57,465."
+              },
+              {
+                "metal": "AG",
+                "grade": 645.9999999999866,
+                "rr": 0.8452012383900896,
+                "amount_usd": 5757.2518826627,
+                "status": "productive",
+                "headline": "Plata: recupera 85% → $5,757."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 4.299999999999629,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Paladio: ley 4 g/t por debajo de la deducción de 18 g/t → paga 0 (se rescata mezclándolo)."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino, paladio (no paga solo)."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Metales rescatados por la mezcla (plata): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [
+        {
+          "metal": "PD",
+          "grade": 4.3,
+          "threshold": 18.0,
+          "content_g": 22.090579199999997,
+          "gross_value_usd": 1104.405493857844
+        }
+      ],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": 871,
+      "jx_lot": 2045,
+      "recipe_raw": "37 + 38",
+      "resolvable": false,
+      "n_components": 2,
+      "wmt": 1510.0,
+      "moisture": 0.01,
+      "dmt": 1494.9,
+      "actual_grades": {
+        "CU": 0.1964,
+        "AU": 141.0,
+        "AG": 556.0,
+        "PT": 0.0,
+        "PD": 6.4
+      },
+      "actual_net_usd": 32162.05804842537,
+      "actual_per_kg": 21.29937619101018,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [
+        {
+          "metal": "PD",
+          "grade": 6.4,
+          "threshold": 18.0,
+          "content_g": 9.56736,
+          "gross_value_usd": 478.3145272042385
+        }
+      ],
+      "note": "2 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": 881,
+      "jx_lot": 1887,
+      "recipe_raw": "11",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 205.0,
+      "moisture": 0.011,
+      "dmt": 202.745,
+      "actual_grades": {
+        "CU": 0.1785,
+        "AU": 206.6,
+        "AG": 2734.0,
+        "PT": 0.0,
+        "PD": 35.3
+      },
+      "actual_net_usd": 7271.675590473949,
+      "actual_per_kg": 35.47158824621439,
+      "model_aswas_usd": 7603.72257265668,
+      "model_optimal_usd": 7603.72257265668,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "011",
+          "name": "Boards Tipo 1 - Lectora",
+          "kg": 205.0,
+          "grade_au": 220.2,
+          "grade_ag": 2881.0,
+          "grade_cu": 0.182,
+          "grade_pd": 23.7
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $7,604.",
+        "reference_single_usd": 7603.72257265668,
+        "partition_usd": 7603.72257265668,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 7603.72257265668,
+            "per_kg": 37.09132962271551,
+            "wmt": 205.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.18199999999999997,
+                "rr": 0.8351648351648352,
+                "amount_usd": 354.5150573396,
+                "status": "productive",
+                "headline": "Cobre: recupera 84% → $355."
+              },
+              {
+                "metal": "AU",
+                "grade": 220.23333333333338,
+                "rr": 0.96,
+                "amount_usd": 6194.770134687967,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 2880.6666666666665,
+                "rr": 0.95,
+                "amount_usd": 1138.8085146365372,
+                "status": "capped",
+                "headline": "Plata: recuperación en el tope (95%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 23.7,
+                "rr": 0.24050632911392403,
+                "amount_usd": 57.7758659925761,
+                "status": "productive",
+                "headline": "Paladio: recupera 24% → $58."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (plata, oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": 891,
+      "jx_lot": 1896,
+      "recipe_raw": "25",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 125.0,
+      "moisture": 0.004,
+      "dmt": 124.5,
+      "actual_grades": {
+        "CU": 0.1503,
+        "AU": 341.8,
+        "AG": 2256.0,
+        "PT": 0.0,
+        "PD": 162.1
+      },
+      "actual_net_usd": 7433.508770361817,
+      "actual_per_kg": 59.46807016289454,
+      "model_aswas_usd": 7433.508770361817,
+      "model_optimal_usd": 7433.508770361817,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "025",
+          "name": "Memorias Plateadas",
+          "kg": 125.0,
+          "grade_au": 341.8,
+          "grade_ag": 2256.0,
+          "grade_cu": 0.1503,
+          "grade_pd": 162.1
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $7,434.",
+        "reference_single_usd": 7433.508770361817,
+        "partition_usd": 7433.508770361817,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 7433.508770361817,
+            "per_kg": 59.46807016289454,
+            "wmt": 125.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.1503,
+                "rr": 0.8003992015968063,
+                "amount_usd": 172.29628915649997,
+                "status": "productive",
+                "headline": "Cobre: recupera 80% → $172."
+              },
+              {
+                "metal": "AU",
+                "grade": 341.8,
+                "rr": 0.96,
+                "amount_usd": 5903.823984076275,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 2256.0,
+                "rr": 0.95,
+                "amount_usd": 547.6662678430857,
+                "status": "capped",
+                "headline": "Plata: recuperación en el tope (95%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 162.1,
+                "rr": 0.8889574336829118,
+                "amount_usd": 896.9222292859555,
+                "status": "productive",
+                "headline": "Paladio: recupera 89% → $897."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (plata, oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": 901,
+      "jx_lot": 2046,
+      "recipe_raw": "54",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 1659.0,
+      "moisture": 0.005,
+      "dmt": 1650.705,
+      "actual_grades": {
+        "CU": 0.3196,
+        "AU": 487.0,
+        "AG": 1852.0,
+        "PT": 0.0,
+        "PD": 37.4
+      },
+      "actual_net_usd": 123409.58484890769,
+      "actual_per_kg": 74.38793541224092,
+      "model_aswas_usd": 122554.38875167076,
+      "model_optimal_usd": 122554.38875167076,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "054",
+          "name": "Tarjeta de Celular Chino",
+          "kg": 1659.0,
+          "grade_au": 481.5,
+          "grade_ag": 1927.0,
+          "grade_cu": 0.3434,
+          "grade_pd": 33.6
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $122,554.",
+        "reference_single_usd": 122554.38875167076,
+        "partition_usd": 122554.38875167076,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 122554.38875167076,
+            "per_kg": 73.87244650492511,
+            "wmt": 1659.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.3434249999999999,
+                "rr": 0.9126446822450317,
+                "amount_usd": 5951.741308880929,
+                "status": "productive",
+                "headline": "Cobre: recupera 91% → $5,952."
+              },
+              {
+                "metal": "AU",
+                "grade": 481.54999999999995,
+                "rr": 0.96,
+                "amount_usd": 110281.54585968344,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 1927.0,
+                "rr": 0.9481058640373637,
+                "amount_usd": 6190.018607643245,
+                "status": "productive",
+                "headline": "Plata: recupera 95% → $6,190."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 33.599999999999994,
+                "rr": 0.4642857142857142,
+                "amount_usd": 1287.405975463167,
+                "status": "productive",
+                "headline": "Paladio: recupera 46% → $1,287."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": 911,
+      "jx_lot": 2047,
+      "recipe_raw": "16",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 172.0,
+      "moisture": 0.006,
+      "dmt": 170.968,
+      "actual_grades": {
+        "CU": 0.2288,
+        "AU": 221.8,
+        "AG": 1188.0,
+        "PT": 0.0,
+        "PD": 42.2
+      },
+      "actual_net_usd": 6120.85671170236,
+      "actual_per_kg": 35.586376230827675,
+      "model_aswas_usd": 5627.343812805002,
+      "model_optimal_usd": 5627.343812805002,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "016",
+          "name": "Tarjeta Filo Dorado limpio sin hierro",
+          "kg": 172.0,
+          "grade_au": 207.1,
+          "grade_ag": 982.0,
+          "grade_cu": 0.2343,
+          "grade_pd": 32.5
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $5,627.",
+        "reference_single_usd": 5627.343812805002,
+        "partition_usd": 5627.343812805002,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 5627.343812805002,
+            "per_kg": 32.71711519072676,
+            "wmt": 172.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.2342666666666667,
+                "rr": 0.8719408081957883,
+                "amount_usd": 401.74758827720547,
+                "status": "productive",
+                "headline": "Cobre: recupera 87% → $402."
+              },
+              {
+                "metal": "AU",
+                "grade": 207.0666666666667,
+                "rr": 0.96,
+                "amount_usd": 4911.532417155371,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 982.3333333333334,
+                "rr": 0.8982015609093994,
+                "amount_usd": 309.6217481024501,
+                "status": "productive",
+                "headline": "Plata: recupera 90% → $310."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 32.53333333333334,
+                "rr": 0.44672131147540994,
+                "amount_usd": 124.22285926997507,
+                "status": "productive",
+                "headline": "Paladio: recupera 45% → $124."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": 921,
+      "jx_lot": 2048,
+      "recipe_raw": "50",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 830.0,
+      "moisture": 0.005,
+      "dmt": 825.85,
+      "actual_grades": {
+        "CU": 0.2981,
+        "AU": 358.4,
+        "AG": 157.0,
+        "PT": 0.0,
+        "PD": 204.1
+      },
+      "actual_net_usd": 50812.83413359747,
+      "actual_per_kg": 61.22028208867165,
+      "model_aswas_usd": 50812.834133597484,
+      "model_optimal_usd": 50812.834133597484,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "050",
+          "name": "Peine Hembra",
+          "kg": 830.0,
+          "grade_au": 358.4,
+          "grade_ag": 157.0,
+          "grade_cu": 0.2981,
+          "grade_pd": 204.1
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $50,813.",
+        "reference_single_usd": 50812.834133597484,
+        "partition_usd": 50812.834133597484,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 50812.834133597484,
+            "per_kg": 61.22028208867167,
+            "wmt": 830.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.2981,
+                "rr": 0.8993626299899363,
+                "amount_usd": 2547.05857285915,
+                "status": "productive",
+                "headline": "Cobre: recupera 90% → $2,547."
+              },
+              {
+                "metal": "AU",
+                "grade": 358.40000000000003,
+                "rr": 0.96,
+                "amount_usd": 41063.9918727028,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 157.0,
+                "rr": 0.3630573248407643,
+                "amount_usd": 96.61842845813301,
+                "status": "productive",
+                "headline": "Plata: recupera 36% → $97."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 204.09999999999997,
+                "rr": 0.9118079372856442,
+                "amount_usd": 7683.67525957741,
+                "status": "productive",
+                "headline": "Paladio: recupera 91% → $7,684."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": 931,
+      "jx_lot": 2049,
+      "recipe_raw": "106 + 107 + 108",
+      "resolvable": false,
+      "n_components": 3,
+      "wmt": 1050.0,
+      "moisture": 0.007,
+      "dmt": 1042.65,
+      "actual_grades": {
+        "CU": 0.2283,
+        "AU": 326.9,
+        "AG": 672.0,
+        "PT": 0.0,
+        "PD": 17.9
+      },
+      "actual_net_usd": 50159.41191903501,
+      "actual_per_kg": 47.77086849431906,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [
+        {
+          "metal": "PD",
+          "grade": 17.9,
+          "threshold": 18.0,
+          "content_g": 18.663435,
+          "gross_value_usd": 933.0674384607704
+        }
+      ],
+      "note": "3 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": 941,
+      "jx_lot": 2050,
+      "recipe_raw": "53",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 930.0,
+      "moisture": 0.004,
+      "dmt": 926.28,
+      "actual_grades": {
+        "CU": 0.3493,
+        "AU": 781.6,
+        "AG": 2554.0,
+        "PT": 0.0,
+        "PD": 57.7
+      },
+      "actual_net_usd": 109647.73601796733,
+      "actual_per_kg": 117.90079141716917,
+      "model_aswas_usd": 105717.55088907752,
+      "model_optimal_usd": 105717.55088907752,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "053",
+          "name": "Tarjeta de Celular Tactil",
+          "kg": 930.0,
+          "grade_au": 750.3,
+          "grade_ag": 2501.0,
+          "grade_cu": 0.3648,
+          "grade_pd": 58.2
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $105,718.",
+        "reference_single_usd": 105717.55088907752,
+        "partition_usd": 105717.55088907752,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 105717.55088907752,
+            "per_kg": 113.6747859022339,
+            "wmt": 930.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.364825,
+                "rr": 0.9177687932570411,
+                "amount_usd": 3567.8049985467906,
+                "status": "productive",
+                "headline": "Cobre: recupera 92% → $3,568."
+              },
+              {
+                "metal": "AU",
+                "grade": 750.3,
+                "rr": 0.96,
+                "amount_usd": 96420.46567079601,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 2501.25,
+                "rr": 0.95,
+                "amount_usd": 4517.591258055112,
+                "status": "capped",
+                "headline": "Plata: recuperación en el tope (95%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 58.175,
+                "rr": 0.6905887408680704,
+                "amount_usd": 1860.4569616796023,
+                "status": "productive",
+                "headline": "Paladio: recupera 69% → $1,860."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (plata, oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": 951,
+      "jx_lot": 2051,
+      "recipe_raw": "11 + 41*(20%)",
+      "resolvable": true,
+      "n_components": 2,
+      "wmt": 409.0,
+      "moisture": 0.003,
+      "dmt": 407.773,
+      "actual_grades": {
+        "CU": 0.2994,
+        "AU": 250.1,
+        "AG": 1270.0,
+        "PT": 0.0,
+        "PD": 12.8
+      },
+      "actual_net_usd": 16106.360060846848,
+      "actual_per_kg": 39.379853449503294,
+      "model_aswas_usd": 16992.77770338797,
+      "model_optimal_usd": 17066.168638706167,
+      "optimal_num_lots": 2,
+      "extra_usd": 73.3909353181989,
+      "extra_pct": 0.43189487086367545,
+      "components": [
+        {
+          "code": "011",
+          "name": "Boards Tipo 1 - Lectora",
+          "kg": 327.2,
+          "grade_au": 220.2,
+          "grade_ag": 2881.0,
+          "grade_cu": 0.182,
+          "grade_pd": 23.7
+        },
+        {
+          "code": "041",
+          "name": "Credicard",
+          "kg": 81.8,
+          "grade_au": 370.7,
+          "grade_ag": 0.0,
+          "grade_cu": 0.7701,
+          "grade_pd": 0.0
+        }
+      ],
+      "explanation": {
+        "headline": "Repartir en 2 lote(s) paga $17,066 (+$73, +0.4%) frente a la mezcla única.",
+        "reference_single_usd": 16992.77770338797,
+        "partition_usd": 17066.168638706167,
+        "gain_usd": 73.3909353181989,
+        "gain_pct": 0.43189487086367545,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 12234.717859853241,
+            "per_kg": 37.392169498328975,
+            "wmt": 327.2,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.18199999999999997,
+                "rr": 0.8351648351648352,
+                "amount_usd": 570.417691095872,
+                "status": "productive",
+                "headline": "Cobre: recupera 84% → $570."
+              },
+              {
+                "metal": "AU",
+                "grade": 220.23333333333335,
+                "rr": 0.96,
+                "amount_usd": 9967.436936573984,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 2880.6666666666665,
+                "rr": 0.95,
+                "amount_usd": 1832.3524207803287,
+                "status": "capped",
+                "headline": "Plata: recuperación en el tope (95%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 23.7,
+                "rr": 0.24050632911392403,
+                "amount_usd": 92.96185140305597,
+                "status": "productive",
+                "headline": "Paladio: recupera 24% → $93."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          },
+          {
+            "role": "rico",
+            "net_usd": 4831.450778852927,
+            "per_kg": 59.064190450524784,
+            "wmt": 81.8,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.7700682159755078,
+                "rr": 0.9610424123764196,
+                "amount_usd": 694.3223733720234,
+                "status": "productive",
+                "headline": "Cobre: recupera 96% → $694."
+              },
+              {
+                "metal": "AU",
+                "grade": 370.6917710362734,
+                "rr": 0.96,
+                "amount_usd": 4194.241165480904,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Plata: ley 0 g/t por debajo de la deducción de 100 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Paladio: ley 0 g/t por debajo de la deducción de 18 g/t → paga 0 (se rescata mezclándolo)."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: plata, platino, paladio (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Repartir en 2 lotes paga $73 más (+0.4%) que una sola mezcla.",
+          "Lotes con recuperación en el tope (plata, oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [
+        {
+          "metal": "PD",
+          "grade": 12.8,
+          "threshold": 18.0,
+          "content_g": 5.219494400000001,
+          "gross_value_usd": 260.945547798052
+        }
+      ],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": 791,
+      "jx_lot": 128,
+      "recipe_raw": "15 + 22*(8%) + 26*(2%)",
+      "resolvable": true,
+      "n_components": 3,
+      "wmt": 6723.0,
+      "moisture": 0.004,
+      "dmt": 6696.108,
+      "actual_grades": {
+        "CU": 0.2011,
+        "AU": 265.2,
+        "AG": 1003.0,
+        "PT": 0.0,
+        "PD": 115.8
+      },
+      "actual_net_usd": 300010.998959965,
+      "actual_per_kg": 44.62457220883014,
+      "model_aswas_usd": 336048.1246157093,
+      "model_optimal_usd": 336416.6543382978,
+      "optimal_num_lots": 2,
+      "extra_usd": 368.52972258848604,
+      "extra_pct": 0.109665757846416,
+      "components": [
+        {
+          "code": "015",
+          "name": "Centrales Telefonicas",
+          "kg": 6050.7,
+          "grade_au": 294.4,
+          "grade_ag": 1577.0,
+          "grade_cu": 0.3045,
+          "grade_pd": 54.3
+        },
+        {
+          "code": "022",
+          "name": "Tarjeta de Disco Duro",
+          "kg": 537.8,
+          "grade_au": 335.0,
+          "grade_ag": 0.0,
+          "grade_cu": 0.0,
+          "grade_pd": 365.9
+        },
+        {
+          "code": "026",
+          "name": "Slot Processors",
+          "kg": 134.5,
+          "grade_au": 0.0,
+          "grade_ag": 0.0,
+          "grade_cu": 0.0,
+          "grade_pd": 1882.0
+        }
+      ],
+      "explanation": {
+        "headline": "Repartir en 2 lote(s) paga $336,417 (+$369, +0.1%) frente a la mezcla única.",
+        "reference_single_usd": 336048.1246157093,
+        "partition_usd": 336416.6543382978,
+        "gain_usd": 368.52972258848604,
+        "gain_pct": 0.109665757846416,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 290191.94717233913,
+            "per_kg": 47.96006200478278,
+            "wmt": 6050.7,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.3044688213192332,
+                "rr": 0.9014677434950057,
+                "amount_usd": 19028.253190788288,
+                "status": "productive",
+                "headline": "Cobre: recupera 90% → $19,028."
+              },
+              {
+                "metal": "AU",
+                "grade": 294.42278736432036,
+                "rr": 0.96,
+                "amount_usd": 246166.17088109622,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 1577.4496938491527,
+                "rr": 0.9366065362401581,
+                "amount_usd": 18275.177420967873,
+                "status": "productive",
+                "headline": "Plata: recupera 94% → $18,275."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 54.32138881157826,
+                "rr": 0.6686388107190033,
+                "amount_usd": 10943.313999486752,
+                "status": "productive",
+                "headline": "Paladio: recupera 67% → $10,943."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          },
+          {
+            "role": "rico",
+            "net_usd": 46224.70716595865,
+            "per_kg": 68.75607194103621,
+            "wmt": 672.3000000000001,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "negligible",
+                "headline": "Cobre: aporte despreciable."
+              },
+              {
+                "metal": "AU",
+                "grade": 267.99550793208067,
+                "rr": 0.96,
+                "amount_usd": 24896.709702379783,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Plata: ley 0 g/t por debajo de la deducción de 100 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 669.107500695793,
+                "rr": 0.9730984931699583,
+                "amount_usd": 21796.993943578873,
+                "status": "productive",
+                "headline": "Paladio: recupera 97% → $21,797."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: plata, platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Repartir en 2 lotes paga $369 más (+0.1%) que una sola mezcla.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": 801,
+      "jx_lot": 493,
+      "recipe_raw": "9",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 3338.0,
+      "moisture": 0.004,
+      "dmt": 3324.648,
+      "actual_grades": {
+        "CU": 0.2084,
+        "AU": 204.4,
+        "AG": 1078.0,
+        "PT": 0.0,
+        "PD": 56.0
+      },
+      "actual_net_usd": 111764.13796392921,
+      "actual_per_kg": 33.482366076671426,
+      "model_aswas_usd": 129315.63521918948,
+      "model_optimal_usd": 129315.63521918948,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "009",
+          "name": "Boards Tipo 1",
+          "kg": 3338.0,
+          "grade_au": 234.6,
+          "grade_ag": 1414.0,
+          "grade_cu": 0.2516,
+          "grade_pd": 54.0
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $129,316.",
+        "reference_single_usd": 129315.63521918948,
+        "partition_usd": 129315.63521918948,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 129315.63521918948,
+            "per_kg": 38.74045393025449,
+            "wmt": 3338.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.2516333333333333,
+                "rr": 0.8807789111140548,
+                "amount_usd": 8476.600083781736,
+                "status": "productive",
+                "headline": "Cobre: recupera 88% → $8,477."
+              },
+              {
+                "metal": "AU",
+                "grade": 234.59999999999997,
+                "rr": 0.96,
+                "amount_usd": 108209.56962072353,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 1414.3333333333333,
+                "rr": 0.9292953099222249,
+                "amount_usd": 8968.816396819024,
+                "status": "productive",
+                "headline": "Plata: recupera 93% → $8,969."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 54.03333333333334,
+                "rr": 0.6668723010487354,
+                "amount_usd": 5989.237917865184,
+                "status": "productive",
+                "headline": "Paladio: recupera 67% → $5,989."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": 811,
+      "jx_lot": 494,
+      "recipe_raw": "12 + 998",
+      "resolvable": false,
+      "n_components": 2,
+      "wmt": 1997.0,
+      "moisture": 0.005,
+      "dmt": 1987.015,
+      "actual_grades": {
+        "CU": 0.1944,
+        "AU": 159.7,
+        "AG": 899.0,
+        "PT": 0.0,
+        "PD": 44.6
+      },
+      "actual_net_usd": 52116.14619289064,
+      "actual_per_kg": 26.09721892483257,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [],
+      "note": "2 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": 821,
+      "jx_lot": 129,
+      "recipe_raw": "12 + 998",
+      "resolvable": false,
+      "n_components": 2,
+      "wmt": 1523.0,
+      "moisture": 0.003,
+      "dmt": 1518.431,
+      "actual_grades": {
+        "CU": 0.1693,
+        "AU": 132.1,
+        "AG": 624.0,
+        "PT": 0.0,
+        "PD": 153.7
+      },
+      "actual_net_usd": 40756.3325197757,
+      "actual_per_kg": 26.76055976347715,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [],
+      "note": "2 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": 831,
+      "jx_lot": 495,
+      "recipe_raw": "3 + 4 + 9*(10%)",
+      "resolvable": false,
+      "n_components": 3,
+      "wmt": 1458.0,
+      "moisture": 0.006,
+      "dmt": 1449.252,
+      "actual_grades": {
+        "CU": 0.2048,
+        "AU": 178.2,
+        "AG": 663.0,
+        "PT": 0.0,
+        "PD": 36.6
+      },
+      "actual_net_usd": 40750.981254964376,
+      "actual_per_kg": 27.949918556216993,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [],
+      "note": "2 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": 841,
+      "jx_lot": 66,
+      "recipe_raw": "29 + 30 + 31 + 32 + 33",
+      "resolvable": false,
+      "n_components": 5,
+      "wmt": 22.0,
+      "moisture": 0.0,
+      "dmt": 22.0,
+      "actual_grades": {
+        "CU": 0.1333,
+        "AU": 4496.0,
+        "AG": 4724.0,
+        "PT": 0.0,
+        "PD": 17.0
+      },
+      "actual_net_usd": 13936.134893965807,
+      "actual_per_kg": 633.4606769984458,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [
+        {
+          "metal": "PD",
+          "grade": 17.0,
+          "threshold": 18.0,
+          "content_g": 0.374,
+          "gross_value_usd": 18.697909681916975
+        }
+      ],
+      "note": "5 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": 851,
+      "jx_lot": 67,
+      "recipe_raw": "27",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 50.0,
+      "moisture": 0.002,
+      "dmt": 49.9,
+      "actual_grades": {
+        "CU": 0.3896,
+        "AU": 1238.4,
+        "AG": 122.0,
+        "PT": 0.0,
+        "PD": 79.3
+      },
+      "actual_net_usd": 8900.07187888554,
+      "actual_per_kg": 178.0014375777108,
+      "model_aswas_usd": 8205.776473410213,
+      "model_optimal_usd": 8205.776473410213,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "027",
+          "name": "Procesadores Plasticos (Fibra)",
+          "kg": 50.0,
+          "grade_au": 1150.9,
+          "grade_ag": 112.0,
+          "grade_cu": 0.3923,
+          "grade_pd": 43.5
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $8,206.",
+        "reference_single_usd": 8205.776473410213,
+        "partition_usd": 8205.776473410213,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 8205.776473410213,
+            "per_kg": 164.11552946820427,
+            "wmt": 50.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.39233333333333337,
+                "rr": 0.923534409515718,
+                "amount_usd": 207.9935081756667,
+                "status": "productive",
+                "headline": "Cobre: recupera 92% → $208."
+              },
+              {
+                "metal": "AU",
+                "grade": 1150.9333333333332,
+                "rr": 0.96,
+                "amount_usd": 7967.878537874581,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 112.0,
+                "rr": 0.10714285714285714,
+                "amount_usd": 1.2290391921715969,
+                "status": "productive",
+                "headline": "Plata: recupera 11% → $1."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 43.5,
+                "rr": 0.5862068965517241,
+                "amount_usd": 63.6153881677948,
+                "status": "productive",
+                "headline": "Paladio: recupera 59% → $64."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "70i",
+      "jx_lot": 659,
+      "recipe_raw": "15 + 22*(6%)",
+      "resolvable": true,
+      "n_components": 2,
+      "wmt": 2385.0,
+      "moisture": 0.004,
+      "dmt": 2375.46,
+      "actual_grades": {
+        "CU": 0.2622,
+        "AU": 297.5,
+        "AG": 1322.0,
+        "PT": 0.0,
+        "PD": 74.4
+      },
+      "actual_net_usd": 115382.86441009518,
+      "actual_per_kg": 48.37855950108813,
+      "model_aswas_usd": 116446.36176556103,
+      "model_optimal_usd": 116524.80383502766,
+      "optimal_num_lots": 2,
+      "extra_usd": 78.44206946663326,
+      "extra_pct": 0.06736326346078463,
+      "components": [
+        {
+          "code": "015",
+          "name": "Centrales Telefonicas",
+          "kg": 2241.9,
+          "grade_au": 294.4,
+          "grade_ag": 1577.0,
+          "grade_cu": 0.3045,
+          "grade_pd": 54.3
+        },
+        {
+          "code": "022",
+          "name": "Tarjeta de Disco Duro",
+          "kg": 143.1,
+          "grade_au": 335.0,
+          "grade_ag": 0.0,
+          "grade_cu": 0.0,
+          "grade_pd": 365.9
+        }
+      ],
+      "explanation": {
+        "headline": "Repartir en 2 lote(s) paga $116,525 (+$78, +0.1%) frente a la mezcla única.",
+        "reference_single_usd": 116446.36176556103,
+        "partition_usd": 116524.80383502766,
+        "gain_usd": 78.44206946663326,
+        "gain_pct": 0.06736326346078463,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 107521.66300852252,
+            "per_kg": 47.96006200478278,
+            "wmt": 2241.9,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.3044688213192332,
+                "rr": 0.9014677434950057,
+                "amount_usd": 7050.33150353319,
+                "status": "productive",
+                "headline": "Cobre: recupera 90% → $7,050."
+              },
+              {
+                "metal": "AU",
+                "grade": 294.42278736432036,
+                "rr": 0.96,
+                "amount_usd": 91209.27140633806,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 1577.4496938491527,
+                "rr": 0.9366065362401581,
+                "amount_usd": 6771.302536907776,
+                "status": "productive",
+                "headline": "Plata: recupera 94% → $6,771."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 54.32138881157826,
+                "rr": 0.6686388107190033,
+                "amount_usd": 4054.707001743493,
+                "status": "productive",
+                "headline": "Paladio: recupera 67% → $4,055."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          },
+          {
+            "role": "rico",
+            "net_usd": 9003.140826505147,
+            "per_kg": 62.915030234137994,
+            "wmt": 143.1,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "negligible",
+                "headline": "Cobre: aporte despreciable."
+              },
+              {
+                "metal": "AU",
+                "grade": 334.99438491510085,
+                "rr": 0.96,
+                "amount_usd": 6624.1245694082745,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Plata: ley 0 g/t por debajo de la deducción de 100 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 365.8792791539074,
+                "rr": 0.9508034452193498,
+                "amount_usd": 2478.8428170968714,
+                "status": "productive",
+                "headline": "Paladio: recupera 95% → $2,479."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: plata, platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Repartir en 2 lotes paga $78 más (+0.1%) que una sola mezcla.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "71i",
+      "jx_lot": 660,
+      "recipe_raw": "9",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 1017.0,
+      "moisture": 0.004,
+      "dmt": 1012.932,
+      "actual_grades": {
+        "CU": 0.2896,
+        "AU": 264.6,
+        "AG": 2161.0,
+        "PT": 0.0,
+        "PD": 51.9
+      },
+      "actual_net_usd": 45484.96630648912,
+      "actual_per_kg": 44.72464730234918,
+      "model_aswas_usd": 39399.04164706883,
+      "model_optimal_usd": 39399.04164706883,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "009",
+          "name": "Boards Tipo 1",
+          "kg": 1017.0,
+          "grade_au": 234.6,
+          "grade_ag": 1414.0,
+          "grade_cu": 0.2516,
+          "grade_pd": 54.0
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $39,399.",
+        "reference_single_usd": 39399.04164706883,
+        "partition_usd": 39399.04164706883,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 39399.04164706883,
+            "per_kg": 38.7404539302545,
+            "wmt": 1017.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.2516333333333333,
+                "rr": 0.8807789111140548,
+                "amount_usd": 2582.595052488324,
+                "status": "productive",
+                "headline": "Cobre: recupera 88% → $2,583."
+              },
+              {
+                "metal": "AU",
+                "grade": 234.6,
+                "rr": 0.96,
+                "amount_usd": 32968.583674138965,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 1414.3333333333333,
+                "rr": 0.9292953099222249,
+                "amount_usd": 2732.5602982519304,
+                "status": "productive",
+                "headline": "Plata: recupera 93% → $2,733."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 54.03333333333334,
+                "rr": 0.6668723010487354,
+                "amount_usd": 1824.7618221896018,
+                "status": "productive",
+                "headline": "Paladio: recupera 67% → $1,825."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "72i",
+      "jx_lot": 661,
+      "recipe_raw": "37 + 38",
+      "resolvable": false,
+      "n_components": 2,
+      "wmt": 1449.0,
+      "moisture": 0.009,
+      "dmt": 1435.959,
+      "actual_grades": {
+        "CU": 0.2236,
+        "AU": 182.2,
+        "AG": 498.0,
+        "PT": 0.0,
+        "PD": 3.2
+      },
+      "actual_net_usd": 39662.60271433033,
+      "actual_per_kg": 27.372396628247294,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [
+        {
+          "metal": "PD",
+          "grade": 3.2,
+          "threshold": 18.0,
+          "content_g": 4.5950688,
+          "gross_value_usd": 229.72775776629578
+        }
+      ],
+      "note": "2 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": "73i",
+      "jx_lot": 662,
+      "recipe_raw": "3 + 4 + 9*(10%)",
+      "resolvable": false,
+      "n_components": 3,
+      "wmt": 1111.0,
+      "moisture": 0.007,
+      "dmt": 1103.223,
+      "actual_grades": {
+        "CU": 0.2239,
+        "AU": 190.2,
+        "AG": 710.0,
+        "PT": 0.0,
+        "PD": 36.6
+      },
+      "actual_net_usd": 33206.52898419788,
+      "actual_per_kg": 29.88886497227532,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [],
+      "note": "2 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": "74i",
+      "jx_lot": 663,
+      "recipe_raw": "6",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 1924.0,
+      "moisture": 0.011,
+      "dmt": 1902.836,
+      "actual_grades": {
+        "CU": 0.219,
+        "AU": 121.0,
+        "AG": 665.0,
+        "PT": 0.0,
+        "PD": 5.8
+      },
+      "actual_net_usd": 36358.96349713345,
+      "actual_per_kg": 18.897590175225286,
+      "model_aswas_usd": 33822.05531421298,
+      "model_optimal_usd": 33822.05531421298,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "006",
+          "name": "Tarjeta Madre PIV - Verdes/Amarillo 1VGA",
+          "kg": 1924.0,
+          "grade_au": 111.2,
+          "grade_ag": 704.0,
+          "grade_cu": 0.2193,
+          "grade_pd": 5.1
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $33,822.",
+        "reference_single_usd": 33822.05531421298,
+        "partition_usd": 33822.05531421298,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "mixto",
+            "net_usd": 33822.05531421298,
+            "per_kg": 17.579030828593023,
+            "wmt": 1924.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.21935,
+                "rr": 0.8632322771825849,
+                "amount_usd": 4144.838505467114,
+                "status": "productive",
+                "headline": "Cobre: recupera 86% → $4,145."
+              },
+              {
+                "metal": "AU",
+                "grade": 111.19999999999999,
+                "rr": 0.9370503597122302,
+                "amount_usd": 28654.30217254683,
+                "status": "productive",
+                "headline": "Oro: recupera 94% → $28,654."
+              },
+              {
+                "metal": "AG",
+                "grade": 703.5,
+                "rr": 0.8578535891968728,
+                "amount_usd": 2357.0162361990347,
+                "status": "productive",
+                "headline": "Plata: recupera 86% → $2,357."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 5.1,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Paladio: ley 5 g/t por debajo de la deducción de 18 g/t → paga 0 (se rescata mezclándolo)."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino, paladio (no paga solo)."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Metales rescatados por la mezcla (plata): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [
+        {
+          "metal": "PD",
+          "grade": 5.8,
+          "threshold": 18.0,
+          "content_g": 11.036448799999999,
+          "gross_value_usd": 551.7607563409116
+        }
+      ],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "75i",
+      "jx_lot": 66,
+      "recipe_raw": "11",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 251.0,
+      "moisture": 0.013,
+      "dmt": 247.737,
+      "actual_grades": {
+        "CU": 0.1857,
+        "AU": 237.1,
+        "AG": 2983.0,
+        "PT": 0.0,
+        "PD": 18.5
+      },
+      "actual_net_usd": 9866.330916655947,
+      "actual_per_kg": 39.308091301418116,
+      "model_aswas_usd": 9291.046033106844,
+      "model_optimal_usd": 9291.046033106844,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "011",
+          "name": "Boards Tipo 1 - Lectora",
+          "kg": 251.0,
+          "grade_au": 220.2,
+          "grade_ag": 2881.0,
+          "grade_cu": 0.182,
+          "grade_pd": 23.7
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $9,291.",
+        "reference_single_usd": 9291.046033106844,
+        "partition_usd": 9291.046033106844,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 9291.046033106844,
+            "per_kg": 37.016119653812126,
+            "wmt": 251.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.18199999999999997,
+                "rr": 0.8351648351648352,
+                "amount_usd": 433.18699233096,
+                "status": "productive",
+                "headline": "Cobre: recupera 84% → $433."
+              },
+              {
+                "metal": "AU",
+                "grade": 220.23333333333335,
+                "rr": 0.96,
+                "amount_usd": 7569.477762002478,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 2880.6666666666665,
+                "rr": 0.95,
+                "amount_usd": 1391.5263261264734,
+                "status": "capped",
+                "headline": "Plata: recuperación en el tope (95%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 23.7,
+                "rr": 0.24050632911392403,
+                "amount_usd": 70.59715264693493,
+                "status": "productive",
+                "headline": "Paladio: recupera 24% → $71."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (plata, oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "76i",
+      "jx_lot": 665,
+      "recipe_raw": "16",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 756.0,
+      "moisture": 0.006,
+      "dmt": 751.4639999999999,
+      "actual_grades": {
+        "CU": 0.2337,
+        "AU": 221.3,
+        "AG": 911.0,
+        "PT": 0.0,
+        "PD": 28.6
+      },
+      "actual_net_usd": 25955.353105525122,
+      "actual_per_kg": 34.33247765281101,
+      "model_aswas_usd": 24734.13908418943,
+      "model_optimal_usd": 24734.13908418943,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "016",
+          "name": "Tarjeta Filo Dorado limpio sin hierro",
+          "kg": 756.0,
+          "grade_au": 207.1,
+          "grade_ag": 982.0,
+          "grade_cu": 0.2343,
+          "grade_pd": 32.5
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $24,734.",
+        "reference_single_usd": 24734.13908418943,
+        "partition_usd": 24734.13908418943,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 24734.13908418943,
+            "per_kg": 32.71711519072676,
+            "wmt": 756.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.2342666666666667,
+                "rr": 0.8719408081957883,
+                "amount_usd": 1765.8207949858563,
+                "status": "productive",
+                "headline": "Cobre: recupera 87% → $1,766."
+              },
+              {
+                "metal": "AU",
+                "grade": 207.06666666666672,
+                "rr": 0.96,
+                "amount_usd": 21587.89829865966,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 982.3333333333334,
+                "rr": 0.8982015609093994,
+                "amount_usd": 1360.8955904968157,
+                "status": "productive",
+                "headline": "Plata: recupera 90% → $1,361."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 32.53333333333334,
+                "rr": 0.44672131147540994,
+                "amount_usd": 546.0028000470998,
+                "status": "productive",
+                "headline": "Paladio: recupera 45% → $546."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "78i",
+      "jx_lot": 1543,
+      "recipe_raw": "27",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 22.0,
+      "moisture": 0.0,
+      "dmt": 22.0,
+      "actual_grades": {
+        "CU": 0.411,
+        "AU": 1119.3,
+        "AG": 38.0,
+        "PT": 0.0,
+        "PD": 24.5
+      },
+      "actual_net_usd": 3504.514675506328,
+      "actual_per_kg": 159.296121613924,
+      "model_aswas_usd": 3617.7816115235405,
+      "model_optimal_usd": 3617.7816115235405,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "027",
+          "name": "Procesadores Plasticos (Fibra)",
+          "kg": 22.0,
+          "grade_au": 1150.9,
+          "grade_ag": 112.0,
+          "grade_cu": 0.3923,
+          "grade_pd": 43.5
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $3,618.",
+        "reference_single_usd": 3617.7816115235405,
+        "partition_usd": 3617.7816115235405,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 3617.7816115235405,
+            "per_kg": 164.44461870561548,
+            "wmt": 22.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.39233333333333337,
+                "rr": 0.923534409515718,
+                "amount_usd": 91.70054468666669,
+                "status": "productive",
+                "headline": "Cobre: recupera 92% → $92."
+              },
+              {
+                "metal": "AU",
+                "grade": 1150.9333333333332,
+                "rr": 0.96,
+                "amount_usd": 3512.8923413475104,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 112.0,
+                "rr": 0.10714285714285714,
+                "amount_usd": 0.5418609664884795,
+                "status": "productive",
+                "headline": "Plata: recupera 11% → $1."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 43.5,
+                "rr": 0.5862068965517241,
+                "amount_usd": 28.04686452287546,
+                "status": "productive",
+                "headline": "Paladio: recupera 59% → $28."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [
+        {
+          "metal": "AG",
+          "grade": 38.0,
+          "threshold": 100.0,
+          "content_g": 0.836,
+          "gross_value_usd": 1.7158930605468519
+        }
+      ],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "79i",
+      "jx_lot": 1544,
+      "recipe_raw": "29 + 30 + 31 + 32 + 33",
+      "resolvable": false,
+      "n_components": 5,
+      "wmt": 19.0,
+      "moisture": 0.002,
+      "dmt": 18.962,
+      "actual_grades": {
+        "CU": 0.1482,
+        "AU": 3652.6,
+        "AG": 5908.0,
+        "PT": 0.0,
+        "PD": 29.0
+      },
+      "actual_net_usd": 9850.37549171142,
+      "actual_per_kg": 518.4408153532327,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [],
+      "note": "5 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": "80i",
+      "jx_lot": 1545,
+      "recipe_raw": "28",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 30.0,
+      "moisture": 0.002,
+      "dmt": 29.94,
+      "actual_grades": {
+        "CU": 0.8618,
+        "AU": 289.5,
+        "AG": 39.0,
+        "PT": 0.0,
+        "PD": 5.9
+      },
+      "actual_net_usd": 1468.0475748627246,
+      "actual_per_kg": 48.93491916209082,
+      "model_aswas_usd": 1460.36966178363,
+      "model_optimal_usd": 1460.36966178363,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "028",
+          "name": "Procesadores Plasticos (Fibra) Base de Aluminio",
+          "kg": 30.0,
+          "grade_au": 288.8,
+          "grade_ag": 48.0,
+          "grade_cu": 0.8479,
+          "grade_pd": 5.5
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $1,460.",
+        "reference_single_usd": 1460.36966178363,
+        "partition_usd": 1460.36966178363,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 1460.36966178363,
+            "per_kg": 48.678988726121,
+            "wmt": 30.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.84795,
+                "rr": 0.9646205554572793,
+                "amount_usd": 281.72117941317003,
+                "status": "productive",
+                "headline": "Cobre: recupera 96% → $282."
+              },
+              {
+                "metal": "AU",
+                "grade": 288.8,
+                "rr": 0.96,
+                "amount_usd": 1199.6124823704597,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 48.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Plata: ley 48 g/t por debajo de la deducción de 100 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 5.45,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Paladio: ley 5 g/t por debajo de la deducción de 18 g/t → paga 0 (se rescata mezclándolo)."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: plata, platino, paladio (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope."
+        ]
+      },
+      "sub_threshold": [
+        {
+          "metal": "AG",
+          "grade": 39.0,
+          "threshold": 100.0,
+          "content_g": 1.1676600000000001,
+          "gross_value_usd": 2.396626424734614
+        },
+        {
+          "metal": "PD",
+          "grade": 5.9,
+          "threshold": 18.0,
+          "content_g": 0.17664600000000003,
+          "gross_value_usd": 8.831312710352691
+        }
+      ],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "82i",
+      "jx_lot": 666,
+      "recipe_raw": "12 + 998",
+      "resolvable": false,
+      "n_components": 2,
+      "wmt": 3439.0,
+      "moisture": 0.007,
+      "dmt": 3414.927,
+      "actual_grades": {
+        "CU": 0.229,
+        "AU": 169.3,
+        "AG": 1108.0,
+        "PT": 0.0,
+        "PD": 40.3
+      },
+      "actual_net_usd": 96395.0422904947,
+      "actual_per_kg": 28.029962864348562,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [],
+      "note": "2 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": "65i",
+      "jx_lot": 1510,
+      "recipe_raw": "15 + 22*(8%)",
+      "resolvable": true,
+      "n_components": 2,
+      "wmt": 3271.0,
+      "moisture": 0.004,
+      "dmt": 3257.916,
+      "actual_grades": {
+        "CU": 0.2497,
+        "AU": 300.2,
+        "AG": 1219.0,
+        "PT": 0.0,
+        "PD": 84.7
+      },
+      "actual_net_usd": 159987.06000670535,
+      "actual_per_kg": 48.91074900846999,
+      "model_aswas_usd": 160647.3357121619,
+      "model_optimal_usd": 160790.77890390216,
+      "optimal_num_lots": 2,
+      "extra_usd": 143.4431917402544,
+      "extra_pct": 0.08929073806568891,
+      "components": [
+        {
+          "code": "015",
+          "name": "Centrales Telefonicas",
+          "kg": 3009.3,
+          "grade_au": 294.4,
+          "grade_ag": 1577.0,
+          "grade_cu": 0.3045,
+          "grade_pd": 54.3
+        },
+        {
+          "code": "022",
+          "name": "Tarjeta de Disco Duro",
+          "kg": 261.7,
+          "grade_au": 335.0,
+          "grade_ag": 0.0,
+          "grade_cu": 0.0,
+          "grade_pd": 365.9
+        }
+      ],
+      "explanation": {
+        "headline": "Repartir en 2 lote(s) paga $160,791 (+$143, +0.1%) frente a la mezcla única.",
+        "reference_single_usd": 160647.3357121619,
+        "partition_usd": 160790.77890390216,
+        "gain_usd": 143.4431917402544,
+        "gain_pct": 0.08929073806568891,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 144327.17379223293,
+            "per_kg": 47.960062004782785,
+            "wmt": 3009.32,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.3044688213192332,
+                "rr": 0.9014677434950057,
+                "amount_usd": 9463.715420051072,
+                "status": "productive",
+                "headline": "Cobre: recupera 90% → $9,464."
+              },
+              {
+                "metal": "AU",
+                "grade": 294.42278736432036,
+                "rr": 0.96,
+                "amount_usd": 122430.92226616765,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 1577.4496938491527,
+                "rr": 0.9366065362401581,
+                "amount_usd": 9089.172643903523,
+                "status": "productive",
+                "headline": "Plata: recupera 94% → $9,089."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 54.32138881157827,
+                "rr": 0.6686388107190033,
+                "amount_usd": 5442.665094110677,
+                "status": "productive",
+                "headline": "Paladio: recupera 67% → $5,443."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          },
+          {
+            "role": "rico",
+            "net_usd": 16463.605111669232,
+            "per_kg": 62.915030234138,
+            "wmt": 261.68,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "negligible",
+                "headline": "Cobre: aporte despreciable."
+              },
+              {
+                "metal": "AU",
+                "grade": 334.99438491510085,
+                "rr": 0.96,
+                "amount_usd": 12113.213957531498,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Plata: ley 0 g/t por debajo de la deducción de 100 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 365.8792791539074,
+                "rr": 0.9508034452193498,
+                "amount_usd": 4532.939122137732,
+                "status": "productive",
+                "headline": "Paladio: recupera 95% → $4,533."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: plata, platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Repartir en 2 lotes paga $143 más (+0.1%) que una sola mezcla.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "66i",
+      "jx_lot": 1511,
+      "recipe_raw": "9",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 2711.0,
+      "moisture": 0.003,
+      "dmt": 2702.867,
+      "actual_grades": {
+        "CU": 0.2569,
+        "AU": 234.8,
+        "AG": 1004.0,
+        "PT": 0.0,
+        "PD": 54.2
+      },
+      "actual_net_usd": 103115.98297713997,
+      "actual_per_kg": 38.03614274331979,
+      "model_aswas_usd": 105131.08995291685,
+      "model_optimal_usd": 105131.08995291685,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "009",
+          "name": "Boards Tipo 1",
+          "kg": 2711.0,
+          "grade_au": 234.6,
+          "grade_ag": 1414.0,
+          "grade_cu": 0.2516,
+          "grade_pd": 54.0
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $105,131.",
+        "reference_single_usd": 105131.08995291685,
+        "partition_usd": 105131.08995291685,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 105131.08995291685,
+            "per_kg": 38.77945036994351,
+            "wmt": 2711.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.2516333333333333,
+                "rr": 0.8807789111140548,
+                "amount_usd": 6891.292743968953,
+                "status": "productive",
+                "headline": "Cobre: recupera 88% → $6,891."
+              },
+              {
+                "metal": "AU",
+                "grade": 234.6,
+                "rr": 0.96,
+                "amount_usd": 87972.04239728725,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 1414.3333333333333,
+                "rr": 0.9292953099222249,
+                "amount_usd": 7291.453972878043,
+                "status": "productive",
+                "headline": "Plata: recupera 93% → $7,291."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 54.03333333333334,
+                "rr": 0.6668723010487354,
+                "amount_usd": 4869.121038782607,
+                "status": "productive",
+                "headline": "Paladio: recupera 67% → $4,869."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "67i",
+      "jx_lot": 1512,
+      "recipe_raw": "3 + 4 + 9*(10%)",
+      "resolvable": false,
+      "n_components": 3,
+      "wmt": 1856.0,
+      "moisture": 0.008,
+      "dmt": 1841.152,
+      "actual_grades": {
+        "CU": 0.2177,
+        "AU": 207.5,
+        "AG": 592.0,
+        "PT": 0.0,
+        "PD": 28.9
+      },
+      "actual_net_usd": 58550.71942650212,
+      "actual_per_kg": 31.54672382893433,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [],
+      "note": "2 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": "68i",
+      "jx_lot": 1513,
+      "recipe_raw": "37 + 38",
+      "resolvable": false,
+      "n_components": 2,
+      "wmt": 2297.0,
+      "moisture": 0.009,
+      "dmt": 2276.3269999999998,
+      "actual_grades": {
+        "CU": 0.2165,
+        "AU": 152.4,
+        "AG": 460.0,
+        "PT": 0.0,
+        "PD": 4.3
+      },
+      "actual_net_usd": 52802.38644942269,
+      "actual_per_kg": 22.9875430776764,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [
+        {
+          "metal": "PD",
+          "grade": 4.3,
+          "threshold": 18.0,
+          "content_g": 9.788206099999998,
+          "gross_value_usd": 489.3555978764405
+        }
+      ],
+      "note": "2 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": "69i",
+      "jx_lot": 1514,
+      "recipe_raw": "16",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 1276.0,
+      "moisture": 0.005,
+      "dmt": 1269.62,
+      "actual_grades": {
+        "CU": 0.2403,
+        "AU": 178.1,
+        "AG": 848.0,
+        "PT": 0.0,
+        "PD": 26.8
+      },
+      "actual_net_usd": 36061.029876867346,
+      "actual_per_kg": 28.2609952013067,
+      "model_aswas_usd": 41789.166386771125,
+      "model_optimal_usd": 41789.166386771125,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "016",
+          "name": "Tarjeta Filo Dorado limpio sin hierro",
+          "kg": 1276.0,
+          "grade_au": 207.1,
+          "grade_ag": 982.0,
+          "grade_cu": 0.2343,
+          "grade_pd": 32.5
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $41,789.",
+        "reference_single_usd": 41789.166386771125,
+        "partition_usd": 41789.166386771125,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 41789.166386771125,
+            "per_kg": 32.750130397156056,
+            "wmt": 1276.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.23426666666666673,
+                "rr": 0.8719408081957883,
+                "amount_usd": 2983.4049238951475,
+                "status": "productive",
+                "headline": "Cobre: recupera 87% → $2,983."
+              },
+              {
+                "metal": "AU",
+                "grade": 207.0666666666667,
+                "rr": 0.96,
+                "amount_usd": 36473.37389142297,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 982.3333333333334,
+                "rr": 0.8982015609093994,
+                "amount_usd": 2299.2721668723543,
+                "status": "productive",
+                "headline": "Plata: recupera 90% → $2,299."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 32.53333333333334,
+                "rr": 0.44672131147540994,
+                "amount_usd": 922.487404580657,
+                "status": "productive",
+                "headline": "Paladio: recupera 45% → $922."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "70i",
+      "jx_lot": 1515,
+      "recipe_raw": "11",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 362.0,
+      "moisture": 0.01,
+      "dmt": 358.38,
+      "actual_grades": {
+        "CU": 0.1818,
+        "AU": 217.0,
+        "AG": 2925.0,
+        "PT": 0.0,
+        "PD": 17.3
+      },
+      "actual_net_usd": 13207.939870008157,
+      "actual_per_kg": 36.486021740354026,
+      "model_aswas_usd": 13440.674327794522,
+      "model_optimal_usd": 13440.674327794522,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "011",
+          "name": "Boards Tipo 1 - Lectora",
+          "kg": 362.0,
+          "grade_au": 220.2,
+          "grade_ag": 2881.0,
+          "grade_cu": 0.182,
+          "grade_pd": 23.7
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $13,441.",
+        "reference_single_usd": 13440.674327794522,
+        "partition_usd": 13440.674327794522,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 13440.674327794522,
+            "per_kg": 37.12893460716719,
+            "wmt": 362.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.18199999999999997,
+                "rr": 0.8351648351648352,
+                "amount_usd": 626.6546955504,
+                "status": "productive",
+                "headline": "Cobre: recupera 84% → $627."
+              },
+              {
+                "metal": "AU",
+                "grade": 220.23333333333335,
+                "rr": 0.96,
+                "amount_usd": 10950.1182316184,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 2880.6666666666665,
+                "rr": 0.95,
+                "amount_usd": 2013.00251782013,
+                "status": "capped",
+                "headline": "Plata: recuperación en el tope (95%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 23.7,
+                "rr": 0.24050632911392403,
+                "amount_usd": 102.1268828055904,
+                "status": "productive",
+                "headline": "Paladio: recupera 24% → $102."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (plata, oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [
+        {
+          "metal": "PD",
+          "grade": 17.3,
+          "threshold": 18.0,
+          "content_g": 6.199974,
+          "gross_value_usd": 309.96404781345865
+        }
+      ],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "71i",
+      "jx_lot": 2286,
+      "recipe_raw": "27",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 49.0,
+      "moisture": 0.002,
+      "dmt": 48.902,
+      "actual_grades": {
+        "CU": 0.3764,
+        "AU": 1095.1,
+        "AG": 176.0,
+        "PT": 0.0,
+        "PD": 26.7
+      },
+      "actual_net_usd": 7619.2462864637855,
+      "actual_per_kg": 155.49482217273032,
+      "model_aswas_usd": 8041.66094394201,
+      "model_optimal_usd": 8041.66094394201,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "027",
+          "name": "Procesadores Plasticos (Fibra)",
+          "kg": 49.0,
+          "grade_au": 1150.9,
+          "grade_ag": 112.0,
+          "grade_cu": 0.3923,
+          "grade_pd": 43.5
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $8,042.",
+        "reference_single_usd": 8041.66094394201,
+        "partition_usd": 8041.66094394201,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 8041.66094394201,
+            "per_kg": 164.11552946820427,
+            "wmt": 49.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.39233333333333337,
+                "rr": 0.923534409515718,
+                "amount_usd": 203.8336380121534,
+                "status": "productive",
+                "headline": "Cobre: recupera 92% → $204."
+              },
+              {
+                "metal": "AU",
+                "grade": 1150.9333333333332,
+                "rr": 0.96,
+                "amount_usd": 7808.52096711709,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 112.0,
+                "rr": 0.10714285714285714,
+                "amount_usd": 1.2044584083281649,
+                "status": "productive",
+                "headline": "Plata: recupera 11% → $1."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 43.5,
+                "rr": 0.5862068965517241,
+                "amount_usd": 62.34308040443891,
+                "status": "productive",
+                "headline": "Paladio: recupera 59% → $62."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "72i",
+      "jx_lot": 2287,
+      "recipe_raw": "28",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 95.0,
+      "moisture": 0.002,
+      "dmt": 94.81,
+      "actual_grades": {
+        "CU": 0.8341,
+        "AU": 288.1,
+        "AG": 57.0,
+        "PT": 0.0,
+        "PD": 5.0
+      },
+      "actual_net_usd": 4600.19053756436,
+      "actual_per_kg": 48.42305829015116,
+      "model_aswas_usd": 4624.503928981494,
+      "model_optimal_usd": 4624.503928981494,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "028",
+          "name": "Procesadores Plasticos (Fibra) Base de Aluminio",
+          "kg": 95.0,
+          "grade_au": 288.8,
+          "grade_ag": 48.0,
+          "grade_cu": 0.8479,
+          "grade_pd": 5.5
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $4,625.",
+        "reference_single_usd": 4624.503928981494,
+        "partition_usd": 4624.503928981494,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 4624.503928981494,
+            "per_kg": 48.67898872612099,
+            "wmt": 95.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.8479499999999999,
+                "rr": 0.9646205554572793,
+                "amount_usd": 892.117068141705,
+                "status": "productive",
+                "headline": "Cobre: recupera 96% → $892."
+              },
+              {
+                "metal": "AU",
+                "grade": 288.8,
+                "rr": 0.96,
+                "amount_usd": 3798.7728608397892,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 48.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Plata: ley 48 g/t por debajo de la deducción de 100 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 5.45,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Paladio: ley 5 g/t por debajo de la deducción de 18 g/t → paga 0 (se rescata mezclándolo)."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: plata, platino, paladio (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope."
+        ]
+      },
+      "sub_threshold": [
+        {
+          "metal": "AG",
+          "grade": 57.0,
+          "threshold": 100.0,
+          "content_g": 5.404170000000001,
+          "gross_value_usd": 11.092078709348662
+        },
+        {
+          "metal": "PD",
+          "grade": 5.0,
+          "threshold": 18.0,
+          "content_g": 0.47405,
+          "gross_value_usd": 23.69985049388434
+        }
+      ],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "73i",
+      "jx_lot": 1827,
+      "recipe_raw": "Boards T1 + Cable Box 3 Chips + PIII 3 BGA",
+      "resolvable": false,
+      "n_components": 0,
+      "wmt": 454.0,
+      "moisture": 0.002,
+      "dmt": 453.092,
+      "actual_grades": {
+        "CU": 0.2614,
+        "AU": 258.1,
+        "AG": 1396.0,
+        "PT": 0.0,
+        "PD": 110.7
+      },
+      "actual_net_usd": 20418.272702201073,
+      "actual_per_kg": 44.97416894757946,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [],
+      "note": "texto libre / no parseable"
+    },
+    {
+      "customer_lot": "74i",
+      "jx_lot": 1828,
+      "recipe_raw": "12 + 998",
+      "resolvable": false,
+      "n_components": 2,
+      "wmt": 4982.0,
+      "moisture": 0.004,
+      "dmt": 4962.072,
+      "actual_grades": {
+        "CU": 0.2307,
+        "AU": 157.7,
+        "AG": 991.0,
+        "PT": 0.0,
+        "PD": 25.6
+      },
+      "actual_net_usd": 127008.94943530386,
+      "actual_per_kg": 25.493566727278978,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [],
+      "note": "2 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": "75i",
+      "jx_lot": 1829,
+      "recipe_raw": "6",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 3853.0,
+      "moisture": 0.007,
+      "dmt": 3826.029,
+      "actual_grades": {
+        "CU": 0.2197,
+        "AU": 101.4,
+        "AG": 742.0,
+        "PT": 0.0,
+        "PD": 4.4
+      },
+      "actual_net_usd": 62906.54867912524,
+      "actual_per_kg": 16.326641235173952,
+      "model_aswas_usd": 68007.50550261977,
+      "model_optimal_usd": 68007.50550261977,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "006",
+          "name": "Tarjeta Madre PIV - Verdes/Amarillo 1VGA",
+          "kg": 3853.0,
+          "grade_au": 111.2,
+          "grade_ag": 704.0,
+          "grade_cu": 0.2193,
+          "grade_pd": 5.1
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $68,008.",
+        "reference_single_usd": 68007.50550261977,
+        "partition_usd": 68007.50550261977,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "mixto",
+            "net_usd": 68007.50550261977,
+            "per_kg": 17.650533481084807,
+            "wmt": 3853.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.21935,
+                "rr": 0.8632322771825849,
+                "amount_usd": 8334.019496285458,
+                "status": "productive",
+                "headline": "Cobre: recupera 86% → $8,334."
+              },
+              {
+                "metal": "AU",
+                "grade": 111.2,
+                "rr": 0.9370503597122302,
+                "amount_usd": 57615.15500386118,
+                "status": "productive",
+                "headline": "Oro: recupera 94% → $57,615."
+              },
+              {
+                "metal": "AG",
+                "grade": 703.5,
+                "rr": 0.8578535891968728,
+                "amount_usd": 4739.248402473129,
+                "status": "productive",
+                "headline": "Plata: recupera 86% → $4,739."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 5.1,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Paladio: ley 5 g/t por debajo de la deducción de 18 g/t → paga 0 (se rescata mezclándolo)."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino, paladio (no paga solo)."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Metales rescatados por la mezcla (plata): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [
+        {
+          "metal": "PD",
+          "grade": 4.4,
+          "threshold": 18.0,
+          "content_g": 16.8345276,
+          "gross_value_usd": 841.6322903811191
+        }
+      ],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "76i",
+      "jx_lot": 1830,
+      "recipe_raw": "49",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 582.0,
+      "moisture": 0.006,
+      "dmt": 578.508,
+      "actual_grades": {
+        "CU": 0.3592,
+        "AU": 319.0,
+        "AG": 134.0,
+        "PT": 0.0,
+        "PD": 62.6
+      },
+      "actual_net_usd": 28718.902440439037,
+      "actual_per_kg": 49.345193196630646,
+      "model_aswas_usd": 28718.902440439037,
+      "model_optimal_usd": 28718.902440439037,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "049",
+          "name": "Peine Macho",
+          "kg": 582.0,
+          "grade_au": 319.0,
+          "grade_ag": 134.0,
+          "grade_cu": 0.3592,
+          "grade_pd": 62.6
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $28,719.",
+        "reference_single_usd": 28718.902440439037,
+        "partition_usd": 28718.902440439037,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 28718.902440439037,
+            "per_kg": 49.345193196630646,
+            "wmt": 582.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.3592,
+                "rr": 0.9164810690423163,
+                "amount_usd": 2190.8373723193445,
+                "status": "productive",
+                "headline": "Cobre: recupera 92% → $2,191."
+              },
+              {
+                "metal": "AU",
+                "grade": 319.0,
+                "rr": 0.96,
+                "amount_usd": 25603.06998188704,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 134.0,
+                "rr": 0.2537313432835821,
+                "amount_usd": 40.37125278804844,
+                "status": "productive",
+                "headline": "Plata: recupera 25% → $40."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 62.599999999999994,
+                "rr": 0.7124600638977635,
+                "amount_usd": 1289.9286334446056,
+                "status": "productive",
+                "headline": "Paladio: recupera 71% → $1,290."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "77i",
+      "jx_lot": 1831,
+      "recipe_raw": "Credicar / Credit Card Reader Boards",
+      "resolvable": false,
+      "n_components": 0,
+      "wmt": 261.0,
+      "moisture": 0.004,
+      "dmt": 259.956,
+      "actual_grades": {
+        "CU": 0.2934,
+        "AU": 128.3,
+        "AG": 951.0,
+        "PT": 0.0,
+        "PD": 10.4
+      },
+      "actual_net_usd": 5616.70366928222,
+      "actual_per_kg": 21.519937430200077,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [
+        {
+          "metal": "PD",
+          "grade": 10.4,
+          "threshold": 18.0,
+          "content_g": 2.7035424000000003,
+          "gross_value_usd": 135.16200966960713
+        }
+      ],
+      "note": "texto libre / no parseable"
+    },
+    {
+      "customer_lot": "78i",
+      "jx_lot": 2288,
+      "recipe_raw": "29 + 30 + 31 + 32 + 33",
+      "resolvable": false,
+      "n_components": 5,
+      "wmt": 12.0,
+      "moisture": 0.002,
+      "dmt": 11.975999999999999,
+      "actual_grades": {
+        "CU": 0.1251,
+        "AU": 4573.9,
+        "AG": 5157.0,
+        "PT": 0.0,
+        "PD": 21.4
+      },
+      "actual_net_usd": 7726.771829696488,
+      "actual_per_kg": 643.8976524747073,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [],
+      "note": "5 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": "79i",
+      "jx_lot": 1832,
+      "recipe_raw": "52",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 980.0,
+      "moisture": 0.004,
+      "dmt": 976.08,
+      "actual_grades": {
+        "CU": 0.3734,
+        "AU": 664.6,
+        "AG": 2344.0,
+        "PT": 0.0,
+        "PD": 52.7
+      },
+      "actual_net_usd": 99325.76989708321,
+      "actual_per_kg": 101.35282642559511,
+      "model_aswas_usd": 89445.83782583402,
+      "model_optimal_usd": 89445.83782583402,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "052",
+          "name": "Tarjeta de Celular Smartphone",
+          "kg": 980.0,
+          "grade_au": 597.2,
+          "grade_ag": 2170.0,
+          "grade_cu": 0.3628,
+          "grade_pd": 46.5
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $89,446.",
+        "reference_single_usd": 89445.83782583402,
+        "partition_usd": 89445.83782583402,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 89445.83782583402,
+            "per_kg": 91.27126308758574,
+            "wmt": 980.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.3628,
+                "rr": 0.9173098125689084,
+                "amount_usd": 3736.8845174169596,
+                "status": "productive",
+                "headline": "Cobre: recupera 92% → $3,737."
+              },
+              {
+                "metal": "AU",
+                "grade": 597.2,
+                "rr": 0.96,
+                "amount_usd": 80871.817662365,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 2170.0,
+                "rr": 0.95,
+                "amount_usd": 4130.02512480534,
+                "status": "capped",
+                "headline": "Plata: recuperación en el tope (95%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 46.5,
+                "rr": 0.6129032258064516,
+                "amount_usd": 1390.7585212467309,
+                "status": "productive",
+                "headline": "Paladio: recupera 61% → $1,391."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (plata, oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "80i",
+      "jx_lot": 1833,
+      "recipe_raw": "54",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 1152.0,
+      "moisture": 0.004,
+      "dmt": 1147.392,
+      "actual_grades": {
+        "CU": 0.3427,
+        "AU": 455.8,
+        "AG": 1744.0,
+        "PT": 0.0,
+        "PD": 33.8
+      },
+      "actual_net_usd": 80658.60666593496,
+      "actual_per_kg": 70.01615161973521,
+      "model_aswas_usd": 85186.70285445127,
+      "model_optimal_usd": 85186.70285445127,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "054",
+          "name": "Tarjeta de Celular Chino",
+          "kg": 1152.0,
+          "grade_au": 481.5,
+          "grade_ag": 1927.0,
+          "grade_cu": 0.3434,
+          "grade_pd": 33.6
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $85,187.",
+        "reference_single_usd": 85186.70285445127,
+        "partition_usd": 85186.70285445127,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 85186.70285445127,
+            "per_kg": 73.94679067226673,
+            "wmt": 1152.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.343425,
+                "rr": 0.9126446822450316,
+                "amount_usd": 4137.008347269504,
+                "status": "productive",
+                "headline": "Cobre: recupera 91% → $4,137."
+              },
+              {
+                "metal": "AU",
+                "grade": 481.54999999999995,
+                "rr": 0.96,
+                "amount_usd": 76655.83097345309,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 1927.0,
+                "rr": 0.9481058640373637,
+                "amount_usd": 4302.633014536818,
+                "status": "productive",
+                "headline": "Plata: recupera 95% → $4,303."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 33.599999999999994,
+                "rr": 0.4642857142857142,
+                "amount_usd": 894.865719191881,
+                "status": "productive",
+                "headline": "Paladio: recupera 46% → $895."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "81i",
+      "jx_lot": 1834,
+      "recipe_raw": "53",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 1030.0,
+      "moisture": 0.002,
+      "dmt": 1027.94,
+      "actual_grades": {
+        "CU": 0.3692,
+        "AU": 658.0,
+        "AG": 2339.0,
+        "PT": 0.0,
+        "PD": 50.3
+      },
+      "actual_net_usd": 103478.96951271495,
+      "actual_per_kg": 100.46501894438344,
+      "model_aswas_usd": 117320.3468075726,
+      "model_optimal_usd": 117320.3468075726,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "053",
+          "name": "Tarjeta de Celular Tactil",
+          "kg": 1030.0,
+          "grade_au": 750.3,
+          "grade_ag": 2501.0,
+          "grade_cu": 0.3648,
+          "grade_pd": 58.2
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $117,320.",
+        "reference_single_usd": 117320.3468075726,
+        "partition_usd": 117320.3468075726,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 117320.3468075726,
+            "per_kg": 113.90324932774038,
+            "wmt": 1030.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.364825,
+                "rr": 0.9177687932570411,
+                "amount_usd": 3959.374562989796,
+                "status": "productive",
+                "headline": "Cobre: recupera 92% → $3,959."
+              },
+              {
+                "metal": "AU",
+                "grade": 750.3,
+                "rr": 0.96,
+                "amount_usd": 107002.69193077476,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 2501.25,
+                "rr": 0.95,
+                "amount_usd": 5013.40065401949,
+                "status": "capped",
+                "headline": "Plata: recuperación en el tope (95%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 58.175,
+                "rr": 0.6905887408680704,
+                "amount_usd": 2064.6436597885418,
+                "status": "productive",
+                "headline": "Paladio: recupera 69% → $2,065."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (plata, oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "82i",
+      "jx_lot": 1835,
+      "recipe_raw": "54",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 1684.0,
+      "moisture": 0.003,
+      "dmt": 1678.948,
+      "actual_grades": {
+        "CU": 0.3317,
+        "AU": 420.4,
+        "AG": 1745.0,
+        "PT": 0.0,
+        "PD": 30.8
+      },
+      "actual_net_usd": 109319.12986875275,
+      "actual_per_kg": 64.91634790305983,
+      "model_aswas_usd": 124651.5910699005,
+      "model_optimal_usd": 124651.5910699005,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "054",
+          "name": "Tarjeta de Celular Chino",
+          "kg": 1684.0,
+          "grade_au": 481.5,
+          "grade_ag": 1927.0,
+          "grade_cu": 0.3434,
+          "grade_pd": 33.6
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $124,652.",
+        "reference_single_usd": 124651.5910699005,
+        "partition_usd": 124651.5910699005,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 124651.5910699005,
+            "per_kg": 74.02113483960838,
+            "wmt": 1684.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.343425,
+                "rr": 0.9126446822450316,
+                "amount_usd": 6053.5735743594505,
+                "status": "productive",
+                "headline": "Cobre: recupera 91% → $6,054."
+              },
+              {
+                "metal": "AU",
+                "grade": 481.54999999999995,
+                "rr": 0.96,
+                "amount_usd": 112168.4255260775,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 1927.0,
+                "rr": 0.9481058640373637,
+                "amount_usd": 6295.92771650017,
+                "status": "productive",
+                "headline": "Plata: recupera 95% → $6,296."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 33.599999999999994,
+                "rr": 0.4642857142857142,
+                "amount_usd": 1309.4330529633908,
+                "status": "productive",
+                "headline": "Paladio: recupera 46% → $1,309."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "83i",
+      "jx_lot": 1836,
+      "recipe_raw": "53",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 1018.0,
+      "moisture": 0.002,
+      "dmt": 1015.9639999999999,
+      "actual_grades": {
+        "CU": 0.3642,
+        "AU": 828.5,
+        "AG": 2568.0,
+        "PT": 0.0,
+        "PD": 59.0
+      },
+      "actual_net_usd": 127142.76191499099,
+      "actual_per_kg": 124.89465806973574,
+      "model_aswas_usd": 115953.50781563968,
+      "model_optimal_usd": 115953.50781563968,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "053",
+          "name": "Tarjeta de Celular Tactil",
+          "kg": 1018.0,
+          "grade_au": 750.3,
+          "grade_ag": 2501.0,
+          "grade_cu": 0.3648,
+          "grade_pd": 58.2
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $115,954.",
+        "reference_single_usd": 115953.50781563968,
+        "partition_usd": 115953.50781563968,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 115953.50781563968,
+            "per_kg": 113.90324932774035,
+            "wmt": 1018.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.364825,
+                "rr": 0.9177687932570411,
+                "amount_usd": 3913.2459273044774,
+                "status": "productive",
+                "headline": "Cobre: recupera 92% → $3,913."
+              },
+              {
+                "metal": "AU",
+                "grade": 750.3,
+                "rr": 0.96,
+                "amount_usd": 105756.05862672687,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 2501.25,
+                "rr": 0.95,
+                "amount_usd": 4954.992102710524,
+                "status": "capped",
+                "headline": "Plata: recuperación en el tope (95%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 58.175,
+                "rr": 0.6905887408680704,
+                "amount_usd": 2040.5895588978012,
+                "status": "productive",
+                "headline": "Paladio: recupera 69% → $2,041."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (plata, oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "85i",
+      "jx_lot": 300,
+      "recipe_raw": "15 + 22*(6%) + 11*(21%)",
+      "resolvable": true,
+      "n_components": 3,
+      "wmt": 1455.0,
+      "moisture": 0.005,
+      "dmt": 1447.725,
+      "actual_grades": {
+        "CU": 0.232,
+        "AU": 277.2,
+        "AG": 1646.0,
+        "PT": 0.0,
+        "PD": 57.8
+      },
+      "actual_net_usd": 65500.986301725665,
+      "actual_per_kg": 45.01786000118602,
+      "model_aswas_usd": 67758.35422334622,
+      "model_optimal_usd": 67806.16077240139,
+      "optimal_num_lots": 2,
+      "extra_usd": 47.806549055167125,
+      "extra_pct": 0.07055447199556586,
+      "components": [
+        {
+          "code": "015",
+          "name": "Centrales Telefonicas",
+          "kg": 1062.1,
+          "grade_au": 294.4,
+          "grade_ag": 1577.0,
+          "grade_cu": 0.3045,
+          "grade_pd": 54.3
+        },
+        {
+          "code": "011",
+          "name": "Boards Tipo 1 - Lectora",
+          "kg": 305.6,
+          "grade_au": 220.2,
+          "grade_ag": 2881.0,
+          "grade_cu": 0.182,
+          "grade_pd": 23.7
+        },
+        {
+          "code": "022",
+          "name": "Tarjeta de Disco Duro",
+          "kg": 87.3,
+          "grade_au": 335.0,
+          "grade_ag": 0.0,
+          "grade_cu": 0.0,
+          "grade_pd": 365.9
+        }
+      ],
+      "explanation": {
+        "headline": "Repartir en 2 lote(s) paga $67,806 (+$48, +0.1%) frente a la mezcla única.",
+        "reference_single_usd": 67758.35422334622,
+        "partition_usd": 67806.16077240139,
+        "gain_usd": 47.806549055167125,
+        "gain_pct": 0.07055447199556586,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 62319.201938322025,
+            "per_kg": 45.56496449391096,
+            "wmt": 1367.7,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.277108765492596,
+                "rr": 0.8917392600458842,
+                "amount_usd": 3868.5037648731072,
+                "status": "productive",
+                "headline": "Cobre: recupera 89% → $3,869."
+              },
+              {
+                "metal": "AU",
+                "grade": 277.84854763399346,
+                "rr": 0.96,
+                "amount_usd": 52458.280360597106,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 1868.5939111807247,
+                "rr": 0.9464838243335535,
+                "amount_usd": 4939.989133465604,
+                "status": "productive",
+                "headline": "Plata: recupera 95% → $4,940."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 47.4804402472895,
+                "rr": 0.6208965227312196,
+                "amount_usd": 2005.7155793862057,
+                "status": "productive",
+                "headline": "Paladio: recupera 62% → $2,006."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          },
+          {
+            "role": "rico",
+            "net_usd": 5486.958834079362,
+            "per_kg": 62.85176213149326,
+            "wmt": 87.3,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "negligible",
+                "headline": "Cobre: aporte despreciable."
+              },
+              {
+                "metal": "AU",
+                "grade": 334.99438491510085,
+                "rr": 0.96,
+                "amount_usd": 4037.07523690005,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Plata: ley 0 g/t por debajo de la deducción de 100 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 365.8792791539074,
+                "rr": 0.9508034452193498,
+                "amount_usd": 1510.7316971793118,
+                "status": "productive",
+                "headline": "Paladio: recupera 95% → $1,511."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: plata, platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Repartir en 2 lotes paga $48 más (+0.1%) que una sola mezcla.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "86i",
+      "jx_lot": 301,
+      "recipe_raw": "12 + 998",
+      "resolvable": false,
+      "n_components": 2,
+      "wmt": 623.0,
+      "moisture": 0.009,
+      "dmt": 617.393,
+      "actual_grades": {
+        "CU": 0.237,
+        "AU": 152.5,
+        "AG": 1232.0,
+        "PT": 0.0,
+        "PD": 29.6
+      },
+      "actual_net_usd": 15812.087508823488,
+      "actual_per_kg": 25.38055779907462,
+      "model_aswas_usd": null,
+      "model_optimal_usd": null,
+      "optimal_num_lots": null,
+      "extra_usd": null,
+      "extra_pct": null,
+      "components": [],
+      "explanation": null,
+      "sub_threshold": [],
+      "note": "2 bases ambiguas; repartidas por igual (supuesto)"
+    },
+    {
+      "customer_lot": "87i",
+      "jx_lot": 299,
+      "recipe_raw": "1*(28%) + 2*(58%) + 14*(14%)",
+      "resolvable": true,
+      "n_components": 3,
+      "wmt": 8482.0,
+      "moisture": 0.012,
+      "dmt": 8380.216,
+      "actual_grades": {
+        "CU": 0.1633,
+        "AU": 43.4,
+        "AG": 615.0,
+        "PT": 0.0,
+        "PD": 17.2
+      },
+      "actual_net_usd": 59916.20522655116,
+      "actual_per_kg": 7.06392421911709,
+      "model_aswas_usd": 59916.2052265512,
+      "model_optimal_usd": 61122.697986214494,
+      "optimal_num_lots": 2,
+      "extra_usd": 1206.4927596632915,
+      "extra_pct": 2.013633465439576,
+      "components": [
+        {
+          "code": "002",
+          "name": "Bajo Grado Verde",
+          "kg": 4919.6,
+          "grade_au": 57.9,
+          "grade_ag": 821.0,
+          "grade_cu": 0.218,
+          "grade_pd": 23.0
+        },
+        {
+          "code": "001",
+          "name": "Bajo Grado Marron",
+          "kg": 2375.0,
+          "grade_au": 28.0,
+          "grade_ag": 396.0,
+          "grade_cu": 0.1053,
+          "grade_pd": 11.1
+        },
+        {
+          "code": "014",
+          "name": "Boards Tipo 3",
+          "kg": 1187.5,
+          "grade_au": 14.0,
+          "grade_ag": 198.0,
+          "grade_cu": 0.0526,
+          "grade_pd": 5.5
+        }
+      ],
+      "explanation": {
+        "headline": "Repartir en 2 lote(s) paga $61,123 (+$1,206, +2.0%) frente a la mezcla única.",
+        "reference_single_usd": 59916.2052265512,
+        "partition_usd": 61122.697986214494,
+        "gain_usd": 1206.4927596632915,
+        "gain_pct": 2.013633465439576,
+        "lots": [
+          {
+            "role": "mixto",
+            "net_usd": 51292.73215285814,
+            "per_kg": 10.426284495535807,
+            "wmt": 4919.56,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.2180340699815839,
+                "rr": 0.8624068247566359,
+                "amount_usd": 10513.823881526898,
+                "status": "productive",
+                "headline": "Cobre: recupera 86% → $10,514."
+              },
+              {
+                "metal": "AU",
+                "grade": 57.946593001841684,
+                "rr": 0.8791991101223583,
+                "amount_usd": 35786.49054606252,
+                "status": "productive",
+                "headline": "Oro: recupera 88% → $35,786."
+              },
+              {
+                "metal": "AG",
+                "grade": 821.1325966850831,
+                "rr": 0.8782169890664424,
+                "amount_usd": 7194.196133605419,
+                "status": "productive",
+                "headline": "Plata: recupera 88% → $7,194."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 22.965009208103172,
+                "rr": 0.2161988773055347,
+                "amount_usd": 1206.4927596632988,
+                "status": "productive",
+                "headline": "Paladio: recupera 22% → $1,206."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo)."
+            ]
+          },
+          {
+            "role": "relleno",
+            "net_usd": 9829.965833356353,
+            "per_kg": 2.7593351279899037,
+            "wmt": 3562.44,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.08771485573971766,
+                "rr": 0.6579826786807805,
+                "amount_usd": 2336.861979457826,
+                "status": "productive",
+                "headline": "Cobre: recupera 66% → $2,337."
+              },
+              {
+                "metal": "AU",
+                "grade": 23.311847759361516,
+                "rr": 0.6997235023041467,
+                "amount_usd": 8297.140049472717,
+                "status": "productive",
+                "headline": "Oro: recupera 70% → $8,297."
+              },
+              {
+                "metal": "AG",
+                "grade": 330.3406998158384,
+                "rr": 0.6972822299651572,
+                "amount_usd": 1664.0222364258125,
+                "status": "productive",
+                "headline": "Plata: recupera 70% → $1,664."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 9.238796807857549,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Paladio: ley 9 g/t por debajo de la deducción de 18 g/t → paga 0 (se rescata mezclándolo)."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino, paladio (no paga solo).",
+              "Lote de relleno: aporta sobre todo cobre/peso. Mandarlo aparte evita que las deducciones por tonelada del oro/plata se apliquen sobre él."
+            ]
+          }
+        ],
+        "bullets": [
+          "Repartir en 2 lotes paga $1,206 más (+2.0%) que una sola mezcla.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [
+        {
+          "metal": "PD",
+          "grade": 17.2,
+          "threshold": 18.0,
+          "content_g": 144.1397152,
+          "gross_value_usd": 7206.180150766941
+        }
+      ],
+      "note": "porcentajes completos"
+    },
+    {
+      "customer_lot": "88i",
+      "jx_lot": 302,
+      "recipe_raw": "52",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 756.0,
+      "moisture": 0.004,
+      "dmt": 752.976,
+      "actual_grades": {
+        "CU": 0.3522,
+        "AU": 529.8,
+        "AG": 1996.0,
+        "PT": 0.0,
+        "PD": 40.3
+      },
+      "actual_net_usd": 61379.10391348042,
+      "actual_per_kg": 81.18929089084712,
+      "model_aswas_usd": 69001.07489421482,
+      "model_optimal_usd": 69001.07489421482,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "052",
+          "name": "Tarjeta de Celular Smartphone",
+          "kg": 756.0,
+          "grade_au": 597.2,
+          "grade_ag": 2170.0,
+          "grade_cu": 0.3628,
+          "grade_pd": 46.5
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $69,001.",
+        "reference_single_usd": 69001.07489421482,
+        "partition_usd": 69001.07489421482,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 69001.07489421482,
+            "per_kg": 91.27126308758574,
+            "wmt": 756.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.3628,
+                "rr": 0.9173098125689084,
+                "amount_usd": 2882.739484864512,
+                "status": "productive",
+                "headline": "Cobre: recupera 92% → $2,883."
+              },
+              {
+                "metal": "AU",
+                "grade": 597.2,
+                "rr": 0.96,
+                "amount_usd": 62386.83076811014,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 2170.0,
+                "rr": 0.95,
+                "amount_usd": 3186.0193819926913,
+                "status": "capped",
+                "headline": "Plata: recuperación en el tope (95%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 46.5,
+                "rr": 0.6129032258064516,
+                "amount_usd": 1072.8708592474782,
+                "status": "productive",
+                "headline": "Paladio: recupera 61% → $1,073."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (plata, oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "89i",
+      "jx_lot": 303,
+      "recipe_raw": "53",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 414.0,
+      "moisture": 0.002,
+      "dmt": 413.172,
+      "actual_grades": {
+        "CU": 0.3766,
+        "AU": 733.1,
+        "AG": 2544.0,
+        "PT": 0.0,
+        "PD": 65.7
+      },
+      "actual_net_usd": 46415.84991271741,
+      "actual_per_kg": 112.1155794993174,
+      "model_aswas_usd": 47155.94522168451,
+      "model_optimal_usd": 47155.94522168451,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "053",
+          "name": "Tarjeta de Celular Tactil",
+          "kg": 414.0,
+          "grade_au": 750.3,
+          "grade_ag": 2501.0,
+          "grade_cu": 0.3648,
+          "grade_pd": 58.2
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $47,156.",
+        "reference_single_usd": 47155.94522168451,
+        "partition_usd": 47155.94522168451,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 47155.94522168451,
+            "per_kg": 113.90324932774035,
+            "wmt": 414.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.364825,
+                "rr": 0.9177687932570411,
+                "amount_usd": 1591.4379311434714,
+                "status": "productive",
+                "headline": "Cobre: recupera 92% → $1,591."
+              },
+              {
+                "metal": "AU",
+                "grade": 750.2999999999998,
+                "rr": 0.96,
+                "amount_usd": 43008.84898965121,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 2501.25,
+                "rr": 0.95,
+                "amount_usd": 2015.0950201592898,
+                "status": "capped",
+                "headline": "Plata: recuperación en el tope (95%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 58.175,
+                "rr": 0.6905887408680704,
+                "amount_usd": 829.8664807305402,
+                "status": "productive",
+                "headline": "Paladio: recupera 69% → $830."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (plata, oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    },
+    {
+      "customer_lot": "90i",
+      "jx_lot": 304,
+      "recipe_raw": "54",
+      "resolvable": true,
+      "n_components": 1,
+      "wmt": 518.0,
+      "moisture": 0.003,
+      "dmt": 516.446,
+      "actual_grades": {
+        "CU": 0.3797,
+        "AU": 563.0,
+        "AG": 2367.0,
+        "PT": 0.0,
+        "PD": 32.4
+      },
+      "actual_net_usd": 44810.331639074386,
+      "actual_per_kg": 86.50643173566483,
+      "model_aswas_usd": 38342.94784691715,
+      "model_optimal_usd": 38342.94784691715,
+      "optimal_num_lots": 1,
+      "extra_usd": 0.0,
+      "extra_pct": 0.0,
+      "components": [
+        {
+          "code": "054",
+          "name": "Tarjeta de Celular Chino",
+          "kg": 518.0,
+          "grade_au": 481.5,
+          "grade_ag": 1927.0,
+          "grade_cu": 0.3434,
+          "grade_pd": 33.6
+        }
+      ],
+      "explanation": {
+        "headline": "La mejor decisión es 1 lote(s): $38,343.",
+        "reference_single_usd": 38342.94784691715,
+        "partition_usd": 38342.94784691715,
+        "gain_usd": 0.0,
+        "gain_pct": 0.0,
+        "lots": [
+          {
+            "role": "rico",
+            "net_usd": 38342.94784691715,
+            "per_kg": 74.02113483960841,
+            "wmt": 518.0,
+            "drivers": [
+              {
+                "metal": "CU",
+                "grade": 0.343425,
+                "rr": 0.9126446822450316,
+                "amount_usd": 1862.0849830868146,
+                "status": "productive",
+                "headline": "Cobre: recupera 91% → $1,862."
+              },
+              {
+                "metal": "AU",
+                "grade": 481.54999999999995,
+                "rr": 0.96,
+                "amount_usd": 34503.114265147364,
+                "status": "capped",
+                "headline": "Oro: recuperación en el tope (96%); subir más la ley no agrega valor, conviene usar el excedente en otro lote."
+              },
+              {
+                "metal": "AG",
+                "grade": 1927.0,
+                "rr": 0.9481058640373637,
+                "amount_usd": 1936.6333474745181,
+                "status": "productive",
+                "headline": "Plata: recupera 95% → $1,937."
+              },
+              {
+                "metal": "PT",
+                "grade": 0.0,
+                "rr": 0.0,
+                "amount_usd": 0.0,
+                "status": "below_threshold",
+                "headline": "Platino: ley 0 g/t por debajo de la deducción de 0 g/t → paga 0 (se rescata mezclándolo)."
+              },
+              {
+                "metal": "PD",
+                "grade": 33.599999999999994,
+                "rr": 0.4642857142857142,
+                "amount_usd": 402.78285120845396,
+                "status": "productive",
+                "headline": "Paladio: recupera 46% → $403."
+              }
+            ],
+            "notes": [
+              "Metal por debajo del umbral en este lote: platino (no paga solo).",
+              "Lote de alta ley: concentra el metal valioso para superar topes y umbrales; no conviene diluirlo con relleno pobre."
+            ]
+          }
+        ],
+        "bullets": [
+          "Conviene un solo lote: el material es homogéneo y separarlo no supera umbrales ni evita diluciones que justifiquen otro envío.",
+          "Lotes con recuperación en el tope (oro): la riqueza extra se aprovechó para levantar otros metales en vez de desperdiciarse sobre el tope.",
+          "Metales rescatados por la mezcla (plata, paladio): superan el umbral de deducción gracias a combinarse con pilas ricas."
+        ]
+      },
+      "sub_threshold": [],
+      "note": "base única (remanente)"
+    }
+  ]
+}

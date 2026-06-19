@@ -1,0 +1,11 @@
+services:
+  raee-optimizer:
+    build: .
+    image: raee-optimizer:latest
+    container_name: raee-optimizer
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    # Para regenerar el artefacto del histórico sin reconstruir la imagen,
+    # montá el repo y corré: docker compose exec raee-optimizer \
+    #   python -m analysis.build_analysis
