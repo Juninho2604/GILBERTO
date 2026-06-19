@@ -32,15 +32,17 @@ def render() -> None:
 
     c1, c2, c3, c4 = st.columns(4)
     with c1:
-        kpi("Pago real total", usd(a["actual_total_usd"]),
-            hint="Lo que efectivamente pagó la refinería (leyes medidas).")
+        kpi("Valorización total (medida)", usd(a["actual_total_usd"]),
+            hint="Fórmula §3 sobre las leyes MEDIDAS de cada lote, a precios de "
+                 "referencia. No es el efectivo histórico (los precios variaban).")
     with c2:
         kpi("Lotes con receta", f"{a['n_resolvable']}/{a['n_lots']}",
             hint="Resolubles para reconstruir y re-optimizar.")
     with c3:
-        kpi("Extra re-optimizando", f"+{a['extra_pct']:.1f}%",
+        kpi("Mejora re-mezclando", f"+{a['extra_pct']:.1f}%",
             delta=f"+{usd(a['extra_usd'])}", delta_color=GOOD,
-            hint="Las mezclas históricas ya eran casi óptimas.")
+            hint="Solo lotes multipila, mundo estimado vs. estimado. Las mezclas "
+                 "históricas ya eran casi óptimas.")
     with c4:
         kpi("Metal sub-umbral", usd(a["sub_threshold_total_usd"]),
             delta="pagó $0", delta_color="#e6b451",
@@ -48,11 +50,13 @@ def render() -> None:
 
     st.write("")
     why(
-        "Este histórico es la <b>prueba de fidelidad</b> del modelo: reproduce el "
-        f"dinero real con ±{a['money_fidelity_pct']:.1f}% de desvío y, al re-optimizar "
-        "cada lote, confirma que las decisiones de Gilberto ya eran muy buenas "
-        f"(solo +{a['extra_pct']:.1f}% de mejora posible lote por lote). El margen "
-        "grande está hacia adelante, sobre el stock acumulado (ver Optimizador).",
+        "Este histórico es la <b>prueba de fidelidad</b> de las leyes estimadas: "
+        "reconstruidas, reproducen la <b>valorización medida</b> con "
+        f"±{a['money_fidelity_pct']:.1f}% de desvío (estimado vs. medido, mismos "
+        "precios). Y al re-mezclar los lotes multipila, la mejora posible es de "
+        f"solo +{a['extra_pct']:.1f}%: las decisiones de Gilberto ya eran muy "
+        "buenas. El margen grande está hacia adelante, sobre el stock acumulado "
+        "(ver Optimizador).",
         "good",
     )
     st.write("")
@@ -60,22 +64,28 @@ def render() -> None:
     # --- Tabla resumen ----------------------------------------------------- #
     st.markdown("##### Lote por lote")
     st.caption(
-        "**Pago real** = fórmula de la refinería (§3) sobre las leyes **medidas** "
-        "de cada lote, a precios de referencia. **Óptimo** = lo que pagaría la "
-        "mejor partición de ese mismo material. Tocá un lote abajo para ver el "
-        "cálculo paso a paso."
+        "Hay **dos mundos, no comparables 1:1**. **Valorización medida** = fórmula "
+        "§3 sobre las leyes **medidas** por la refinería (a precios de referencia). "
+        "El bloque **Re-mezcla (estimado)** reconstruye las pilas con leyes "
+        "**estimadas** y deja que el optimizador re-particione: solo tiene sentido "
+        "en lotes de **≥2 pilas** (en monopila no hay nada que mezclar, va '—'). "
+        "La columna honesta es **Mejora** (estimado vs. estimado, mismo mundo). "
+        "Tocá un lote abajo para ver el cálculo paso a paso."
     )
     rows = []
     for L in a["lots"]:
+        # La re-mezcla solo tiene sentido con ≥2 pilas resolubles.
+        multipila = L["n_components"] > 1 and L["model_optimal_usd"] is not None
         rows.append(
             {
                 "Lote": str(L["customer_lot"]),
+                "JX": str(L["jx_lot"]),
                 "Receta": _mask_recipe(L["recipe_raw"], private),
                 "kg": round(L["wmt"], 0),
-                "Pago real": round(L["actual_net_usd"], 0),
+                "Valorización medida": round(L["actual_net_usd"], 0),
                 "USD/kg": round(L["actual_per_kg"], 1),
-                "Óptimo": round(L["model_optimal_usd"], 0) if L["model_optimal_usd"] else None,
-                "Extra": round(L["extra_usd"], 0) if L["extra_usd"] else None,
+                "Re-mezcla (est.)": round(L["model_optimal_usd"], 0) if multipila else None,
+                "Mejora": round(L["extra_usd"], 0) if (multipila and L["extra_usd"]) else None,
                 "Sub-umbral": round(sum(s["gross_value_usd"] for s in L["sub_threshold"]), 0) or None,
             }
         )
@@ -83,10 +93,22 @@ def render() -> None:
     st.dataframe(
         df, width="stretch", hide_index=True, height=320,
         column_config={
-            "Pago real": st.column_config.NumberColumn("Pago real", format="$%.0f"),
-            "Óptimo": st.column_config.NumberColumn("Óptimo (modelo)", format="$%.0f"),
-            "Extra": st.column_config.NumberColumn("Extra", format="$%.0f"),
-            "Sub-umbral": st.column_config.NumberColumn("Metal $0", format="$%.0f"),
+            "Lote": st.column_config.TextColumn("Lote", help="ID del cliente (puede repetirse entre series)."),
+            "JX": st.column_config.TextColumn("JX", help="ID único del envío a la refinería."),
+            "Valorización medida": st.column_config.NumberColumn(
+                "Valorización medida", format="$%.0f",
+                help="Leyes medidas, precios de referencia. No es el efectivo histórico."),
+            "Re-mezcla (est.)": st.column_config.NumberColumn(
+                "Re-mezcla (est.)", format="$%.0f",
+                help="MUNDO ESTIMADO: re-partición del material reconstruido con "
+                     "leyes estimadas. Solo multipila. No comparable 1:1 con la "
+                     "valorización medida."),
+            "Mejora": st.column_config.NumberColumn(
+                "Mejora", format="$%.0f",
+                help="Re-mezcla − tal cual, ambos en mundo estimado (comparación honesta)."),
+            "Sub-umbral": st.column_config.NumberColumn(
+                "Metal $0", format="$%.0f",
+                help="Ag/Pd bajo el umbral de deducción: pagó $0 (leyes medidas)."),
         },
     )
 
@@ -104,10 +126,13 @@ def render() -> None:
     L = options[pick]
 
     m1, m2, m3 = st.columns(3)
-    m1.metric("Pago real (medido)", usd(L["actual_net_usd"]))
-    m2.metric("Modelo 'tal cual'", usd(L["model_aswas_usd"] or 0))
-    m3.metric("Modelo óptimo", usd(L["model_optimal_usd"] or 0),
-              delta=f"+{usd(L['extra_usd'] or 0)}")
+    m1.metric("Valorización (medida)", usd(L["actual_net_usd"]),
+              help="Leyes medidas, precios de referencia (no efectivo histórico).")
+    m2.metric("Modelo 'tal cual' (est.)", usd(L["model_aswas_usd"] or 0),
+              help="Leyes estimadas, mezcla como la armó Gilberto.")
+    m3.metric("Modelo re-mezcla (est.)", usd(L["model_optimal_usd"] or 0),
+              delta=f"+{usd(L['extra_usd'] or 0)}",
+              help="Leyes estimadas, mejor partición. Mejora = vs. 'tal cual'.")
 
     # --- Transparencia: cómo se calcula el $ de este lote ------------------ #
     with st.expander("🧮 ¿Cómo se calcula este precio? (paso a paso)", expanded=False):
