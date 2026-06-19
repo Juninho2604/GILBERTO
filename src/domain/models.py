@@ -34,6 +34,7 @@ class GradeSource(str, Enum):
 
     MANUAL = "manual"
     ESTIMATED = "estimada"      # despejada del histórico por regresión
+    MARKET = "mercado"          # estimada por tipo de material (piso conservador)
     LAB = "laboratorio"         # ensayo real
 
 
