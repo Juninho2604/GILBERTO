@@ -253,6 +253,7 @@ def optimize_partition(
     *,
     num_lots: int = 2,
     min_lot_kg: float = 0.0,
+    max_lot_kg: Optional[float] = None,
     solver: Optional[pulp.LpSolver] = None,
     time_limit_s: Optional[float] = 30.0,
 ) -> PartitionResult:
@@ -260,7 +261,9 @@ def optimize_partition(
 
     Responde a "¿cuáles son las mezclas óptimas?": decide cuánto de cada pila va
     a cada lote (puede dejar material sin asignar si no conviene enviarlo).
-    ``min_lot_kg`` impone un tamaño mínimo por lote activo.
+    ``min_lot_kg`` impone un tamaño mínimo por lote activo; ``max_lot_kg`` impone
+    el tope físico de un lote (p. ej. el lote final de ~18-19 t que se arma en
+    Miami, o la capacidad del contenedor).
     """
     cand = [it for it in items if it.quantity_kg > 0]
     if not cand:
@@ -280,6 +283,9 @@ def optimize_partition(
     for it in cand:
         prob += pulp.lpSum(x[(it.code, k)] for k in range(num_lots)) <= it.quantity_kg
 
+    # Tope superior de un lote: el menor entre el stock total y el max físico.
+    cap = min(total_stock, max_lot_kg) if max_lot_kg else total_stock
+
     nets = []
     for k in range(num_lots):
         xk = {it.code: x[(it.code, k)] for it in cand}
@@ -288,7 +294,9 @@ def optimize_partition(
         if min_lot_kg > 0:
             u = pulp.LpVariable(f"use_{k}", cat="Binary")
             prob += wmt_k >= min_lot_kg * u
-            prob += wmt_k <= total_stock * u
+            prob += wmt_k <= cap * u
+        elif max_lot_kg:
+            prob += wmt_k <= max_lot_kg  # tope físico del lote / contenedor
         # Rompe simetría: ordena lotes por peso decreciente.
         if k > 0:
             prev = {it.code: x[(it.code, k - 1)] for it in cand}

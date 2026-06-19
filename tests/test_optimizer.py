@@ -19,6 +19,20 @@ def _item(code, **kw):
     return InventoryItem(code=code, name=code, **kw)
 
 
+def test_partition_respects_max_lot_kg():
+    """Ningún lote debe superar el tope físico (contenedor / lote final)."""
+    prices, terms = default_prices(), default_terms()
+    items = [
+        _item(f"P{i}", quantity_kg=8000, grade_cu=0.20, grade_au=120, grade_ag=600, grade_pd=40)
+        for i in range(5)
+    ]  # 40.000 kg en total
+    res = optimize_partition(items, prices, terms, num_lots=4, max_lot_kg=18_500)
+    assert res.status == "Optimal"
+    assert res.lots
+    for lot in res.lots:
+        assert lot.total_weight_kg <= 18_500 + 1.0  # tolerancia numérica
+
+
 def test_excludes_value_destroying_pile():
     """Una pila de puro relleno (sin metal) no debería entrar si destruye valor."""
     prices, terms = default_prices(), default_terms()
