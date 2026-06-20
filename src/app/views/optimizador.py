@@ -164,24 +164,30 @@ def render() -> None:
 
     # Plan de contenedores (lote final + anticipo).
     loads = pack_lots([l.total_weight_kg for l in res.lots], container_kg, final_lot_kg)
-    import pandas as pd
-
-    rows = []
+    lot_totals = {i + 1: l.total_weight_kg for i, l in enumerate(res.lots)}
+    any_split = False
     for c in loads:
-        principal = "  +  ".join(
-            f"Lote {n}: {kg/1000:,.1f} t" for n, kg, anti in c.segments if not anti
+        over = c.total_kg > container_kg + 1.0
+        mark = "🚫 EXCEDE EL TOPE" if over else "✓ dentro del tope"
+        st.markdown(
+            f"**📦 Contenedor #{c.index} — {c.total_kg/1000:,.1f} t "
+            f"de {container_kg/1000:,.0f} t** · {c.fill_pct:.0f}% lleno · {mark}"
         )
-        anticipo = "  +  ".join(
-            f"Lote {n}: {kg/1000:,.1f} t" for n, kg, anti in c.segments if anti
+        parts = []
+        for n, kg, anti in c.segments:
+            partial = kg < lot_totals.get(n, kg) - 1.0
+            any_split = any_split or partial
+            tag = " (parte)" if partial else ""
+            atag = " · anticipo" if anti else ""
+            parts.append(f"Lote {n}{tag}: {kg/1000:,.1f} t{atag}")
+        st.caption("Lleva → " + "   •   ".join(parts))
+    if any_split:
+        st.caption(
+            "ℹ️ Un lote marcado **(parte)** se reparte entre dos contenedores: se "
+            "llena uno hasta el tope de 23 t y el resto viaja en el siguiente. Por "
+            "eso **ningún contenedor pasa su capacidad** — aunque un mismo lote "
+            "aparezca en dos."
         )
-        rows.append({
-            "Contenedor": f"#{c.index}",
-            "Lote final": principal or "—",
-            "Anticipo (espera en Miami)": anticipo or "—",
-            "Carga": f"{c.total_kg/1000:,.1f} t",
-            "Llenado": f"{c.fill_pct:.0f}%",
-        })
-    st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
     st.write("")
 
     # --- Por qué es la mejor decisión ------------------------------------- #
