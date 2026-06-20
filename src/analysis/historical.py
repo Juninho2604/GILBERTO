@@ -80,6 +80,10 @@ class LotComparison:
     actual_grades: dict[str, float]
     actual_net_usd: float
     actual_per_kg: float
+    actual_util_pct: float = 0.0       # % del metal presente que la refinería paga
+    actual_net_util_pct: float = 0.0   # idem, ya descontados los cargos
+    actual_gross_usd: float = 0.0      # valor del metal presente (interno, para agregar)
+    actual_metal_paid_usd: float = 0.0 # valor del metal pagado (interno, para agregar)
     # Mundo del modelo (solo si la receta es resoluble)
     model_aswas_usd: Optional[float] = None
     model_optimal_usd: Optional[float] = None
@@ -117,6 +121,10 @@ class HistoryAnalysis:
     model_optimal_usd: float         # re-optimizado lote por lote
     extra_usd: float
     extra_pct: float
+    # Aprovechamiento del material (lo importante para el negocio)
+    util_pct: float = 0.0          # % del metal presente que paga la refinería
+    net_util_pct: float = 0.0      # idem, ya descontados los cargos
+    unused_pct: float = 0.0        # % del metal que se pierde bajo los mínimos
     # Validación
     precision: list[MetalPrecision] = field(default_factory=list)
     money_fidelity_pct: float = 0.0  # |baseline_estimado − real| / real, en %
@@ -225,6 +233,10 @@ def analyze_lot(
         actual_grades=dict(lot.grades),
         actual_net_usd=actual.net_value_usd,
         actual_per_kg=actual.result_per_kg,
+        actual_util_pct=actual.metal_utilization_pct,
+        actual_net_util_pct=actual.net_utilization_pct,
+        actual_gross_usd=actual.gross_metal_total,
+        actual_metal_paid_usd=actual.metal_total,
         sub_threshold=[asdict(s) for s in sub],
         note=lot.recipe.note,
     )
@@ -318,6 +330,14 @@ def analyze_history(
         s["gross_value_usd"] for c in comparisons for s in c.sub_threshold
     )
 
+    # Aprovechamiento agregado: metal pagado / metal presente (todos los lotes).
+    gross_all = sum(c.actual_gross_usd for c in comparisons)
+    paid_all = sum(c.actual_metal_paid_usd for c in comparisons)
+    net_all = sum(c.actual_net_usd for c in comparisons)
+    util_pct = 100.0 * paid_all / gross_all if gross_all else 0.0
+    net_util_pct = 100.0 * net_all / gross_all if gross_all else 0.0
+    unused_pct = max(0.0, 100.0 - util_pct)
+
     stocked = {it.code for it in inv if it.quantity_kg > 0}
     coverage = {
         "stocked_items": len(stocked),
@@ -334,6 +354,9 @@ def analyze_history(
         model_optimal_usd=optimal,
         extra_usd=extra,
         extra_pct=extra_pct,
+        util_pct=util_pct,
+        net_util_pct=net_util_pct,
+        unused_pct=unused_pct,
         precision=precision,
         money_fidelity_pct=round(money_fidelity, 1),
         sub_threshold_total_usd=sub_total,

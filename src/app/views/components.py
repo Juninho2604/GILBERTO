@@ -58,11 +58,28 @@ def charges_breakdown(v: LotValuation) -> None:
 
 
 def lot_header_metrics(v: LotValuation) -> None:
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Valor neto", usd2(v.net_value_usd))
-    c2.metric("USD / kg", f"{v.result_per_kg:,.2f}")
-    c3.metric("WMT", f"{v.wmt:,.0f} kg")
-    c4.metric("Au mezcla", f"{v.metals['AU'].grade:,.0f} g/t")
+    """Encabezado del lote: el % manda, el $ queda como referencia."""
+    c1, c2, c3 = st.columns(3)
+    c1.metric(
+        "Material aprovechado", f"{v.metal_utilization_pct:.0f}%",
+        help="Del metal presente en la mezcla, qué % paga la refinería (supera "
+        "sus mínimos de deducción). El resto se pierde bajo el umbral.",
+    )
+    c2.metric(
+        "No aprovechado", f"{v.unused_pct:.0f}%",
+        delta="se pierde bajo el mínimo", delta_color="off",
+        help="Metal que cae por debajo del mínimo de la refinería y paga $0.",
+    )
+    c3.metric(
+        "Neto tras cargos", f"{v.net_utilization_pct:.0f}%",
+        help="% neto sobre el metal presente, ya descontados tratamiento y "
+        "trituración.",
+    )
+    st.caption(
+        f"Referencia · {v.wmt/1000:,.1f} t · Au mezcla "
+        f"{v.metals['AU'].grade:,.0f} g/t · valor neto {usd2(v.net_value_usd)} "
+        f"({v.result_per_kg:,.1f} USD/kg)."
+    )
 
 
 def explanation_block(expl: dict) -> None:

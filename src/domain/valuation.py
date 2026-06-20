@@ -37,7 +37,8 @@ class MetalResult:
     rr: float             # recovery rate aplicado
     recovered: float      # metal recuperado (kg para CU, g para preciosos)
     unit_price: float     # precio neto de RC (USD/t para CU, USD/oz preciosos)
-    amount_usd: float     # monto en USD
+    amount_usd: float     # monto en USD (metal recuperado, lo que pagan)
+    gross_amount_usd: float = 0.0  # valor del metal PRESENTE (si RR=1, antes de mínimos)
 
 
 @dataclass
@@ -55,6 +56,26 @@ class LotValuation:
     charges_total: float
     net_value_usd: float
     result_per_kg: float
+    gross_metal_total: float = 0.0  # valor de TODO el metal presente (antes de mínimos)
+
+    @property
+    def metal_utilization_pct(self) -> float:
+        """% del metal presente que la refinería paga (supera sus mínimos).
+
+        100% = todo el metal se cobra; lo que falta es metal que cae bajo el
+        umbral de deducción y se pierde. Es el "% de material aprovechado".
+        """
+        return 100.0 * self.metal_total / self.gross_metal_total if self.gross_metal_total > 0 else 0.0
+
+    @property
+    def net_utilization_pct(self) -> float:
+        """% neto sobre el metal presente, ya descontados los cargos por peso."""
+        return 100.0 * self.net_value_usd / self.gross_metal_total if self.gross_metal_total > 0 else 0.0
+
+    @property
+    def unused_pct(self) -> float:
+        """% del metal presente que NO se aprovecha (se pierde bajo los mínimos)."""
+        return max(0.0, 100.0 - self.metal_utilization_pct)
 
 
 @dataclass
@@ -107,7 +128,10 @@ def _metal_result_cu(
     recovered_kg = content_kg * rr
     unit_price = prices.price_cu - terms.rc_cu
     amount_usd = recovered_kg * unit_price / 1000.0  # kg → tonelada
-    return MetalResult("CU", grade_cu, content_kg, rr, recovered_kg, unit_price, amount_usd)
+    gross_usd = content_kg * unit_price / 1000.0     # si se pagara todo el metal
+    return MetalResult(
+        "CU", grade_cu, content_kg, rr, recovered_kg, unit_price, amount_usd, gross_usd
+    )
 
 
 def _metal_result_precious(
@@ -119,7 +143,10 @@ def _metal_result_precious(
     recovered_g = content_g * rr
     unit_price = prices.price(metal) - terms.rc(metal)
     amount_usd = recovered_g * unit_price / TROY_OUNCE_G  # gramos → onza troy
-    return MetalResult(metal, grade, content_g, rr, recovered_g, unit_price, amount_usd)
+    gross_usd = max(0.0, content_g * unit_price / TROY_OUNCE_G)  # metal presente
+    return MetalResult(
+        metal, grade, content_g, rr, recovered_g, unit_price, amount_usd, gross_usd
+    )
 
 
 def value_lot(
@@ -144,6 +171,7 @@ def value_lot(
         )
 
     metal_total = sum(r.amount_usd for r in results.values())
+    gross_metal_total = sum(r.gross_amount_usd for r in results.values())
 
     treatment_charge = (dmt / 1000.0) * terms.tc_rate
     shredding_charge = (wmt / 1000.0) * terms.shred_rate
@@ -168,6 +196,7 @@ def value_lot(
         charges_total=charges_total,
         net_value_usd=net_value_usd,
         result_per_kg=result_per_kg,
+        gross_metal_total=gross_metal_total,
     )
 
 

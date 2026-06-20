@@ -97,7 +97,20 @@ def default_optimum() -> dict:
 
     best_usd = best.net_value_usd if best else single
     baseline = max(separate, single)  # mejor estrategia "humana" simple
+
+    # Aprovechamiento del material en la mejor mezcla (lo importante).
+    gross = paid = net = 0.0
+    if best:
+        for l in best.lots:
+            gross += l.valuation.gross_metal_total
+            paid += l.valuation.metal_total
+            net += l.valuation.net_value_usd
+    best_util_pct = 100.0 * paid / gross if gross else 0.0
+    best_net_util_pct = 100.0 * net / gross if gross else 0.0
     return {
+        "best_util_pct": best_util_pct,
+        "best_net_util_pct": best_net_util_pct,
+        "best_unused_pct": max(0.0, 100.0 - best_util_pct),
         "separate_usd": separate,
         "single_usd": single,
         "best_usd": best_usd,

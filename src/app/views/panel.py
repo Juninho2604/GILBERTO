@@ -31,28 +31,30 @@ def render() -> None:
         )
     with c2:
         kpi(
-            "Mejor mezcla — stock actual",
-            usd(opt["best_usd"]),
-            delta=f"en {opt['best_num_lots']} lote(s)",
-            delta_color=MUTED,
-            hint=f"{opt['n_graded']} pilas con ley · {opt['graded_stock_kg']:,.0f} kg "
-            f"(de {opt['n_items']} en stock).",
+            "Material aprovechado — stock actual",
+            f"{opt['best_util_pct']:.0f}%",
+            delta="del metal lo paga la refinería",
+            delta_color=GOOD,
+            accent=True,
+            hint=f"Mejor mezcla del stock con ley ({opt['n_graded']} pilas · "
+            f"{opt['graded_stock_kg']:,.0f} kg). El resto cae bajo los mínimos.",
         )
     with c3:
         kpi(
             "Gana vs. mezcla única",
             f"+{opt['gain_vs_single_pct']:.1f}%",
-            delta=f"+{usd(opt['gain_vs_single_usd'])} por ciclo",
+            delta="por mezclar mejor (no diluir el oro)",
             delta_color=GOOD,
-            hint="No diluir el oro: separar lo rico del relleno.",
+            hint="Separar lo rico del relleno rinde más que mezclar todo junto.",
         )
     with c4:
         kpi(
-            "Metal rescatable",
-            usd(a["sub_threshold_total_usd"]),
-            delta="Ag/Pd que pagó $0",
+            "Material desaprovechado — histórico",
+            f"{a['unused_pct']:.0f}%",
+            delta="metal que pagó $0 bajo el mínimo",
             delta_color="#e6b451",
-            hint="Metal medido bajo el umbral de deducción en el histórico.",
+            hint="Promedio sobre los 53 lotes: metal presente que no superó el "
+            "umbral de deducción.",
         )
 
     st.write("")

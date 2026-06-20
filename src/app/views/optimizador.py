@@ -120,8 +120,18 @@ def render() -> None:
     shipped_kg = sum(l.total_weight_kg for l in res.lots)
     plan = containers_needed(shipped_kg, container_kg)
 
-    # --- Titular ---------------------------------------------------------- #
-    st.markdown(f"### {usd2(res.net_value_usd)}")
+    # --- Titular: el % manda, el $ de referencia -------------------------- #
+    gross = sum(l.valuation.gross_metal_total for l in res.lots)
+    paid = sum(l.valuation.metal_total for l in res.lots)
+    net = sum(l.valuation.net_value_usd for l in res.lots)
+    util = 100.0 * paid / gross if gross else 0.0
+    net_util = 100.0 * net / gross if gross else 0.0
+    st.markdown(f"### {util:.0f}% del metal aprovechado")
+    st.caption(
+        f"De todo el oro/plata/cobre/paladio del envío, la refinería paga el "
+        f"**{util:.0f}%**; tras cargos queda **{net_util:.0f}%** neto. "
+        f"Referencia: valor neto {usd2(res.net_value_usd)}."
+    )
     st.markdown(expl["headline"])
 
     sweep = st.session_state.get("opt_sweep", [])
@@ -186,9 +196,10 @@ def render() -> None:
         role = expl["lots"][i - 1]["role"] if i - 1 < len(expl["lots"]) else "mixto"
         lot_fill = 100.0 * lot.total_weight_kg / final_lot_kg if final_lot_kg else 0.0
         with st.expander(
-            f"Lote {i} · {_ROLE_LABEL.get(role, '')} — {usd(v.net_value_usd)} · "
-            f"{v.result_per_kg:.1f} USD/kg · {lot.total_weight_kg/1000:,.1f} t "
-            f"({lot_fill:.0f}% del tope) · Au {v.metals['AU'].grade:.0f} g/t",
+            f"Lote {i} · {_ROLE_LABEL.get(role, '')} — "
+            f"{v.metal_utilization_pct:.0f}% aprovechado · "
+            f"{lot.total_weight_kg/1000:,.1f} t ({lot_fill:.0f}% del tope) · "
+            f"Au {v.metals['AU'].grade:.0f} g/t · ref. {usd(v.net_value_usd)}",
             expanded=(i == 1),
         ):
             cap_fill = 100.0 * lot.total_weight_kg / container_kg if container_kg else 0.0

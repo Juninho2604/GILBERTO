@@ -32,21 +32,21 @@ def render() -> None:
 
     c1, c2, c3, c4 = st.columns(4)
     with c1:
-        kpi("Valorización total (medida)", usd(a["actual_total_usd"]),
-            hint="Fórmula §3 sobre las leyes MEDIDAS de cada lote, a precios de "
-                 "referencia. No es el efectivo histórico (los precios variaban).")
+        kpi("Material aprovechado", f"{a['util_pct']:.0f}%",
+            delta="del metal lo paga la refinería", delta_color=GOOD, accent=True,
+            hint="De todo el oro/plata/cobre/paladio presente en los lotes, qué % "
+                 "superó los mínimos de la refinería y se cobró.")
     with c2:
+        kpi("No aprovechado", f"{a['unused_pct']:.0f}%",
+            delta="se pierde bajo el mínimo", delta_color="#e6b451",
+            hint="Metal que quedó por debajo del umbral de deducción y pagó $0.")
+    with c3:
+        kpi("Neto tras cargos", f"{a['net_util_pct']:.0f}%",
+            hint="% neto sobre el metal presente, ya descontados tratamiento y "
+                 "trituración.")
+    with c4:
         kpi("Lotes con receta", f"{a['n_resolvable']}/{a['n_lots']}",
             hint="Resolubles para reconstruir y re-optimizar.")
-    with c3:
-        kpi("Mejora re-mezclando", f"+{a['extra_pct']:.1f}%",
-            delta=f"+{usd(a['extra_usd'])}", delta_color=GOOD,
-            hint="Solo lotes multipila, mundo estimado vs. estimado. Las mezclas "
-                 "históricas ya eran casi óptimas.")
-    with c4:
-        kpi("Metal sub-umbral", usd(a["sub_threshold_total_usd"]),
-            delta="pagó $0", delta_color="#e6b451",
-            hint="Ag/Pd bajo el umbral de deducción.")
 
     st.write("")
     why(
@@ -64,13 +64,11 @@ def render() -> None:
     # --- Tabla resumen ----------------------------------------------------- #
     st.markdown("##### Lote por lote")
     st.caption(
-        "Hay **dos mundos, no comparables 1:1**. **Valorización medida** = fórmula "
-        "§3 sobre las leyes **medidas** por la refinería (a precios de referencia). "
-        "El bloque **Re-mezcla (estimado)** reconstruye las pilas con leyes "
-        "**estimadas** y deja que el optimizador re-particione: solo tiene sentido "
-        "en lotes de **≥2 pilas** (en monopila no hay nada que mezclar, va '—'). "
-        "La columna honesta es **Mejora** (estimado vs. estimado, mismo mundo). "
-        "Tocá un lote abajo para ver el cálculo paso a paso."
+        "**Aprovechado** = del metal presente en el lote, qué % pagó la refinería "
+        "(lo que superó sus mínimos); **Neto** descuenta además los cargos. El **$** "
+        "queda solo como referencia (leyes medidas, precios de referencia; no es el "
+        "efectivo histórico). El bloque **Re-mezcla (est.)** es del mundo estimado y "
+        "solo aplica a lotes de **≥2 pilas**. Tocá un lote abajo para el detalle."
     )
     rows = []
     for L in a["lots"]:
@@ -82,11 +80,12 @@ def render() -> None:
                 "JX": str(L["jx_lot"]),
                 "Receta": _mask_recipe(L["recipe_raw"], private),
                 "kg": round(L["wmt"], 0),
-                "Valorización medida": round(L["actual_net_usd"], 0),
+                "Aprovechado": round(L.get("actual_util_pct", 0)),
+                "Neto": round(L.get("actual_net_util_pct", 0)),
+                "Valor neto": round(L["actual_net_usd"], 0),
                 "USD/kg": round(L["actual_per_kg"], 1),
                 "Re-mezcla (est.)": round(L["model_optimal_usd"], 0) if multipila else None,
                 "Mejora": round(L["extra_usd"], 0) if (multipila and L["extra_usd"]) else None,
-                "Sub-umbral": round(sum(s["gross_value_usd"] for s in L["sub_threshold"]), 0) or None,
             }
         )
     df = pd.DataFrame(rows)
@@ -95,20 +94,23 @@ def render() -> None:
         column_config={
             "Lote": st.column_config.TextColumn("Lote", help="ID del cliente (puede repetirse entre series)."),
             "JX": st.column_config.TextColumn("JX", help="ID único del envío a la refinería."),
-            "Valorización medida": st.column_config.NumberColumn(
-                "Valorización medida", format="$%.0f",
-                help="Leyes medidas, precios de referencia. No es el efectivo histórico."),
+            "Aprovechado": st.column_config.ProgressColumn(
+                "Aprovechado", min_value=0, max_value=100, format="%d%%",
+                help="% del metal presente que la refinería pagó (superó sus mínimos)."),
+            "Neto": st.column_config.NumberColumn(
+                "Neto", format="%d%%",
+                help="% neto sobre el metal presente, ya descontados los cargos."),
+            "Valor neto": st.column_config.NumberColumn(
+                "Valor neto ($ ref.)", format="$%.0f",
+                help="Referencia en USD (leyes medidas, precios de referencia). No es "
+                     "el efectivo histórico."),
             "Re-mezcla (est.)": st.column_config.NumberColumn(
                 "Re-mezcla (est.)", format="$%.0f",
                 help="MUNDO ESTIMADO: re-partición del material reconstruido con "
-                     "leyes estimadas. Solo multipila. No comparable 1:1 con la "
-                     "valorización medida."),
+                     "leyes estimadas. Solo multipila."),
             "Mejora": st.column_config.NumberColumn(
                 "Mejora", format="$%.0f",
                 help="Re-mezcla − tal cual, ambos en mundo estimado (comparación honesta)."),
-            "Sub-umbral": st.column_config.NumberColumn(
-                "Metal $0", format="$%.0f",
-                help="Ag/Pd bajo el umbral de deducción: pagó $0 (leyes medidas)."),
         },
     )
 
