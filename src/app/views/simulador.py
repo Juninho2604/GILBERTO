@@ -6,7 +6,7 @@ import pandas as pd
 import streamlit as st
 
 from app.data_access import inventory_items
-from app.ui import brand, pile_label, usd2
+from app.ui import brand, pile_label
 from app.views.components import charges_breakdown, lot_header_metrics, metal_table
 from domain.models import Category, GradeSource, InventoryItem
 from domain.valuation import BlendComponent, value_blend

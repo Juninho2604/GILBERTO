@@ -5,7 +5,7 @@ from __future__ import annotations
 import streamlit as st
 
 from app.data_access import default_optimum, history_analysis
-from app.ui import GOOD, MUTED, brand, kpi, usd, why
+from app.ui import GOOD, brand, kpi, usd, why
 
 
 def render() -> None:

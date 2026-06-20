@@ -80,6 +80,35 @@ def test_appendix_a_totals(appendix_a):
     assert appendix_a.result_per_kg == pytest.approx(13.57, abs=0.01)
 
 
+def test_appendix_a_utilization_pct(appendix_a):
+    """% de material aprovechado: metal pagado / metal presente (y su complemento)."""
+    v = appendix_a
+    # El bruto es la suma de los valores de metal presente (si RR fuese 1).
+    gross = sum(r.gross_amount_usd for r in v.metals.values())
+    assert v.gross_metal_total == pytest.approx(gross)
+    assert v.gross_metal_total >= v.metal_total  # presente ≥ pagado
+    # Aprovechado = metal pagado / presente; del Apéndice A da ≈89%.
+    assert v.metal_utilization_pct == pytest.approx(89.0, abs=0.5)
+    # Neto (tras cargos) es menor que el aprovechado bruto.
+    assert v.net_utilization_pct < v.metal_utilization_pct
+    # Aprovechado + no aprovechado = 100%.
+    assert v.metal_utilization_pct + v.unused_pct == pytest.approx(100.0, abs=1e-6)
+    # Por metal: amount/gross == RR (el Pd sub-umbral aporta 0).
+    au = v.metals["AU"]
+    assert au.amount_usd / au.gross_amount_usd == pytest.approx(au.rr, rel=1e-6)
+    assert v.metals["PD"].amount_usd == 0.0
+
+
+def test_utilization_zero_metal_is_safe():
+    """Sin metal presente, los % no explotan (división por cero)."""
+    prices, terms = default_prices(), default_terms()
+    v = value_lot(1000.0, 0.0, {"CU": 0.0}, prices, terms)
+    assert v.gross_metal_total == 0.0
+    assert v.metal_utilization_pct == 0.0
+    assert v.net_utilization_pct == 0.0
+    assert v.unused_pct == 100.0
+
+
 # --------------------------------------------------------------------------- #
 # Recovery Rate unitarios (tabla 3.3)
 # --------------------------------------------------------------------------- #
