@@ -341,3 +341,64 @@ def _max_grade(items: Sequence[InventoryItem]) -> float:
     for it in items:
         g = max(g, it.grade_au, it.grade_ag, it.grade_pt, it.grade_pd)
     return g
+
+
+# --------------------------------------------------------------------------- #
+# Modo 3 — mejor partición: el sistema elige cuántos lotes
+# --------------------------------------------------------------------------- #
+@dataclass
+class BestPartitionResult:
+    """Mejor partición encontrada y el barrido que la justifica."""
+
+    result: PartitionResult
+    num_lots: int
+    sweep: list[tuple[int, float]] = field(default_factory=list)  # (k, net_usd)
+
+    @property
+    def net_value_usd(self) -> float:
+        return self.result.net_value_usd
+
+
+def best_partition(
+    items: Sequence[InventoryItem],
+    prices: MetalPrices,
+    terms: ContractTerms,
+    *,
+    max_num_lots: int = 6,
+    min_lot_kg: float = 0.0,
+    max_lot_kg: Optional[float] = None,
+    time_limit_s: Optional[float] = 10.0,
+    min_gain_usd: float = 50.0,
+    solver: Optional[pulp.LpSolver] = None,
+) -> BestPartitionResult:
+    """Prueba 1..``max_num_lots`` y devuelve la partición de mayor valor.
+
+    El valor óptimo es **no decreciente** en la cantidad de lotes (un k-partición
+    es un caso particular de (k+1) con un lote vacío), así que la ganancia se
+    aplana: cortamos cuando agregar un lote rinde menos de ``min_gain_usd``. Así
+    el usuario no tiene que adivinar el número de lotes — el sistema lo elige.
+    """
+    cand = [it for it in items if it.quantity_kg > 0]
+    if not cand:
+        return BestPartitionResult(PartitionResult(status="empty"), 0)
+
+    # Tope razonable: no tiene sentido más lotes que pilas, ni más de lo pedido.
+    upper = max(1, min(max_num_lots, len(cand)))
+    best: Optional[PartitionResult] = None
+    best_k = 0
+    sweep: list[tuple[int, float]] = []
+    for k in range(1, upper + 1):
+        r = optimize_partition(
+            cand, prices, terms, num_lots=k, min_lot_kg=min_lot_kg,
+            max_lot_kg=max_lot_kg, time_limit_s=time_limit_s, solver=solver,
+        )
+        if not r.lots:
+            continue
+        sweep.append((k, r.net_value_usd))
+        if best is None or r.net_value_usd > best.net_value_usd + min_gain_usd:
+            best, best_k = r, k
+        else:
+            break  # la ganancia se aplanó; más lotes no agregan valor real
+    if best is None:
+        return BestPartitionResult(PartitionResult(status="infeasible"), 0, sweep)
+    return BestPartitionResult(best, best_k, sweep)

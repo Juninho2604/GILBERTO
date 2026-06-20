@@ -22,7 +22,7 @@ from app.views.components import (
     metal_table,
 )
 from domain.valuation import BlendComponent, value_blend
-from optimize.optimizer import optimize_partition
+from optimize.optimizer import best_partition, optimize_partition
 
 _ROLE_LABEL = {"rico": "LOTE RICO", "relleno": "RELLENO", "mixto": "MIXTO"}
 
@@ -58,10 +58,19 @@ def render() -> None:
 
     # --- Parámetros de optimización --------------------------------------- #
     min_lots = max(1, ceil(stock_kg / final_lot_kg)) if final_lot_kg > 0 else 1
-    c1, c2, c3 = st.columns([1, 1, 1])
-    num_lots = c1.slider("Cantidad de lotes", 1, 8, max(2, min_lots))
-    min_lot_kg = c2.number_input("Tamaño mínimo por lote (kg)", value=0.0, step=100.0)
-    run = c3.button("▶ Optimizar", type="primary", width="stretch")
+    c1, c2, c3 = st.columns([1.1, 1, 1])
+    mode = c1.radio(
+        "Cantidad de lotes", ["Automático", "Manual"], horizontal=True,
+        help="Automático: el sistema prueba varias cantidades y elige la de mayor "
+        "valor. Manual: vos fijás el número de lotes.",
+    )
+    if mode == "Manual":
+        num_lots = c2.slider("Número de lotes", 1, 8, max(2, min_lots))
+    else:
+        num_lots = None
+        c2.metric("Lotes", "auto", help="Lo decide el optimizador.")
+    min_lot_kg = c3.number_input("Tamaño mínimo por lote (kg)", value=0.0, step=100.0)
+    run = st.button("▶ Optimizar", type="primary", width="stretch")
 
     st.caption(
         f"Stock con ley: **{stock_kg:,.0f} kg**. Con tope de lote "
@@ -76,10 +85,18 @@ def render() -> None:
 
     if run:
         with st.spinner("Resolviendo el modelo (MILP)…"):
-            res = optimize_partition(
-                items, prices, terms, num_lots=num_lots,
-                min_lot_kg=min_lot_kg, max_lot_kg=final_lot_kg,
-            )
+            if num_lots is None:  # Automático: el sistema elige cuántos lotes.
+                bp = best_partition(
+                    items, prices, terms, max_num_lots=6,
+                    min_lot_kg=min_lot_kg, max_lot_kg=final_lot_kg,
+                )
+                res, chosen, sweep = bp.result, bp.num_lots, bp.sweep
+            else:
+                res = optimize_partition(
+                    items, prices, terms, num_lots=num_lots,
+                    min_lot_kg=min_lot_kg, max_lot_kg=final_lot_kg,
+                )
+                chosen, sweep = len(res.lots), []
             # Alternativa ingenua: el mismo material en una sola mezcla.
             single = value_blend(
                 [BlendComponent(it, it.quantity_kg) for it in items], prices, terms
@@ -89,6 +106,8 @@ def render() -> None:
         st.session_state.opt_expl = expl.to_dict()
         st.session_state.opt_container_kg = container_kg
         st.session_state.opt_final_lot_kg = final_lot_kg
+        st.session_state.opt_chosen = chosen
+        st.session_state.opt_sweep = sweep
 
     res = st.session_state.opt_result
     expl = st.session_state.opt_expl
@@ -104,6 +123,19 @@ def render() -> None:
     # --- Titular ---------------------------------------------------------- #
     st.markdown(f"### {usd2(res.net_value_usd)}")
     st.markdown(expl["headline"])
+
+    sweep = st.session_state.get("opt_sweep", [])
+    chosen = st.session_state.get("opt_chosen", len(res.lots))
+    if sweep and len(sweep) > 1:
+        detail = " · ".join(
+            f"**{k}: {usd(v)}**" if k == chosen else f"{k}: {usd(v)}"
+            for k, v in sweep
+        )
+        st.caption(
+            f"🔎 El sistema eligió **{chosen} lote(s)** automáticamente. "
+            f"Valor según cantidad de lotes — {detail}. Dividir en más lotes "
+            "agrega menos de $50, así que no vale la pena complicar el armado."
+        )
     st.write("")
 
     # --- Guía de armado / logística --------------------------------------- #

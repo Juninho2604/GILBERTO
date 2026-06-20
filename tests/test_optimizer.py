@@ -8,7 +8,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from domain.models import Category, InventoryItem, default_prices, default_terms
-from optimize.optimizer import optimize_blend, optimize_partition
+from optimize.optimizer import best_partition, optimize_blend, optimize_partition
 
 pulp = pytest.importorskip("pulp")
 
@@ -31,6 +31,35 @@ def test_pack_lots_container_plan():
     assert any(anti for _, _, anti in c1.segments)  # hay anticipo
     # Conserva el peso total.
     assert sum(c.total_kg for c in loads) == pytest.approx(18_500 + 11_525 + 11_525)
+
+
+def test_best_partition_picks_and_beats_single_lot():
+    """Auto-elige cuántos lotes; con material valioso que excede el tope, ≥2 lotes.
+
+    Dos pilas ricas que juntas pasan el tope del lote: en 1 solo lote no entran
+    (se deja material valioso afuera). El sistema debe elegir ≥2 lotes y batir al
+    de 1 lote.
+    """
+    prices, terms = default_prices(), default_terms()
+    items = [
+        _item("RICO1", quantity_kg=12_000, grade_cu=0.25, grade_au=200, grade_ag=800, grade_pd=50),
+        _item("RICO2", quantity_kg=12_000, grade_cu=0.24, grade_au=180, grade_ag=750, grade_pd=45),
+    ]
+    bp = best_partition(items, prices, terms, max_num_lots=5, max_lot_kg=18_000)
+    one = optimize_partition(items, prices, terms, num_lots=1, max_lot_kg=18_000)
+    assert bp.num_lots >= 2
+    assert bp.net_value_usd > one.net_value_usd  # 1 lote deja material rico afuera
+    # El barrido es no decreciente en cantidad de lotes.
+    vals = [v for _, v in bp.sweep]
+    assert vals == sorted(vals)
+
+
+def test_best_partition_stops_when_flat():
+    """Si un lote alcanza, no infla la cantidad de lotes."""
+    prices, terms = default_prices(), default_terms()
+    items = [_item("U", quantity_kg=4_000, grade_cu=0.22, grade_au=150, grade_ag=700, grade_pd=40)]
+    bp = best_partition(items, prices, terms, max_num_lots=5, max_lot_kg=18_000)
+    assert bp.num_lots == 1
 
 
 def test_partition_respects_max_lot_kg():
