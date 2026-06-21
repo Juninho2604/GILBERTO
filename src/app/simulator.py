@@ -27,7 +27,7 @@ import streamlit as st
 
 from app.auth import demo_mode, require_access
 from app.sidebar import render_sidebar
-from app.ui import inject_css, sidebar_account, sidebar_brand, sidebar_section
+from app.ui import inject_css, sidebar_account, sidebar_brand
 from app.views import (
     demo,
     historico,
@@ -69,26 +69,27 @@ _OPTIONS = list(MODULES)
 if st.session_state.get("nav_module") not in MODULES:
     st.session_state["nav_module"] = _OPTIONS[0]
 
+# Marca + cuenta + parámetros en el sidebar (opcional, no afecta navegar).
 sidebar_brand("Aurix")
 sidebar_account("Servicios Megabytes", "Cuenta comercial", initials="SM")
-sidebar_section("Menú principal")
-for _key, (_icon, _render) in MODULES.items():
-    _active = _key == st.session_state["nav_module"]
-    if st.sidebar.button(
-        _key, icon=f":material/{_icon}:", key=f"nav_{_key}",
-        type="primary" if _active else "secondary", width="stretch",
-    ):
-        st.session_state["nav_module"] = _key
-        st.rerun()
-
 if demo_mode():
     st.sidebar.caption(
-        "🔒 Modo demo: solo Demo e Inventario. Para ver todos los módulos, "
-        "quitá DEMO_MODE del .env y redeployá."
+        "Modo demo: solo Demo e Inventario. Para ver todos los módulos, quitá "
+        "DEMO_MODE del .env y redeployá."
     )
-
-# Parámetros (precios/términos/riesgo) debajo de la navegación.
 render_sidebar()
 
-choice = st.session_state["nav_module"]
+# --------------------------------------------------------------------------- #
+# Navegación SIEMPRE visible, ARRIBA (no depende del panel lateral).
+# --------------------------------------------------------------------------- #
+choice = st.pills(
+    "Navegación", _OPTIONS,
+    default=st.session_state["nav_module"],
+    selection_mode="single", label_visibility="collapsed",
+    width="stretch", key="nav_top",
+)
+if not choice:  # si se deselecciona, quedate en el módulo actual
+    choice = st.session_state["nav_module"]
+st.session_state["nav_module"] = choice
+st.divider()
 MODULES[choice][1]()
