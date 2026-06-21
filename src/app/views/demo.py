@@ -17,8 +17,8 @@ import pandas as pd
 import streamlit as st
 
 from analysis.explain import explain_partition
-from app.data_access import demo_lot, resolvable_lot_ids
-from app.ui import brand, pile_label
+from app.data_access import default_optimum, demo_lot, resolvable_lot_ids
+from app.ui import brand, pile_label, why
 from app.views.components import explanation_block, metal_table
 from app.viz3d import LotViz, container_figure
 from domain.risk import blend_threshold_risk
@@ -210,3 +210,33 @@ def render() -> None:
             if rrows:
                 st.caption("Seguridad de cobro por metal (probabilidad de superar el umbral)")
                 st.dataframe(pd.DataFrame(rrows), width="stretch", hide_index=True)
+
+    # --- 6) El verdadero atractivo: el inventario, hacia adelante --------- #
+    st.write("")
+    st.markdown("##### El verdadero atractivo: tu inventario, hacia adelante")
+    why(
+        "<b>Lo que viste es el pasado.</b> En la mayoría de los lotes la mejora es "
+        "chica porque <b>las mezclas ya eran muy buenas</b> — el sistema valida el "
+        "criterio con el que se viene trabajando. El salto de valor está "
+        "<b>hacia adelante</b>: optimizar <b>todo el inventario acumulado</b>, "
+        "armando el contenedor óptimo de cada envío y diciendo qué mandar y qué "
+        "retener.",
+        "good",
+    )
+    try:
+        opt = default_optimum()
+        f1, f2, f3 = st.columns(3)
+        f1.metric("Próximo contenedor — aprovechado", f"{opt['best_util_pct']:.0f}%",
+                  help="Mejor contenedor que armaría el sistema con el stock actual.")
+        f2.metric("Stock con ley", f"{opt['graded_stock_kg']/1000:,.1f} t",
+                  delta=f"{opt['n_graded']} pilas", delta_color="off")
+        f3.metric("Envíos por delante", f"~{opt['n_envios']}",
+                  delta="1 cada ~3 meses", delta_color="off")
+        st.caption(
+            "Y **se afina solo**: cada liquidación nueva de la refinería mejora las "
+            "leyes y la confianza de las pilas, sin laboratorio. El sistema vale "
+            "más cuanto más se usa."
+        )
+    except Exception:
+        st.caption("El optimizador completo del inventario está en el módulo "
+                   "**Optimizador** (envío por envío).")
