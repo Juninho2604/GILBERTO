@@ -53,6 +53,66 @@ def invalidate_caches() -> None:
     st.cache_resource.clear()
 
 
+@st.cache_data(show_spinner=False)
+def resolvable_lot_ids() -> list[str]:
+    """IDs de lotes históricos para la demo: resolubles y de ≥2 pilas (interesantes
+    para mostrar la partición y el 3D). Si no hubiera, cae a todos los resolubles."""
+    from data.load_history import load_history
+
+    lots = load_history()
+    multi = [str(L.customer_lot) for L in lots
+             if L.recipe.resolvable and len(L.recipe.fractions) >= 2]
+    if multi:
+        return multi
+    return [str(L.customer_lot) for L in lots if L.recipe.resolvable]
+
+
+@st.cache_data(show_spinner=False)
+def demo_lot(customer_lot: str) -> dict:
+    """Reconstruye un lote histórico para la demo: meta + pilas con ley, σ y tier.
+
+    Devuelve lo necesario para (1) mostrar lo que se envió y se cobró, y (2)
+    re-optimizar ese mismo material con todo el motor (3D, riesgo, confianza).
+    """
+    from data.estimate_grades import estimate_grades
+    from data.load_history import load_history
+    from data.load_inventory import load_raee_inventory
+    from domain.models import Category
+
+    lots = load_history()
+    lot = next((L for L in lots if str(L.customer_lot) == str(customer_lot)), None)
+    if lot is None:
+        return {}
+    names = {it.code: it.name for it in load_raee_inventory(with_stock_only=False)}
+    est = estimate_grades(lots, names=names)
+
+    items: list[InventoryItem] = []
+    for code, frac in lot.recipe.fractions.items():
+        e = est.get(code)
+        if e is None or frac <= 0:
+            continue
+        it = InventoryItem(
+            code=code, name=names.get(code, code), category=Category.RAEE,
+            quantity_kg=frac * lot.wmt, moisture=lot.moisture,
+            grade_cu=e.grades.get("CU", 0.0), grade_au=e.grades.get("AU", 0.0),
+            grade_ag=e.grades.get("AG", 0.0), grade_pt=e.grades.get("PT", 0.0),
+            grade_pd=e.grades.get("PD", 0.0), grade_source=e.source,
+        )
+        it.grade_sigma = dict(e.sigmas)
+        it.grade_tier = dict(e.tiers)
+        items.append(it)
+
+    return {
+        "customer_lot": str(lot.customer_lot),
+        "jx_lot": str(lot.jx_lot),
+        "recipe_raw": lot.recipe_raw,
+        "wmt": lot.wmt,
+        "moisture": lot.moisture,
+        "measured_grades": dict(lot.grades),
+        "items": items,
+    }
+
+
 def _has_grade(it: InventoryItem) -> bool:
     return max(it.grade_cu, it.grade_au, it.grade_ag, it.grade_pt, it.grade_pd) > 0
 

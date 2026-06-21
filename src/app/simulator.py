@@ -29,6 +29,7 @@ from app.auth import require_login
 from app.sidebar import render_sidebar
 from app.ui import inject_css
 from app.views import (
+    demo,
     historico,
     inventario,
     optimizador,
@@ -54,6 +55,7 @@ render_sidebar()
 # Panel de navegación propio (pills): siempre visible, ideal para celular.
 # --------------------------------------------------------------------------- #
 MODULES = {
+    "Demo": ("🎬", demo.render),
     "Panel": ("📊", panel.render),
     "Inventario": ("📦", inventario.render),
     "Simulador": ("🧪", simulador.render),
