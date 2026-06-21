@@ -35,7 +35,17 @@ _CSS = """
 html, body, .stApp, [class*="css"] { font-family:'Manrope',system-ui,sans-serif;
   color:var(--text); }
 .stApp { background:var(--bg); }
-#MainMenu, footer, header [data-testid="stToolbar"] { visibility:hidden; }
+#MainMenu, footer { visibility:hidden; }
+header [data-testid="stToolbar"] { visibility:hidden; }
+/* Control para abrir/cerrar el menú lateral: SIEMPRE visible y con contraste */
+[data-testid="stSidebarCollapsedControl"], [data-testid="collapsedControl"] {
+  visibility:visible !important; display:flex !important; opacity:1 !important;
+  z-index:1000; }
+[data-testid="stSidebarCollapsedControl"] button,
+[data-testid="collapsedControl"] button { color:#16241B !important; }
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stSidebarCollapseButton"] button {
+  visibility:visible !important; opacity:1 !important; color:#EAF3EC !important; }
 .block-container { padding-top:2rem; max-width:1300px; }
 
 h1, h2, h3, h4 { font-family:'Space Grotesk',sans-serif; color:var(--text);
