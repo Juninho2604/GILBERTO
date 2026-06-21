@@ -6,6 +6,10 @@ services:
     restart: unless-stopped
     ports:
       - "${PORT:-8501}:8501"
+    environment:
+      # Contraseña de acceso. Se lee del archivo .env del proyecto (o del entorno).
+      # Sin valor, la app queda SIN login (solo para desarrollo local).
+      - APP_PASSWORD=${APP_PASSWORD:-}
     # Para regenerar el artefacto del histórico sin reconstruir la imagen,
     # montá el repo y corré: docker compose exec raee-optimizer \
     #   python -m analysis.build_analysis

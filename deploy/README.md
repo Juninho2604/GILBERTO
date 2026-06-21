@@ -3,6 +3,21 @@
 Deploy con Docker, accesible en el puerto **8501** (sin HTTPS todavía). La misma
 imagen sirve para el VPS de prueba y, después, para el servidor de Gilberto.
 
+## 🔒 Acceso con contraseña (login básico)
+
+La app pide una contraseña antes de mostrar el inventario y la fórmula (datos
+comerciales sensibles). La contraseña vive en `APP_PASSWORD`, que el deploy
+persiste en `${APP_DIR}/.env` (nunca en el repo).
+
+- **Elegir la tuya:** `APP_PASSWORD='miClave' bash deploy/setup.sh`
+- **Si no pasás ninguna:** el script **genera una al azar**, la guarda en `.env`
+  y la imprime **una sola vez** al terminar. Anotala.
+- **Cambiarla:** editá `${APP_DIR}/.env` y volvé a correr el redeploy.
+
+> ⚠️ Esto es un portón básico y la app corre por **HTTP** (la contraseña viaja
+> sin cifrar). Para protección real, poné **Caddy/nginx con HTTPS** delante del
+> `:8501` (ver final del documento).
+
 ## Opción A — un solo comando (recomendado)
 
 En el VPS (como `root` o con `sudo`):

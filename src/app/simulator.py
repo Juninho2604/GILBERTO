@@ -25,6 +25,7 @@ if str(SRC) not in sys.path:
 
 import streamlit as st
 
+from app.auth import require_login
 from app.sidebar import render_sidebar
 from app.ui import inject_css
 from app.views import (
@@ -42,6 +43,9 @@ st.set_page_config(
     initial_sidebar_state="auto",  # se colapsa solo en celular; abierto en escritorio
 )
 inject_css()
+
+# Portón de acceso: exige contraseña (APP_PASSWORD) antes de mostrar nada.
+require_login()
 
 # Barra lateral compartida (precios, términos, modo privado).
 render_sidebar()

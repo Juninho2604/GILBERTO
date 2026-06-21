@@ -48,11 +48,24 @@ else
   git clone -b "${BRANCH}" "${REPO_URL}" "${APP_DIR}"
 fi
 
-echo "==> 4/5  Build + run (puerto ${PORT})"
+echo "==> 4/6  Contraseña de acceso (.env)"
 cd "${APP_DIR}"
+ENV_FILE="${APP_DIR}/.env"
+GENERATED=""
+if [ -n "${APP_PASSWORD:-}" ]; then
+  # Contraseña pasada explícitamente: la persistimos.
+  printf 'APP_PASSWORD=%s\n' "${APP_PASSWORD}" > "${ENV_FILE}"
+elif [ ! -f "${ENV_FILE}" ]; then
+  # Sin contraseña y sin .env previo: generamos una y la guardamos (seguro por defecto).
+  GENERATED="$(head -c 12 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 14)"
+  printf 'APP_PASSWORD=%s\n' "${GENERATED}" > "${ENV_FILE}"
+fi
+chmod 600 "${ENV_FILE}" 2>/dev/null || true
+
+echo "==> 5/6  Build + run (puerto ${PORT})"
 PORT="${PORT}" $SUDO docker compose up -d --build
 
-echo "==> 5/5  Firewall"
+echo "==> 6/6  Firewall"
 if command -v ufw >/dev/null 2>&1 && $SUDO ufw status 2>/dev/null | grep -q "Status: active"; then
   $SUDO ufw allow "${PORT}/tcp" || true
 fi
@@ -61,6 +74,18 @@ IP="$(curl -fsS https://api.ipify.org 2>/dev/null || echo '<IP-DEL-VPS>')"
 echo
 echo "================================================================"
 echo "  Listo. Abrí:  http://${IP}:${PORT}"
+if [ -n "${GENERATED}" ]; then
+  echo
+  echo "  🔑 CONTRASEÑA GENERADA (guardala, se muestra una sola vez):"
+  echo "       ${GENERATED}"
+  echo
+  echo "  Para cambiarla:  editá ${ENV_FILE} y corré el redeploy."
+else
+  echo "  🔒 Login activo con la contraseña de ${ENV_FILE}."
+fi
 echo "  Logs:        docker compose -f ${APP_DIR}/docker-compose.yml logs -f"
 echo "  Redeploy:    bash ${APP_DIR}/deploy/setup.sh"
 echo "================================================================"
+echo
+echo "  ⚠️  La app corre por HTTP (sin cifrado). Para protección real,"
+echo "      poné Caddy/nginx con HTTPS delante del :${PORT}."
