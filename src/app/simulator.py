@@ -81,6 +81,12 @@ for _key, (_icon, _render) in MODULES.items():
         st.session_state["nav_module"] = _key
         st.rerun()
 
+if demo_mode():
+    st.sidebar.caption(
+        "🔒 Modo demo: solo Demo e Inventario. Para ver todos los módulos, "
+        "quitá DEMO_MODE del .env y redeployá."
+    )
+
 # Parámetros (precios/términos/riesgo) debajo de la navegación.
 render_sidebar()
 
