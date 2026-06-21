@@ -25,7 +25,7 @@ if str(SRC) not in sys.path:
 
 import streamlit as st
 
-from app.auth import require_login
+from app.auth import demo_mode, require_access
 from app.sidebar import render_sidebar
 from app.ui import inject_css
 from app.views import (
@@ -45,8 +45,8 @@ st.set_page_config(
 )
 inject_css()
 
-# Portón de acceso: exige contraseña (APP_PASSWORD) antes de mostrar nada.
-require_login()
+# Portón de acceso: PIN en modo demo, contraseña (APP_PASSWORD) en modo normal.
+require_access()
 
 # Barra lateral compartida (precios, términos, modo privado).
 render_sidebar()
@@ -54,14 +54,21 @@ render_sidebar()
 # --------------------------------------------------------------------------- #
 # Panel de navegación propio (pills): siempre visible, ideal para celular.
 # --------------------------------------------------------------------------- #
-MODULES = {
-    "Demo": ("🎬", demo.render),
-    "Panel": ("📊", panel.render),
-    "Inventario": ("📦", inventario.render),
-    "Simulador": ("🧪", simulador.render),
-    "Optimizador": ("🎯", optimizador.render),
-    "Histórico": ("🗂️", historico.render),
-}
+if demo_mode():
+    # Modo demo (reunión): solo lo justo, para no revelar todo el avance.
+    MODULES = {
+        "Demo": ("🎬", demo.render),
+        "Inventario": ("📦", inventario.render),
+    }
+else:
+    MODULES = {
+        "Demo": ("🎬", demo.render),
+        "Panel": ("📊", panel.render),
+        "Inventario": ("📦", inventario.render),
+        "Simulador": ("🧪", simulador.render),
+        "Optimizador": ("🎯", optimizador.render),
+        "Histórico": ("🗂️", historico.render),
+    }
 _OPTIONS = list(MODULES)
 
 choice = st.pills(

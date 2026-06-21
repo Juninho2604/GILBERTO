@@ -18,10 +18,23 @@ from domain.models import (
 
 
 def render_sidebar() -> tuple[MetalPrices, ContractTerms, bool]:
+    from app.auth import demo_mode
+
     if "prices" not in st.session_state:
         st.session_state.prices = default_prices()
     if "terms" not in st.session_state:
         st.session_state.terms = default_terms()
+
+    # En modo demo: sin parámetros del motor a la vista (defaults silenciosos).
+    if demo_mode():
+        st.session_state.prices = default_prices()
+        st.session_state.terms = default_terms()
+        st.session_state.private = False
+        st.session_state.z_min = 1.5
+        st.session_state.k_safe = 1.0
+        st.sidebar.markdown("### Servicios Megabytes, C.A.")
+        st.sidebar.caption("Optimizador de Mezclas RAEE · demo")
+        return st.session_state.prices, st.session_state.terms, False
 
     p: MetalPrices = st.session_state.prices
     t: ContractTerms = st.session_state.terms

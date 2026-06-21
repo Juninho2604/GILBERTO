@@ -72,6 +72,8 @@ elif ! grep -q '^APP_PASSWORD=' "${ENV_FILE}" 2>/dev/null; then
 fi
 [ -n "${DOMAIN:-}" ] && set_env_var DOMAIN "${DOMAIN}"
 [ -n "${EXTERNAL_PROXY:-}" ] && set_env_var EXTERNAL_PROXY "${EXTERNAL_PROXY}"
+[ -n "${DEMO_MODE:-}" ] && set_env_var DEMO_MODE "${DEMO_MODE}"
+[ -n "${DEMO_PIN:-}" ] && set_env_var DEMO_PIN "${DEMO_PIN}"
 
 # Modo "proxy externo": ya tenés tu propio reverse proxy (nginx) en el VPS.
 # La app queda solo en 127.0.0.1 y NO se levanta Caddy (evita pelear por el :80).

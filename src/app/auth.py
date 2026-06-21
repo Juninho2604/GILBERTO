@@ -29,6 +29,57 @@ def _expected_password() -> str | None:
         return None
 
 
+def demo_mode() -> bool:
+    """Modo demo (para reuniones): solo Inventario + Demo, con PIN."""
+    return os.environ.get("DEMO_MODE", "") == "1"
+
+
+def _expected_pin() -> str | None:
+    pin = os.environ.get("DEMO_PIN")
+    if pin:
+        return pin
+    try:
+        return st.secrets.get("DEMO_PIN")  # type: ignore[no-any-return]
+    except Exception:
+        return None
+
+
+def require_access() -> None:
+    """Portón de entrada: PIN en modo demo, contraseña en modo normal."""
+    if demo_mode() and _expected_pin():
+        if st.session_state.get("_pin_ok"):
+            return
+        _render_pin(_expected_pin())
+        st.stop()
+    require_login()
+
+
+def _render_pin(expected: str) -> None:
+    st.markdown("<div style='height:10vh'></div>", unsafe_allow_html=True)
+    _, mid, _ = st.columns([1, 1, 1])
+    with mid:
+        st.markdown(
+            "<div class='brand' style='justify-content:center'>"
+            "<span class='dot'></span><span class='title'>Acceso</span></div>",
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            "<div class='subtle' style='text-align:center;margin-bottom:1rem'>"
+            "Ingresá tu PIN para continuar.</div>",
+            unsafe_allow_html=True,
+        )
+        with st.form("pin", clear_on_submit=True):
+            pin = st.text_input("PIN", type="password", label_visibility="collapsed",
+                                placeholder="• • • •")
+            ok = st.form_submit_button("Entrar", type="primary", width="stretch")
+        if ok:
+            if hmac.compare_digest(str(pin), str(expected)):
+                st.session_state["_pin_ok"] = True
+                st.rerun()
+            else:
+                st.error("PIN incorrecto.")
+
+
 def require_login() -> None:
     """Exige contraseña antes de renderizar la app. Llamar al inicio del entrypoint."""
     expected = _expected_password()

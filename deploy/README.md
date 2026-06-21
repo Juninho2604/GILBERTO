@@ -60,6 +60,22 @@ solo. Solo necesitás un subdominio gratis de DuckDNS.
 > falta pasarlo: `bash deploy/setup.sh` mantiene el HTTPS.
 > Para **volver a HTTP** sin dominio, borrá la línea `DOMAIN=` del `.env`.
 
+## 🎬 Modo demo (reuniones)
+
+Para mostrar solo **Inventario + Demo** detrás de un **PIN** (oculta el resto del
+avance):
+
+```bash
+DEMO_MODE=1 DEMO_PIN=2604 EXTERNAL_PROXY=1 bash deploy/setup.sh
+```
+
+Para **volver a la app completa** (con login por contraseña): borrá esas líneas
+del `.env` y redeployá.
+
+```bash
+sed -i '/^DEMO_MODE=/d; /^DEMO_PIN=/d' .env && EXTERNAL_PROXY=1 bash deploy/setup.sh
+```
+
 ## Opción B — paso a paso
 
 ```bash
