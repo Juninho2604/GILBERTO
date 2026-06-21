@@ -148,7 +148,7 @@ def render() -> None:
         disabled=["Pila"],
         column_config={
             "Pila": st.column_config.TextColumn("Pila", help="Etiqueta (número de la pila)."),
-            "name": None if not private else st.column_config.TextColumn("name"),
+            "name": None,  # nombre nunca visible (privacidad): solo código
             "quantity_kg": st.column_config.NumberColumn("quantity_kg", min_value=0.0, format="%.1f"),
             "moisture": st.column_config.NumberColumn("moisture", min_value=0.0, max_value=1.0, format="%.3f"),
             "grade_source": st.column_config.SelectboxColumn(

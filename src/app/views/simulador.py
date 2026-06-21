@@ -79,9 +79,9 @@ def render() -> None:
         height=360,
         hide_index=True,
         key="sim_editor",
-        disabled=["Pila", "code", "name", "grade_source"] if not private else ["Pila", "code", "grade_source"],
+        disabled=["Pila", "code", "name", "grade_source"],
         column_config={
-            "name": None if not private else st.column_config.TextColumn("name"),
+            "name": None,  # nombre nunca visible (privacidad): solo código
             "code": None,
             "blend_kg": st.column_config.NumberColumn("blend_kg", min_value=0.0, format="%.0f"),
             "grade_source": None,

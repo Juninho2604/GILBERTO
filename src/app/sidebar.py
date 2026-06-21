@@ -27,12 +27,10 @@ def render_sidebar() -> tuple[MetalPrices, ContractTerms, bool]:
     t: ContractTerms = st.session_state.terms
 
     st.sidebar.markdown("### ⚙️ Parámetros")
-    private = st.sidebar.toggle(
-        "🔒 Modo privado (mostrar leyenda)",
-        value=False,
-        help="Apagado: las pilas se muestran solo por número (#1, #2…) para no "
-        "filtrar materiales ni fórmulas. Encendido: agrega el nombre real.",
-    )
+    # Privacidad: las pilas se muestran SIEMPRE solo por su código asignado.
+    # Nunca el nombre del material (protección de info de Gilberto y su socio).
+    private = False
+    st.sidebar.caption("🔒 Las pilas se muestran solo por **código** (sin nombres).")
 
     with st.sidebar.expander("💲 Precios del día", expanded=False):
         st.caption("Cu en USD/t · preciosos en USD/onza troy (referencia §10).")

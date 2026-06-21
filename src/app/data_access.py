@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import json
+from math import ceil
 from pathlib import Path
 
 import streamlit as st
@@ -18,8 +19,6 @@ import streamlit as st
 from data.bootstrap import default_inventory
 from data.inventory_store import load_saved_state
 from domain.models import InventoryItem, default_prices, default_terms
-from domain.valuation import BlendComponent, value_blend
-from optimize.optimizer import optimize_partition
 
 _HISTORY_JSON = Path(__file__).resolve().parents[2] / "data" / "history_analysis.json"
 
@@ -70,57 +69,43 @@ def optimizable_items() -> list[InventoryItem]:
     return [it for it in inventory_items() if _has_grade(it)]
 
 
-@st.cache_resource(show_spinner=False)
-def default_optimum() -> dict:
-    """Óptimo del inventario actual con precios/términos por defecto (panel).
+_CONTAINER_KG = 23_000.0  # estándar 40' ≈ 23 t
 
-    Compara las estrategias simples (separado / una sola mezcla) contra la mejor
-    partición, **sobre el mismo universo de pilas con ley** (sin peso muerto de
-    pilas sin ensayo). Cacheado: corre una vez por sesión.
+
+@st.cache_data(show_spinner=False)
+def default_optimum() -> dict:
+    """El mejor **contenedor de 23 t** del inventario actual (panel).
+
+    Gilberto manda 1 contenedor cada ~3 meses; el panel resume el aprovechamiento
+    del próximo envío óptimo (no la partición de todo el stock). Cacheado.
     """
+    from optimize.optimizer import optimize_blend
+
     prices, terms = default_prices(), default_terms()
     items = optimizable_items()
+    stock_kg = sum(it.quantity_kg for it in items)
+    target = min(_CONTAINER_KG, stock_kg)
 
-    separate = sum(
-        value_blend([BlendComponent(it, it.quantity_kg)], prices, terms).net_value_usd
-        for it in items
+    best = optimize_blend(
+        items, prices, terms,
+        objective="net_usd", min_lot_kg=target, max_lot_kg=_CONTAINER_KG,
     )
-    single = value_blend(
-        [BlendComponent(it, it.quantity_kg) for it in items], prices, terms
-    ).net_value_usd
+    v = best.valuation
+    util = v.metal_utilization_pct if v else 0.0
+    net_util = v.net_utilization_pct if v else 0.0
+    weight = best.total_weight_kg
 
-    best, best_k = None, 1
-    for k in (1, 2, 3):
-        res = optimize_partition(items, prices, terms, num_lots=k, time_limit_s=20.0)
-        if res.lots and (best is None or res.net_value_usd > best.net_value_usd):
-            best, best_k = res, k
-
-    best_usd = best.net_value_usd if best else single
-    baseline = max(separate, single)  # mejor estrategia "humana" simple
-
-    # Aprovechamiento del material en la mejor mezcla (lo importante).
-    gross = paid = net = 0.0
-    if best:
-        for l in best.lots:
-            gross += l.valuation.gross_metal_total
-            paid += l.valuation.metal_total
-            net += l.valuation.net_value_usd
-    best_util_pct = 100.0 * paid / gross if gross else 0.0
-    best_net_util_pct = 100.0 * net / gross if gross else 0.0
+    n_envios = max(1, ceil(stock_kg / _CONTAINER_KG)) if _CONTAINER_KG else 1
     return {
-        "best_util_pct": best_util_pct,
-        "best_net_util_pct": best_net_util_pct,
-        "best_unused_pct": max(0.0, 100.0 - best_util_pct),
-        "separate_usd": separate,
-        "single_usd": single,
-        "best_usd": best_usd,
-        "best_num_lots": best_k,
-        "baseline_usd": baseline,
-        "gain_vs_single_usd": best_usd - single,
-        "gain_vs_single_pct": 100.0 * (best_usd - single) / single if single else 0.0,
-        "gain_vs_best_simple_usd": best_usd - baseline,
-        "gain_vs_best_simple_pct": 100.0 * (best_usd - baseline) / baseline if baseline else 0.0,
-        "graded_stock_kg": sum(it.quantity_kg for it in items),
+        "best_util_pct": util,
+        "best_net_util_pct": net_util,
+        "best_unused_pct": max(0.0, 100.0 - util),
+        "best_usd": v.net_value_usd if v else 0.0,
+        "container_kg": _CONTAINER_KG,
+        "container_weight_kg": weight,
+        "container_fill_pct": 100.0 * weight / _CONTAINER_KG if _CONTAINER_KG else 0.0,
+        "n_envios": n_envios,
+        "graded_stock_kg": stock_kg,
         "n_graded": len(items),
         "total_stock_kg": sum(it.quantity_kg for it in inventory_items()),
         "n_items": len(inventory_items()),

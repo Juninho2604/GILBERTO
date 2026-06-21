@@ -31,21 +31,23 @@ def render() -> None:
         )
     with c2:
         kpi(
-            "Material aprovechado — stock actual",
+            "Material aprovechado — próximo contenedor",
             f"{opt['best_util_pct']:.0f}%",
             delta="del metal lo paga la refinería",
             delta_color=GOOD,
             accent=True,
-            hint=f"Mejor mezcla del stock con ley ({opt['n_graded']} pilas · "
-            f"{opt['graded_stock_kg']:,.0f} kg). El resto cae bajo los mínimos.",
+            hint=f"Mejor contenedor de {opt['container_kg']/1000:,.0f} t "
+            f"({opt['container_weight_kg']/1000:,.1f} t, {opt['container_fill_pct']:.0f}% "
+            f"lleno) armado desde el stock con ley.",
         )
     with c3:
         kpi(
-            "Gana vs. mezcla única",
-            f"+{opt['gain_vs_single_pct']:.1f}%",
-            delta="por mezclar mejor (no diluir el oro)",
+            "Envíos pendientes",
+            f"~{opt['n_envios']}",
+            delta="1 contenedor cada ~3 meses",
             delta_color=GOOD,
-            hint="Separar lo rico del relleno rinde más que mezclar todo junto.",
+            hint=f"Con {opt['graded_stock_kg']:,.0f} kg en stock y "
+            f"{opt['container_kg']/1000:,.0f} t por contenedor.",
         )
     with c4:
         kpi(
@@ -76,10 +78,10 @@ def render() -> None:
             f"ya eran casi óptimas. El modelo no lo contradice, lo respalda.",
         )
         why(
-            f"<b>Agrega valor hacia adelante.</b> Sobre el stock <b>actual</b> "
-            f"(aún sin enviar), la mejor partición paga <b>+{usd(opt['gain_vs_single_usd'])}</b> "
-            f"({opt['gain_vs_single_pct']:+.1f}%) frente a una sola mezcla, y "
-            f"<b>+{usd(opt['gain_vs_best_simple_usd'])}</b> frente a enviar todo por separado.",
+            f"<b>Optimiza el próximo envío.</b> Sobre el stock <b>actual</b>, arma "
+            f"el mejor <b>contenedor de {opt['container_kg']/1000:,.0f} t</b> que "
+            f"cobra el <b>{opt['best_util_pct']:.0f}%</b> del metal cargado, dejando "
+            f"el resto del stock para los siguientes envíos.",
             "good",
         )
         why(

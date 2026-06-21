@@ -105,14 +105,13 @@ def pct(x: float, signed: bool = True) -> str:
 # Confidencialidad: etiqueta de pila
 # --------------------------------------------------------------------------- #
 def pile_label(code: str, name: str = "", private: bool = False) -> str:
-    """Etiqueta de una pila. Por número (#1) salvo modo privado con leyenda."""
-    try:
-        tag = f"#{int(code)}"
-    except (TypeError, ValueError):
-        tag = f"#{code}"
-    if private and name:
-        return f"{tag} · {name}"
-    return tag
+    """Etiqueta de una pila: **solo el código** asignado, como en las planillas.
+
+    Nunca muestra el nombre del material (privacidad de Gilberto y su socio).
+    Los parámetros ``name``/``private`` se conservan por compatibilidad pero se
+    ignoran a propósito.
+    """
+    return str(code)
 
 
 # --------------------------------------------------------------------------- #
