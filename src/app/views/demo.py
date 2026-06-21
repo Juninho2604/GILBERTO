@@ -85,7 +85,7 @@ def render() -> None:
     with st.spinner("Optimizando el lote…"):
         # k_safe=0: compara el MISMO material mejor mezclado (sin descartar pilas),
         # para que la comparación sea pareja. El riesgo por metal se muestra igual.
-        bp = best_partition(items, prices, terms, max_num_lots=3, k_safe=0.0)
+        bp = best_partition(items, prices, terms, max_num_lots=6, k_safe=0.0)
     res = bp.result
     if not res.lots:
         st.info("Lote muy chico para repartir; ya está óptimo como una sola mezcla.")

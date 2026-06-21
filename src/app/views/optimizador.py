@@ -58,15 +58,16 @@ def render() -> None:
     n_envios = max(1, ceil(stock_kg / container_kg)) if container_kg > 0 else 1
     st.caption(
         f"Stock con ley: **{stock_kg:,.0f} kg**. Se arma **1 contenedor** de "
-        f"**{container_kg/1000:,.1f} t** dividido en los lotes que la refinería tasa "
-        f"por separado. Con este stock harían falta ~**{n_envios} envíos** "
+        f"**{container_kg/1000:,.1f} t** y se **divide en los lotes** que la refinería "
+        f"procesa por separado — **sin tamaño mínimo**, buscando la división que más "
+        f"paga en conjunto. Con este stock harían falta ~**{n_envios} envíos** "
         f"(≈ 1 cada 3 meses)."
     )
 
     if run:
         with st.spinner("Armando el contenedor y dividiéndolo en lotes óptimos…"):
             bp = best_partition(
-                items, prices, terms, max_num_lots=5, container_kg=container_kg,
+                items, prices, terms, max_num_lots=8, container_kg=container_kg,
                 k_safe=float(st.session_state.get("k_safe", 1.0)),
             )
         st.session_state.cont_bp = bp
@@ -104,6 +105,16 @@ def render() -> None:
     m2.metric("No aprovechado", f"{100-util:.0f}%", delta="bajo el mínimo", delta_color="off")
     m3.metric("Lotes en el contenedor", f"{len(res.lots)}")
     m4.metric("Carga", f"{shipped/1000:,.1f} t", delta=f"{fill:.0f}% lleno", delta_color="off")
+
+    # Por qué esa división.
+    if len(bp.sweep) > 1:
+        probadas = ", ".join(str(k) for k, _ in bp.sweep)
+        st.caption(
+            f"El sistema probó dividir el contenedor en {probadas} lote(s) "
+            f"(**sin tamaño mínimo**) y eligió **{bp.num_lots}**: es la división que "
+            f"más paga en conjunto. Dividir aún más deja metales bajo el umbral de "
+            f"la refinería y ya no suma."
+        )
     st.write("")
 
     # --- 3D: el contenedor armado ----------------------------------------- #

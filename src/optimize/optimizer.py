@@ -387,21 +387,23 @@ def best_partition(
     prices: MetalPrices,
     terms: ContractTerms,
     *,
-    max_num_lots: int = 6,
+    max_num_lots: int = 8,
     min_lot_kg: float = 0.0,
     max_lot_kg: Optional[float] = None,
     container_kg: Optional[float] = None,
     k_safe: float = 0.0,
     time_limit_s: Optional[float] = 10.0,
-    min_gain_usd: float = 50.0,
+    min_gain_usd: float = 25.0,
     solver: Optional[pulp.LpSolver] = None,
 ) -> BestPartitionResult:
-    """Prueba 1..``max_num_lots`` y devuelve la partición de mayor valor.
+    """Divide en los lotes óptimos (sin tamaño mínimo) y devuelve el mejor.
 
-    El valor óptimo es **no decreciente** en la cantidad de lotes (un k-partición
-    es un caso particular de (k+1) con un lote vacío), así que la ganancia se
-    aplana: cortamos cuando agregar un lote rinde menos de ``min_gain_usd``. Así
-    el usuario no tiene que adivinar el número de lotes — el sistema lo elige.
+    El contenedor se parte en los lotes que la refinería procesa por separado.
+    Prueba 1..``max_num_lots`` lotes: el valor óptimo es **no decreciente** en la
+    cantidad de lotes, pero se aplana (sobre-dividir deja metales bajo el umbral y
+    los pierde). Cortamos cuando agregar un lote rinde menos de ``min_gain_usd``,
+    así el sistema elige la división óptima sin generar lotes que no aportan.
+    ``min_lot_kg=0`` por defecto: **sin tamaño mínimo de lote**.
     """
     cand = [it for it in items if it.quantity_kg > 0]
     if not cand:
