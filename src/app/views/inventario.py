@@ -21,6 +21,19 @@ _COLS = [
 ]
 
 
+def _confidence_badge(it: InventoryItem) -> str:
+    """Semáforo de confianza de la pila, según el oro y la plata (los que mandan)."""
+    tiers = [it.grade_tier.get(m) for m in ("AU", "AG")]
+    tiers = [t for t in tiers if t]
+    if not tiers:
+        return "— s/d"
+    if all(t == "MEASURED" for t in tiers):
+        return "🟢 medida"
+    if any(t == "NOT_DETERMINED" for t in tiers):
+        return "🔴 floja"
+    return "🟡 estimada"
+
+
 def _items_to_df(items: list[InventoryItem], private: bool) -> pd.DataFrame:
     df = pd.DataFrame(
         [
@@ -38,6 +51,7 @@ def _items_to_df(items: list[InventoryItem], private: bool) -> pd.DataFrame:
             for it in items
         ]
     )
+    df.insert(0, "Confianza", [_confidence_badge(it) for it in items])
     df.insert(0, "Pila", [pile_label(c, n, private) for c, n in zip(df["code"], df["name"])])
     return df
 
@@ -135,7 +149,9 @@ def render() -> None:
     st.markdown("##### Editar inventario")
     st.caption(
         "Cambiá cantidades y leyes; agregá filas con el **+** abajo. "
-        "Cu en fracción (0.21 = 21%); Au/Ag/Pd en g/t. Tocá **Guardar** para aplicar."
+        "Cu en fracción (0.21 = 21%); Au/Ag/Pd en g/t. La columna **Confianza** "
+        "(🟢 medida · 🟡 estimada · 🔴 floja) avisa de qué leyes fiarse. "
+        "Tocá **Guardar** para aplicar."
     )
     df = _items_to_df(items, private)
     edited = st.data_editor(
@@ -145,9 +161,13 @@ def render() -> None:
         num_rows="dynamic",
         hide_index=True,
         key="inv_edit",
-        disabled=["Pila"],
+        disabled=["Pila", "Confianza"],
         column_config={
-            "Pila": st.column_config.TextColumn("Pila", help="Etiqueta (número de la pila)."),
+            "Pila": st.column_config.TextColumn("Pila", help="Código de la pila."),
+            "Confianza": st.column_config.TextColumn(
+                "Confianza", help="Según oro/plata: 🟢 medida (la pila viajó sola) · "
+                "🟡 estimada (despejada por regresión) · 🔴 floja (bloque colineal "
+                "o muy poca data → no confiar en el número)."),
             "name": None,  # nombre nunca visible (privacidad): solo código
             "quantity_kg": st.column_config.NumberColumn("quantity_kg", min_value=0.0, format="%.1f"),
             "moisture": st.column_config.NumberColumn("moisture", min_value=0.0, max_value=1.0, format="%.3f"),

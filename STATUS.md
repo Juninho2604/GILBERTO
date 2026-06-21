@@ -12,7 +12,8 @@ RAEE) a decidir **qué mezcla de materiales mandar en cada contenedor** a la
 refinería (**JX**) para que le **paguen el mayor porcentaje posible** del metal.
 
 **Estado:** funcional y desplegado en producción (con login + HTTPS). Núcleo de
-cálculo validado contra datos reales. **48 tests en verde**, ~5.000 líneas.
+cálculo validado contra datos reales. Motor de **confianza y riesgo** integrado.
+**59 tests en verde**, ~5.500 líneas.
 
 - **Repo / rama de trabajo:** `Juninho2604/GILBERTO` → `claude/new-session-5k4aar`
 - **App en vivo:** `https://147-93-6-70.sslip.io` (login con contraseña)
@@ -125,12 +126,12 @@ la **única fuente** es lo que la refinería pagó por los **53 lotes histórico
 - **Validación:** el modelo reproduce el dinero real con ~3% de desvío; error
   mediano de ley: Cu 2%, Au 5%, Ag 8% (media 19% — colas feas), Pd 10%.
 
-> ⚠️ **Hueco conocido y pendiente:** la confianza NO distingue cuántas recetas
-> sostienen cada estimación. Pilas que aparecen en 1 sola receta (ej. "Slot
-> Processors") dan leyes-fantasma (Pd 1882 g/t, Au 0) con la misma etiqueta
-> `ESTIMATED` que una bien sostenida. **El dato `n_recipes` ya se guarda; falta
-> usarlo para degradar/marcar la confianza.** (Ver lote 791 como caso testigo:
-> el modelo lo valoriza +12% por sobreestimar la plata).
+> ✅ **Resuelto (motor de confianza):** cada ley trae ahora **σ (margen de error)
+> y tier por metal**: `MEASURED` (viajó sola), `ESTIMATED` (separable en la
+> regresión con σ acotado), `NOT_DETERMINED` (bloque colineal, bajo apalancamiento
+> o σ≥valor). La ley-fantasma Pd 1882 de la pila 26 → NOT_DETERMINED. Se detectan
+> los **bloques colineales** (pilas que solo viajaron juntas). Ver `data/
+> estimate_grades.py`, `domain/risk.py`. Tests: `test_confidence.py`, `test_risk.py`.
 
 Las leyes **se afinan solas** a medida que se mandan más lotes y se ve lo que
 paga la refinería (no hace falta laboratorio).
@@ -183,10 +184,11 @@ glassmorphism, glow, gradientes).
 
 | Módulo | Qué hace |
 |---|---|
+| **Demo** 🎬 | Toma un lote real del histórico (al azar) y lo optimiza automático: reproduce el pago, lo re-mezcla, 3D, riesgo y confianza. **Para la reunión con Gilberto.** |
 | **Panel** | Resumen: % aprovechado del próximo contenedor, envíos pendientes, precisión del modelo. |
-| **Inventario** | Editar stock y leyes en vivo (solo por **código**). |
+| **Inventario** | Editar stock y leyes en vivo (solo por **código**), con **semáforo de confianza** por pila. |
 | **Simulador** | Armar una mezcla a mano y ver el % y el resultado al instante. |
-| **Optimizador** | Arma el **mejor contenedor de 23 t**, lo parte en lotes, lo muestra en **3D** y avisa si algo queda en $0. |
+| **Optimizador** | Arma el **mejor contenedor de 23 t**, lo parte en lotes, lo muestra en **3D**, avisa $0 y muestra **riesgo de cobro** (P_cobro, semáforo) por lote/metal. |
 | **Histórico** | Los 53 lotes reales vs. la mezcla óptima, con % aprovechado por lote. |
 
 **Decisiones de UI tomadas con el usuario:**
@@ -269,13 +271,23 @@ EXTERNAL_PROXY=1 bash deploy/setup.sh
 
 ## 11. Próximos pasos sugeridos (por prioridad)
 
-1. **Confianza por `n_recipes`** — degradar/marcar las leyes flojas en la UI y que
-   el optimizador no sobre-confíe. (Dato ya disponible, falta usarlo.)
-2. **Flujo de carga de lotes nuevos** — que cada liquidación nueva de la refinería
-   reafine las leyes sin editar el xlsx a mano.
-3. **Dominio propio** para la demo a Gilberto (~$1-10/año) en vez de sslip.io.
-4. **Modelar contenedor↔lotes históricos** (pregunta abierta #5).
-5. Llevar el nivel visual del Optimizador al Panel e Histórico.
+**Del change-order de confianza/riesgo (lo entregado y lo pendiente):**
+- ✅ Feature 1 (confianza σ/tier), Feature 2 (riesgo de umbral, P_cobro), Feature 3
+  (valorización conservadora `grade−k·σ` + flagging por lote). Semáforo en
+  Inventario. Página Demo.
+- ⏸️ **Restricción dura `z≥z_min` en el MILP** — la σ de la mezcla es no lineal;
+  hoy hay ley conservadora + flagging. Falta linealizar o pasar al Nivel 2.
+- ⏸️ **Nivel 2: valor esperado** integrando la distribución del ensayo (suaviza el
+  acantilado del umbral). Es la "mejora principal" del doc.
+- ⏸️ **Bloques como pila virtual** (no fragmentar en ratios no vistos como
+  restricción dura).
+- ⏸️ Semáforo/banda ±σ también en Simulador; 3D coloreado por confianza.
+
+**Otros:**
+- **Flujo de carga de lotes nuevos** — que cada liquidación reafine las leyes sin
+  editar el xlsx a mano.
+- **Dominio propio** para la demo (~$1-10/año) en vez de sslip.io.
+- **Modelar contenedor↔lotes históricos** (pregunta abierta #5).
 
 ---
 
@@ -306,6 +318,9 @@ sudo nginx -T | grep -A20 'server_name 147-93-6-70'
 4. **Contenedor = varios lotes + visualización 3D + UI premium**.
 5. **Login** por contraseña.
 6. **HTTPS** (Caddy/DuckDNS y luego modo **proxy externo** para nginx).
+7. **Motor de confianza y riesgo** (Features 1-3 del change-order): σ/tier por
+   (pila, metal), bloques colineales, P_cobro, valorización conservadora, semáforo.
+8. **Página Demo** sobre el histórico real (para la reunión con Gilberto).
 
 > El núcleo (fórmula + optimizador) está sólido y testeado. El mayor margen de
 > mejora está en la **calidad/confianza de las leyes**, no en el motor.
