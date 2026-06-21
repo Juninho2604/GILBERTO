@@ -67,7 +67,7 @@ GENERATED=""
 if [ -n "${APP_PASSWORD:-}" ]; then
   set_env_var APP_PASSWORD "${APP_PASSWORD}"
 elif ! grep -q '^APP_PASSWORD=' "${ENV_FILE}" 2>/dev/null; then
-  GENERATED="$(head -c 12 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 14)"
+  GENERATED="$(head -c 32 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | cut -c1-14 || true)"
   set_env_var APP_PASSWORD "${GENERATED}"
 fi
 [ -n "${DOMAIN:-}" ] && set_env_var DOMAIN "${DOMAIN}"
@@ -77,8 +77,8 @@ fi
 
 # Modo "proxy externo": ya tenés tu propio reverse proxy (nginx) en el VPS.
 # La app queda solo en 127.0.0.1 y NO se levanta Caddy (evita pelear por el :80).
-EXT_PROXY="${EXTERNAL_PROXY:-$(grep '^EXTERNAL_PROXY=' "${ENV_FILE}" 2>/dev/null | cut -d= -f2-)}"
-EFFECTIVE_DOMAIN="${DOMAIN:-$(grep '^DOMAIN=' "${ENV_FILE}" 2>/dev/null | cut -d= -f2-)}"
+EXT_PROXY="${EXTERNAL_PROXY:-$(grep '^EXTERNAL_PROXY=' "${ENV_FILE}" 2>/dev/null | cut -d= -f2- || true)}"
+EFFECTIVE_DOMAIN="${DOMAIN:-$(grep '^DOMAIN=' "${ENV_FILE}" 2>/dev/null | cut -d= -f2- || true)}"
 
 echo "==> 5/6  Build + run"
 if [ "${EXT_PROXY:-}" = "1" ]; then
