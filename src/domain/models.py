@@ -59,6 +59,11 @@ class InventoryItem:
     grade_pd: float = 0.0             # ley de paladio (g/t)
     grade_source: GradeSource = GradeSource.MANUAL
     grade_confidence: Optional[float] = None  # 0..1, opcional
+    # Confianza por metal (Feature 1): margen de error y tier. Viajan al lado de
+    # las leyes; el cálculo de valorización usa el valor puntual, las features de
+    # riesgo leen σ/tier. Vacíos = sin info de confianza.
+    grade_sigma: dict[str, float] = field(default_factory=dict)  # metal → σ
+    grade_tier: dict[str, str] = field(default_factory=dict)     # metal → MEASURED/ESTIMATED/NOT_DETERMINED
 
     def grade(self, metal: str) -> float:
         """Devuelve la ley de un metal por su símbolo (``"CU"``, ``"AU"``, ...)."""
@@ -66,6 +71,14 @@ class InventoryItem:
         if metal not in METALS:
             raise KeyError(f"Metal desconocido: {metal!r}")
         return getattr(self, f"grade_{metal.lower()}")
+
+    def sigma(self, metal: str) -> float:
+        """σ (margen de error absoluto) de la ley de un metal. 0 si se desconoce."""
+        return self.grade_sigma.get(metal.upper(), 0.0)
+
+    def tier(self, metal: str) -> str:
+        """Tier de confianza del metal: MEASURED / ESTIMATED / NOT_DETERMINED."""
+        return self.grade_tier.get(metal.upper(), "NOT_DETERMINED")
 
     @property
     def is_raee(self) -> bool:

@@ -43,13 +43,36 @@ class Confidence(str, Enum):
     NONE = "none"            # sin datos (pendiente laboratorio)
 
 
+# Tier de confianza por (pila, metal) — Feature 1 del change-order.
+TIER_MEASURED = "MEASURED"            # la pila viajó sola (análisis directo)
+TIER_ESTIMATED = "ESTIMATED"          # separable en la regresión, con σ acotado
+TIER_NOT_DETERMINED = "NOT_DETERMINED"  # bloque colineal, o σ ≥ valor
+
+# Ruido por defecto (CV) cuando hay una sola medición directa. Conservador.
+CV_DEFAULT: dict[str, float] = {"CU": 0.05, "AU": 0.15, "AG": 0.30, "PD": 0.30, "PT": 0.30}
+
+
+@dataclass
+class Grade:
+    """Una ley con su margen de error y nivel de confianza (por metal)."""
+
+    value: float                       # ley estimada/medida
+    sigma: float = 0.0                 # 1 desviación estándar (error absoluto)
+    tier: str = TIER_NOT_DETERMINED    # MEASURED | ESTIMATED | NOT_DETERMINED
+    n_direct: int = 0                  # nº de veces que la pila viajó sola
+    source: str = "regression"         # replicates | regression | colinear_block
+
+
 @dataclass
 class GradeEstimate:
     """Ley estimada de una pila, con su origen y diagnóstico."""
 
     code: str
     name: str = ""
-    grades: dict[str, float] = field(default_factory=dict)  # metal → ley
+    grades: dict[str, float] = field(default_factory=dict)  # metal → ley (valor puntual)
+    sigmas: dict[str, float] = field(default_factory=dict)  # metal → σ (margen de error)
+    tiers: dict[str, str] = field(default_factory=dict)     # metal → tier de confianza
+    block: Optional[tuple] = None       # miembros del bloque colineal si la pila está en uno
     confidence: Confidence = Confidence.NONE
     n_pure_lots: int = 0          # cuántas veces apareció sola
     n_recipes: int = 0            # en cuántas recetas (resolubles) aparece
@@ -61,6 +84,17 @@ class GradeEstimate:
         if self.confidence == Confidence.DIRECT:
             return GradeSource.LAB  # tratamos la medición directa como dato duro
         return GradeSource.ESTIMATED
+
+    def grade(self, metal: str) -> Grade:
+        """Devuelve la :class:`Grade` (valor + σ + tier) de un metal."""
+        return Grade(
+            value=self.grades.get(metal, 0.0),
+            sigma=self.sigmas.get(metal, 0.0),
+            tier=self.tiers.get(metal, TIER_NOT_DETERMINED),
+            n_direct=self.n_pure_lots,
+            source="colinear_block" if self.block else (
+                "replicates" if self.n_pure_lots else "regression"),
+        )
 
 
 # --------------------------------------------------------------------------- #
@@ -183,7 +217,139 @@ def estimate_grades(
     for c, est in estimates.items():
         if not est.name:
             est.name = names.get(c, "")
+
+    # Confianza por (pila, metal): σ, tier, bloques colineales (Feature 1).
+    _compute_confidence(lots, estimates)
     return estimates
+
+
+# --------------------------------------------------------------------------- #
+# Confianza por (pila, metal): σ, tier y bloques colineales
+# --------------------------------------------------------------------------- #
+def _colinear_blocks(lots: list[HistoricLot]) -> dict[str, tuple]:
+    """Pilas que SOLO viajaron juntas (columnas proporcionales) → no separables.
+
+    Devuelve ``{code: (miembros del bloque)}``. Dos pilas están confundidas si su
+    columna en la matriz de recetas es proporcional (mismo patrón de aparición y
+    ratio constante): la regresión no puede despejar sus leyes individuales.
+    """
+    withfr = [L for L in lots if L.recipe.fractions]
+    codes = sorted({c for L in withfr for c in L.recipe.fractions})
+    if not codes:
+        return {}
+    idx = {c: i for i, c in enumerate(codes)}
+    A = np.zeros((len(withfr), len(codes)))
+    for r, L in enumerate(withfr):
+        for c, f in L.recipe.fractions.items():
+            A[r, idx[c]] = f
+
+    sig2codes: dict[tuple, list[str]] = {}
+    for c in codes:
+        col = A[:, idx[c]]
+        nz = np.flatnonzero(np.abs(col) > 1e-9)
+        if len(nz) == 0:
+            continue
+        v = col[nz] / np.linalg.norm(col[nz])
+        sig = (tuple(nz.tolist()), tuple(np.round(v, 6).tolist()))
+        sig2codes.setdefault(sig, []).append(c)
+
+    blocks: dict[str, tuple] = {}
+    for members in sig2codes.values():
+        if len(members) >= 2:
+            tup = tuple(sorted(members))
+            for c in members:
+                blocks[c] = tup
+    return blocks
+
+
+def _regression_se(lots: list[HistoricLot]) -> dict[tuple, float]:
+    """Error estándar de cada (pila, metal) en la regresión sobre lotes resolubles.
+
+    ``SE_j = sqrt(σ²_residual · [ (AᵀA)⁺ ]_jj )``. Para columnas confundidas el
+    pinv da valores poco fiables; por eso los bloques colineales se marcan aparte.
+    """
+    resolv = [L for L in lots if L.recipe.resolvable]
+    rcodes = sorted({c for L in resolv for c in L.recipe.fractions})
+    se: dict[tuple, float] = {}
+    if not rcodes or len(resolv) <= 1:
+        return se
+    ridx = {c: i for i, c in enumerate(rcodes)}
+    A = np.zeros((len(resolv), len(rcodes)))
+    for r, L in enumerate(resolv):
+        for c, f in L.recipe.fractions.items():
+            A[r, ridx[c]] = f
+    rank = int(np.linalg.matrix_rank(A))
+    dof = max(1, len(resolv) - rank)
+    ata_pinv = np.linalg.pinv(A.T @ A)
+    diag = np.clip(np.diag(ata_pinv), 0.0, None)
+    for m in METALS:
+        b = np.array([L.grades.get(m, 0.0) for L in resolv])
+        x, *_ = np.linalg.lstsq(A, b, rcond=None)
+        resid = b - A @ x
+        s2 = float(resid @ resid) / dof
+        for c in rcodes:
+            se[(c, m)] = float(np.sqrt(s2 * diag[ridx[c]]))
+    return se
+
+
+def _pure_observations(lots: list[HistoricLot]) -> dict[str, list[dict]]:
+    """Leyes de los lotes puros (una pila, fracción 1) → mediciones directas."""
+    obs: dict[str, list[dict]] = {}
+    for L in lots:
+        if L.recipe.resolvable and len(L.recipe.fractions) == 1:
+            (c, f), = L.recipe.fractions.items()
+            if abs(f - 1.0) < 1e-6:
+                obs.setdefault(c, []).append(L.grades)
+    return obs
+
+
+# Apalancamiento mínimo: una pila que nunca fue ≥10% de ningún lote queda mal
+# determinada por la regresión (caso pila 26: 2% de un solo lote → no usable).
+MIN_LEVERAGE = 0.10
+
+
+def _compute_confidence(
+    lots: list[HistoricLot], estimates: dict[str, GradeEstimate]
+) -> None:
+    """Asigna σ y tier por (pila, metal) y marca bloques colineales. Muta in place."""
+    pure = _pure_observations(lots)
+    blocks = _colinear_blocks(lots)
+    se = _regression_se(lots)
+
+    # Apalancamiento: mayor fracción que tuvo cada pila en un lote resoluble.
+    max_frac: dict[str, float] = {}
+    for L in lots:
+        if not L.recipe.resolvable:
+            continue
+        for c, f in L.recipe.fractions.items():
+            max_frac[c] = max(max_frac.get(c, 0.0), f)
+
+    for c, est in estimates.items():
+        est.block = blocks.get(c)
+        low_leverage = max_frac.get(c, 0.0) < MIN_LEVERAGE
+        for m in METALS:
+            val = est.grades.get(m, 0.0)
+            cv = CV_DEFAULT.get(m, 0.3)
+            if c in pure:                          # MEASURED (viajó sola)
+                vals = [o.get(m, 0.0) for o in pure[c]]
+                sigma = float(np.std(vals, ddof=1)) if len(vals) >= 2 else val * cv
+                if sigma <= 0:
+                    sigma = val * cv
+                tier = TIER_MEASURED
+            elif c in blocks:                      # confundida en un bloque
+                sigma = val * cv
+                tier = TIER_NOT_DETERMINED
+            elif low_leverage:                     # nunca fue parte significativa
+                sigma = se.get((c, m), val * cv)
+                tier = TIER_NOT_DETERMINED
+            else:                                  # despejada por regresión
+                sigma = se.get((c, m), val * cv)
+                tier = TIER_ESTIMATED
+            # Regla universal: si el error iguala o supera al valor, no es usable.
+            if val > 0 and sigma >= val:
+                tier = TIER_NOT_DETERMINED
+            est.sigmas[m] = sigma
+            est.tiers[m] = tier
 
 
 def reconstruction_report(
@@ -244,6 +410,8 @@ def apply_estimates_to_inventory(
                 Confidence.ASSUMED: 0.3,
                 Confidence.NONE: None,
             }[est.confidence]
+            it.grade_sigma = dict(est.sigmas)
+            it.grade_tier = dict(est.tiers)
         out.append(it)
     return out
 
