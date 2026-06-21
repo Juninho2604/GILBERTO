@@ -113,7 +113,7 @@ def render() -> None:
         "Las leyes son **estimadas** desde el histórico y están a validar con "
         "ensayos reales. Preguntas abiertas (§7) que mueven el óptimo: tamaño "
         "mínimo de lote, si el platino se paga, y si los términos son negociados.",
-        icon="ℹ️",
+        icon=":material/info:",
     )
 
 

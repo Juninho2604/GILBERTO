@@ -120,6 +120,33 @@ section[data-testid="stSidebar"] [data-baseweb="select"] > div {
 section[data-testid="stSidebar"] [data-testid="stExpander"] {
   background:var(--sidebar-soft); border-color:#2A352E; }
 
+/* Marca + cuenta + navegación del sidebar (estilo Aurix) */
+.side-brand { display:flex; align-items:center; gap:.6rem; padding:.1rem .1rem 1rem; }
+.side-brand .logo { width:38px; height:38px; border-radius:11px; background:var(--grad);
+  display:grid; place-items:center; box-shadow:0 6px 16px #2E8A2355; }
+.side-brand .logo-text { font-family:'Space Grotesk',sans-serif; font-weight:700;
+  font-size:1.25rem; color:#EAF3EC; }
+.side-acct { display:flex; align-items:center; gap:.6rem; background:var(--sidebar-soft);
+  border:1px solid #2A352E; border-radius:14px; padding:.55rem .65rem; margin-bottom:1rem; }
+.side-acct .av { width:30px; height:30px; border-radius:9px; background:#B5851F; color:#fff;
+  display:grid; place-items:center; font-weight:700; font-size:.78rem; flex:0 0 auto; }
+.side-acct .nm { font-weight:700; font-size:.84rem; color:#EAF3EC; line-height:1.1; }
+.side-acct .sub { font-size:.71rem; color:#8CA092; }
+.navsec { font-size:.66rem; text-transform:uppercase; letter-spacing:.09em;
+  color:#6E8076; font-weight:700; margin:.5rem .2rem .25rem; }
+
+/* Botones de navegación del sidebar: alineados a la izquierda, pill activo verde */
+section[data-testid="stSidebar"] .stButton > button {
+  justify-content:flex-start; text-align:left; border:0 !important; border-radius:12px;
+  font-weight:600; background:transparent; color:#AEBCB2; padding:.5rem .8rem;
+  box-shadow:none; }
+section[data-testid="stSidebar"] .stButton > button:hover {
+  background:#18221C; color:#EAF3EC; transform:none; }
+section[data-testid="stSidebar"] .stButton > button[kind="primary"] {
+  background:#8DE05B !important; color:#10241A !important; font-weight:700; }
+section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
+  background:#9BE86E !important; }
+
 /* Tablas / dataframes */
 [data-testid="stDataFrame"], [data-testid="stTable"] {
   border:1px solid var(--border2); border-radius:14px; overflow:hidden; }
@@ -172,6 +199,38 @@ def pile_label(code: str, name: str = "", private: bool = False) -> str:
 # --------------------------------------------------------------------------- #
 # Componentes
 # --------------------------------------------------------------------------- #
+_LOGO_SVG = (
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none">'
+    '<path d="M12 2.5l8 4.6v9.8l-8 4.6-8-4.6V7.1z" stroke="#F3F6F3" '
+    'stroke-width="2" fill="none" stroke-linejoin="round"/>'
+    '<circle cx="12" cy="12" r="2.4" fill="#F3F6F3"/></svg>'
+)
+
+
+def sidebar_brand(name: str = "Aurix") -> None:
+    """Logo + nombre de la marca en el tope del sidebar."""
+    st.sidebar.markdown(
+        f'<div class="side-brand"><span class="logo">{_LOGO_SVG}</span>'
+        f'<span class="logo-text">{name}</span></div>',
+        unsafe_allow_html=True,
+    )
+
+
+def sidebar_account(name: str, sub: str = "Cuenta comercial", initials: str = "") -> None:
+    """Tarjeta de cuenta (avatar + nombre) en el sidebar."""
+    initials = initials or "".join(w[0] for w in name.split()[:2]).upper()
+    st.sidebar.markdown(
+        f'<div class="side-acct"><span class="av">{initials}</span>'
+        f'<span><div class="nm">{name}</div><div class="sub">{sub}</div></span></div>',
+        unsafe_allow_html=True,
+    )
+
+
+def sidebar_section(label: str) -> None:
+    """Etiqueta de sección del menú lateral (p. ej. 'Menú principal')."""
+    st.sidebar.markdown(f'<div class="navsec">{label}</div>', unsafe_allow_html=True)
+
+
 def brand(title: str, subtitle: str = "") -> None:
     st.markdown(
         f'<div class="brand"><span class="dot"></span>'

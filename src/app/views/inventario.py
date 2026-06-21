@@ -28,10 +28,10 @@ def _confidence_badge(it: InventoryItem) -> str:
     if not tiers:
         return "— s/d"
     if all(t == "MEASURED" for t in tiers):
-        return "🟢 medida"
+        return "Medida"
     if any(t == "NOT_DETERMINED" for t in tiers):
-        return "🔴 floja"
-    return "🟡 estimada"
+        return "Floja"
+    return "Estimada"
 
 
 def _items_to_df(items: list[InventoryItem], private: bool) -> pd.DataFrame:
@@ -124,12 +124,12 @@ def render() -> None:
     c4.metric("Stock total", f"{sum(it.quantity_kg for it in items):,.0f} kg")
 
     if has_saved_state():
-        st.caption("✏️ Estás usando un inventario **guardado/editado** (no el del xlsx original).")
+        st.caption("Estás usando un inventario **guardado/editado** (no el del xlsx original).")
     else:
-        st.caption("📄 Estás usando el inventario **real del xlsx** con leyes estimadas.")
+        st.caption("Estás usando el inventario **real del xlsx** con leyes estimadas.")
 
     # --- Carga de xlsx ----------------------------------------------------- #
-    with st.expander("📤 Cargar inventario desde Excel (.xlsx)"):
+    with st.expander("Cargar inventario desde Excel (.xlsx)", icon=":material/upload_file:"):
         st.caption(
             "Actualiza las cantidades de las pilas existentes (por código) y "
             "agrega las nuevas. Las leyes ya conocidas se conservan."
@@ -150,7 +150,7 @@ def render() -> None:
     st.caption(
         "Cambiá cantidades y leyes; agregá filas con el **+** abajo. "
         "Cu en fracción (0.21 = 21%); Au/Ag/Pd en g/t. La columna **Confianza** "
-        "(🟢 medida · 🟡 estimada · 🔴 floja) avisa de qué leyes fiarse. "
+        "(Medida · Estimada · Floja) avisa de qué leyes fiarse. "
         "Tocá **Guardar** para aplicar."
     )
     df = _items_to_df(items, private)
@@ -165,8 +165,8 @@ def render() -> None:
         column_config={
             "Pila": st.column_config.TextColumn("Pila", help="Código de la pila."),
             "Confianza": st.column_config.TextColumn(
-                "Confianza", help="Según oro/plata: 🟢 medida (la pila viajó sola) · "
-                "🟡 estimada (despejada por regresión) · 🔴 floja (bloque colineal "
+                "Confianza", help="Según oro/plata: Medida (la pila viajó sola) · "
+                "Estimada (despejada por regresión) · Floja (bloque colineal "
                 "o muy poca data → no confiar en el número)."),
             "name": None,  # nombre nunca visible (privacidad): solo código
             "quantity_kg": st.column_config.NumberColumn("quantity_kg", min_value=0.0, format="%.1f"),
@@ -178,7 +178,7 @@ def render() -> None:
     )
 
     b1, b2, _ = st.columns([1, 1, 2])
-    if b1.button("💾 Guardar cambios", type="primary", width="stretch"):
+    if b1.button("Guardar cambios", icon=":material/save:", type="primary", width="stretch"):
         new_items = _df_to_items(edited.drop(columns=["Pila"], errors="ignore"))
         if not new_items:
             st.warning("No hay pilas válidas para guardar.")
@@ -187,7 +187,7 @@ def render() -> None:
             invalidate_caches()
             st.success(f"Inventario guardado ({len(new_items)} pilas). Aplicado a todos los módulos.")
             st.rerun()
-    if b2.button("↺ Restablecer al original", width="stretch"):
+    if b2.button("Restablecer al original", icon=":material/restart_alt:", width="stretch"):
         reset_state()
         invalidate_caches()
         st.info("Inventario restablecido al xlsx original.")

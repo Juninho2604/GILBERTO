@@ -22,7 +22,7 @@ from domain.valuation import BlendComponent, value_lot
 from optimize.optimizer import best_partition
 
 _METAL_NOMBRE = {"CU": "cobre", "AU": "oro", "AG": "plata", "PT": "platino", "PD": "paladio"}
-_ROLE = {0: "🥇 LOTE RICO", 1: "⚖️ MIXTO", 2: "🧱 RELLENO"}
+_ROLE = {0: "LOTE RICO", 1: "MIXTO", 2: "RELLENO"}
 
 
 def render() -> None:
@@ -44,7 +44,8 @@ def render() -> None:
         return
 
     c1, c2 = st.columns([1, 1.4])
-    if c1.button("🎲 Tomar un lote al azar", type="primary", width="stretch"):
+    if c1.button("Tomar un lote al azar", icon=":material/casino:",
+                 type="primary", width="stretch"):
         st.session_state.demo_id = random.choice(ids)
     if "demo_id" not in st.session_state:
         st.session_state.demo_id = random.choice(ids)
@@ -120,7 +121,7 @@ def render() -> None:
         comps = [BlendComponent(p.item, p.weight_kg) for p in l.components]
         risk = blend_threshold_risk(comps, terms)
         with st.expander(
-            f"{_ROLE.get(i-1, '📦 LOTE')} {i} — {v.metal_utilization_pct:.0f}% "
+            f"{_ROLE.get(i-1, 'LOTE')} {i} — {v.metal_utilization_pct:.0f}% "
             f"aprovechado · {l.total_weight_kg/1000:,.1f} t",
             expanded=(i == 1),
         ):
@@ -140,11 +141,11 @@ def render() -> None:
             for m, r in risk.items():
                 if r.grade <= 0:
                     continue
-                sem = "🟢" if r.safe(z_min) else ("🟡" if r.z >= 0 else "🔴")
+                sem = "Seguro" if r.safe(z_min) else ("Medio" if r.z >= 0 else "Riesgo")
                 rrows.append({
                     "Metal": m, "Ley ± σ": f"{r.grade:.0f} ± {r.sigma:.0f}",
                     "Umbral": f"{r.threshold:.0f}", "P. cobro": f"{r.p_cobro*100:.0f}%",
-                    "Seguro": sem,
+                    "Cobro": sem,
                 })
             if rrows:
                 st.caption("Seguridad de cobro por metal (probabilidad de superar el umbral)")
@@ -152,8 +153,9 @@ def render() -> None:
 
     st.write("")
     st.success(
-        f"✅ El sistema **reconoció** un lote real, reprodujo su valorización, lo "
+        f"El sistema **reconoció** un lote real, reprodujo su valorización, lo "
         f"**repartió en {len(res.lots)} lote(s) óptimos**, mostró el contenedor en "
         f"3D y evaluó el **riesgo de cobro** y la **confianza** de cada ley — todo "
-        f"automático, sobre los datos reales de la refinería."
+        f"automático, sobre los datos reales de la refinería.",
+        icon=":material/check_circle:",
     )

@@ -137,7 +137,8 @@ def render() -> None:
               help="Leyes estimadas, mejor partición. Mejora = vs. 'tal cual'.")
 
     # --- Transparencia: cómo se calcula el $ de este lote ------------------ #
-    with st.expander("🧮 ¿Cómo se calcula este precio? (paso a paso)", expanded=False):
+    with st.expander("¿Cómo se calcula este precio? (paso a paso)",
+                     icon=":material/calculate:", expanded=False):
         prices, terms = default_prices(), default_terms()
         v = value_lot(
             wmt=L["wmt"], moisture=L["moisture"],
@@ -161,7 +162,7 @@ def render() -> None:
             st.caption("Metal total − cargos")
             charges_breakdown(v)
         st.caption(
-            "⚠️ Es lo que **pagaría la refinería hoy a estos precios** por esas "
+            "Es lo que **pagaría la refinería hoy a estos precios** por esas "
             "leyes; no necesariamente lo que se pagó el día del envío (los "
             "precios varían). Cambiá los precios en la barra lateral para otro "
             "escenario del Simulador."

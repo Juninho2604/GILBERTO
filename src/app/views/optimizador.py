@@ -26,7 +26,7 @@ from domain.valuation import BlendComponent
 from optimize.optimizer import best_partition
 
 _METAL_NOMBRE = {"CU": "cobre", "AU": "oro", "AG": "plata", "PT": "platino", "PD": "paladio"}
-_ROLE = {0: "🥇 LOTE RICO", 1: "⚖️ MIXTO", 2: "🧱 RELLENO"}
+_ROLE = {0: "LOTE RICO", 1: "MIXTO", 2: "RELLENO"}
 
 
 def render() -> None:
@@ -52,7 +52,8 @@ def render() -> None:
         "Capacidad (kg)", value=float(cont_default), step=500.0,
         help="Carga máxima del contenedor (estándar 40' ≈ 23 t).",
     )
-    run = st.button("▶ Armar el mejor contenedor", type="primary", width="stretch")
+    run = st.button("Armar el mejor contenedor", icon=":material/play_arrow:",
+                    type="primary", width="stretch")
 
     n_envios = max(1, ceil(stock_kg / container_kg)) if container_kg > 0 else 1
     st.caption(
@@ -108,7 +109,7 @@ def render() -> None:
     # --- 3D: el contenedor armado ----------------------------------------- #
     st.markdown("##### El contenedor, en 3D")
     st.caption("Cada bloque es un **lote** (tamaño = peso, color = % que paga: "
-               "🟢 alto · 🟠 bajo). Arrastrá para rotar, scroll para zoom.")
+               "verde = alto, ámbar = bajo). Arrastrá para rotar, scroll para zoom.")
     viz = [
         LotViz(
             index=i + 1,
@@ -135,11 +136,13 @@ def render() -> None:
     if wasted:
         for i, m, grade, ded in wasted:
             st.warning(
-                f"⚠️ Lote {i} · **{_METAL_NOMBRE[m]}**: {grade:.1f} g/t < umbral "
-                f"{ded:.0f} g/t → paga $0. Sumar pilas más ricas en {_METAL_NOMBRE[m]}."
+                f"Lote {i} · **{_METAL_NOMBRE[m]}**: {grade:.1f} g/t < umbral "
+                f"{ded:.0f} g/t → paga $0. Sumar pilas más ricas en {_METAL_NOMBRE[m]}.",
+                icon=":material/warning:",
             )
     else:
-        st.success("✅ Todos los metales superan el umbral: **no se pierde material en $0**.")
+        st.success("Todos los metales superan el umbral: **no se pierde material en $0**.",
+                   icon=":material/check_circle:")
     st.write("")
 
     # --- Riesgo de umbral a nivel contenedor ------------------------------ #
@@ -153,11 +156,12 @@ def render() -> None:
     if fragile:
         for i, m, r in fragile:
             st.warning(
-                f"🎲 Lote {i} · **{_METAL_NOMBRE[m]}**: la mezcla queda en "
+                f"Lote {i} · **{_METAL_NOMBRE[m]}**: la mezcla queda en "
                 f"{r.grade:.0f} ±{r.sigma:.0f} g/t vs umbral {r.threshold:.0f} → "
                 f"probabilidad de cobro **{r.p_cobro*100:.0f}%** (z={r.z:.1f} < "
                 f"{z_min:.1f}). Riesgo de que la refinería analice por debajo y no "
-                f"pague ese metal. Conviene diluir con una pila más rica."
+                f"pague ese metal. Conviene diluir con una pila más rica.",
+                icon=":material/warning:",
             )
 
     # --- Detalle de cada lote --------------------------------------------- #
@@ -167,7 +171,7 @@ def render() -> None:
         comps = [BlendComponent(p.item, p.weight_kg) for p in l.components]
         risk = blend_threshold_risk(comps, terms)
         with st.expander(
-            f"{_ROLE.get(i-1, '📦 LOTE')} {i} — {v.metal_utilization_pct:.0f}% "
+            f"{_ROLE.get(i-1, 'LOTE')} {i} — {v.metal_utilization_pct:.0f}% "
             f"aprovechado · {l.total_weight_kg/1000:,.1f} t · Au {v.metals['AU'].grade:.0f} g/t",
             expanded=(i == 1),
         ):
@@ -193,13 +197,13 @@ def render() -> None:
             for m, r in risk.items():
                 if r.grade <= 0:
                     continue
-                sem = "🟢" if r.safe(z_min) else ("🟡" if r.z >= 0 else "🔴")
+                sem = "Seguro" if r.safe(z_min) else ("Medio" if r.z >= 0 else "Riesgo")
                 rrows.append({
                     "Metal": m,
                     "Ley ± σ (g/t)": f"{r.grade:.0f} ± {r.sigma:.0f}",
                     "Umbral": f"{r.threshold:.0f}",
                     "P. cobro": f"{r.p_cobro*100:.0f}%",
-                    "Seguro": sem,
+                    "Cobro": sem,
                 })
             if rrows:
                 st.dataframe(pd.DataFrame(rrows), width="stretch", hide_index=True)

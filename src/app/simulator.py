@@ -27,7 +27,7 @@ import streamlit as st
 
 from app.auth import demo_mode, require_access
 from app.sidebar import render_sidebar
-from app.ui import inject_css
+from app.ui import inject_css, sidebar_account, sidebar_brand, sidebar_section
 from app.views import (
     demo,
     historico,
@@ -38,7 +38,7 @@ from app.views import (
 )
 
 st.set_page_config(
-    page_title="Optimizador de Mezclas RAEE",
+    page_title="Aurix · Mezclas RAEE",
     page_icon="♻️",
     layout="wide",
     initial_sidebar_state="auto",  # se colapsa solo en celular; abierto en escritorio
@@ -48,42 +48,41 @@ inject_css()
 # Portón de acceso: PIN en modo demo, contraseña (APP_PASSWORD) en modo normal.
 require_access()
 
-# Barra lateral compartida (precios, términos, modo privado).
-render_sidebar()
-
 # --------------------------------------------------------------------------- #
-# Panel de navegación propio (pills): siempre visible, ideal para celular.
+# Navegación en el sidebar (estilo Aurix): marca + cuenta + ítems con ícono.
 # --------------------------------------------------------------------------- #
 if demo_mode():
-    # Modo demo (reunión): solo lo justo, para no revelar todo el avance.
     MODULES = {
-        "Demo": ("🎬", demo.render),
-        "Inventario": ("📦", inventario.render),
+        "Demo": ("smart_display", demo.render),
+        "Inventario": ("inventory_2", inventario.render),
     }
 else:
     MODULES = {
-        "Demo": ("🎬", demo.render),
-        "Panel": ("📊", panel.render),
-        "Inventario": ("📦", inventario.render),
-        "Simulador": ("🧪", simulador.render),
-        "Optimizador": ("🎯", optimizador.render),
-        "Histórico": ("🗂️", historico.render),
+        "Demo": ("smart_display", demo.render),
+        "Panel": ("dashboard", panel.render),
+        "Inventario": ("inventory_2", inventario.render),
+        "Simulador": ("science", simulador.render),
+        "Optimizador": ("bolt", optimizador.render),
+        "Histórico": ("history", historico.render),
     }
 _OPTIONS = list(MODULES)
+if st.session_state.get("nav_module") not in MODULES:
+    st.session_state["nav_module"] = _OPTIONS[0]
 
-choice = st.pills(
-    "Navegación",
-    _OPTIONS,
-    default=_OPTIONS[0],
-    selection_mode="single",
-    format_func=lambda k: f"{MODULES[k][0]} {k}",
-    key="nav_module",
-    label_visibility="collapsed",
-    width="stretch",
-)
-if not choice:  # si se deselecciona, quedate en el módulo actual
-    choice = st.session_state.get("_last_module", _OPTIONS[0])
-st.session_state["_last_module"] = choice
+sidebar_brand("Aurix")
+sidebar_account("Servicios Megabytes", "Cuenta comercial", initials="SM")
+sidebar_section("Menú principal")
+for _key, (_icon, _render) in MODULES.items():
+    _active = _key == st.session_state["nav_module"]
+    if st.sidebar.button(
+        _key, icon=f":material/{_icon}:", key=f"nav_{_key}",
+        type="primary" if _active else "secondary", width="stretch",
+    ):
+        st.session_state["nav_module"] = _key
+        st.rerun()
 
-st.divider()
+# Parámetros (precios/términos/riesgo) debajo de la navegación.
+render_sidebar()
+
+choice = st.session_state["nav_module"]
 MODULES[choice][1]()

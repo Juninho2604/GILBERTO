@@ -108,7 +108,7 @@ def render() -> None:
         components.append(BlendComponent(item, blend_kg))
 
     for w in warnings:
-        st.warning("⚠️ " + w)
+        st.warning(w, icon=":material/warning:")
 
     if not components:
         st.info(

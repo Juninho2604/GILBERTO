@@ -87,9 +87,9 @@ def require_login() -> None:
     if not expected:
         # Sin contraseña configurada: no bloquear (dev), pero avisar fuerte.
         st.warning(
-            "⚠️ **App sin contraseña.** Configurá `APP_PASSWORD` para proteger el "
+            "**App sin contraseña.** Configurá `APP_PASSWORD` para proteger el "
             "inventario y la fórmula en un acceso público.",
-            icon="🔓",
+            icon=":material/lock_open:",
         )
         return
 
@@ -124,4 +124,4 @@ def _render_login(expected: str) -> None:
                 st.rerun()
             else:
                 st.error("Contraseña incorrecta.")
-        st.caption("🔒 Datos comerciales confidenciales. Acceso solo autorizado.")
+        st.caption("Datos comerciales confidenciales. Acceso solo autorizado.")

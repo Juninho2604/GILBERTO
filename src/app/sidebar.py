@@ -32,20 +32,18 @@ def render_sidebar() -> tuple[MetalPrices, ContractTerms, bool]:
         st.session_state.private = False
         st.session_state.z_min = 1.5
         st.session_state.k_safe = 1.0
-        st.sidebar.markdown("### Servicios Megabytes, C.A.")
-        st.sidebar.caption("Optimizador de Mezclas RAEE · demo")
         return st.session_state.prices, st.session_state.terms, False
 
     p: MetalPrices = st.session_state.prices
     t: ContractTerms = st.session_state.terms
 
-    st.sidebar.markdown("### ⚙️ Parámetros")
+    from app.ui import sidebar_section
+    sidebar_section("Ajustes")
     # Privacidad: las pilas se muestran SIEMPRE solo por su código asignado.
-    # Nunca el nombre del material (protección de info de Gilberto y su socio).
     private = False
-    st.sidebar.caption("🔒 Las pilas se muestran solo por **código** (sin nombres).")
+    st.sidebar.caption("Las pilas se muestran solo por **código** (sin nombres).")
 
-    with st.sidebar.expander("💲 Precios del día", expanded=False):
+    with st.sidebar.expander("Precios del día", icon=":material/payments:", expanded=False):
         st.caption("Cu en USD/t · preciosos en USD/onza troy (referencia §10).")
         price_cu = st.number_input("Cu (USD/t)", value=float(p.price_cu), step=10.0, format="%.2f")
         price_au = st.number_input("Au (USD/oz)", value=float(p.price_au), step=10.0, format="%.2f")
@@ -54,7 +52,7 @@ def render_sidebar() -> tuple[MetalPrices, ContractTerms, bool]:
         price_pd = st.number_input("Pd (USD/oz)", value=float(p.price_pd), step=10.0, format="%.2f")
     prices = MetalPrices(price_cu, price_au, price_ag, price_pt, price_pd)
 
-    with st.sidebar.expander("📄 Términos del contrato", expanded=False):
+    with st.sidebar.expander("Términos del contrato", icon=":material/description:", expanded=False):
         st.caption("Refining charges (RC) y cargos de procesamiento.")
         rc_cu = st.number_input("RC Cu (USD/t)", value=float(t.rc_cu), step=10.0, format="%.2f")
         rc_au = st.number_input("RC Au (USD/oz)", value=float(t.rc_au), step=0.5, format="%.2f")
@@ -63,7 +61,7 @@ def render_sidebar() -> tuple[MetalPrices, ContractTerms, bool]:
         tc_rate = st.number_input("Treatment (USD/Dt)", value=float(t.tc_rate), step=10.0, format="%.2f")
         shred_rate = st.number_input("Shredding (USD/t)", value=float(t.shred_rate), step=10.0, format="%.2f")
 
-    with st.sidebar.expander("🧮 Deducciones y topes (RR)", expanded=False):
+    with st.sidebar.expander("Deducciones y topes (RR)", icon=":material/functions:", expanded=False):
         st.caption("Términos de recuperación — CONFIRMAR con Gilberto (§7).")
         cu_ded = st.number_input("Cu: deducción", value=float(t.cu_deduction), step=0.01, format="%.3f")
         au_ded = st.number_input("Au: deducción (g/t)", value=float(t.au_rule.deduction), step=1.0, format="%.1f")
@@ -84,7 +82,7 @@ def render_sidebar() -> tuple[MetalPrices, ContractTerms, bool]:
         min_lot_charge=t.min_lot_charge, moisture_penalty=t.moisture_penalty,
     )
 
-    with st.sidebar.expander("🎯 Riesgo de umbral", expanded=False):
+    with st.sidebar.expander("Riesgo de umbral", icon=":material/target:", expanded=False):
         st.caption("Cuán seguro debe ser el cobro de cada metal (margen en σ).")
         z_min = st.number_input(
             "z mínimo (margen en σ)", value=1.5, step=0.1, format="%.1f",
