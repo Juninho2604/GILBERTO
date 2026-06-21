@@ -1,0 +1,25 @@
+# Capa de HTTPS: se aplica junto al compose base cuando hay dominio.
+#   docker compose -f docker-compose.yml -f docker-compose.tls.yml up -d
+#
+# Agrega Caddy (reverse proxy + Let's Encrypt). En este modo la app NO se publica
+# al exterior (BIND_IP=127.0.0.1); el único acceso público es Caddy por 443.
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: raee-caddy
+    restart: unless-stopped
+    depends_on:
+      - raee-optimizer
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN:?Falta DOMAIN (p. ej. gilberto.duckdns.org)}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

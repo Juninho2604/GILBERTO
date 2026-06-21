@@ -1,0 +1,11 @@
+# Caddy: HTTPS automático (Let's Encrypt) delante del Optimizador.
+# El dominio sale de la variable DOMAIN (p. ej. gilberto.duckdns.org).
+# Caddy saca y renueva el certificado solo; redirige HTTP→HTTPS.
+
+{$DOMAIN} {
+	reverse_proxy raee-optimizer:8501 {
+		# Streamlit usa WebSockets; Caddy reenvía el upgrade automáticamente.
+		header_up Host {host}
+		header_up X-Real-IP {remote_host}
+	}
+}

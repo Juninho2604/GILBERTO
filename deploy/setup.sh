@@ -48,44 +48,71 @@ else
   git clone -b "${BRANCH}" "${REPO_URL}" "${APP_DIR}"
 fi
 
-echo "==> 4/6  Contraseña de acceso (.env)"
+echo "==> 4/6  Configuración (.env: contraseña + dominio)"
 cd "${APP_DIR}"
 ENV_FILE="${APP_DIR}/.env"
+touch "${ENV_FILE}"; chmod 600 "${ENV_FILE}" 2>/dev/null || true
+
+# Setea KEY=VALUE en .env sin pisar las otras claves.
+set_env_var() {
+  local key="$1" val="$2"
+  if grep -q "^${key}=" "${ENV_FILE}" 2>/dev/null; then
+    sed -i "s|^${key}=.*|${key}=${val}|" "${ENV_FILE}"
+  else
+    printf '%s=%s\n' "${key}" "${val}" >> "${ENV_FILE}"
+  fi
+}
+
 GENERATED=""
 if [ -n "${APP_PASSWORD:-}" ]; then
-  # Contraseña pasada explícitamente: la persistimos.
-  printf 'APP_PASSWORD=%s\n' "${APP_PASSWORD}" > "${ENV_FILE}"
-elif [ ! -f "${ENV_FILE}" ]; then
-  # Sin contraseña y sin .env previo: generamos una y la guardamos (seguro por defecto).
+  set_env_var APP_PASSWORD "${APP_PASSWORD}"
+elif ! grep -q '^APP_PASSWORD=' "${ENV_FILE}" 2>/dev/null; then
   GENERATED="$(head -c 12 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 14)"
-  printf 'APP_PASSWORD=%s\n' "${GENERATED}" > "${ENV_FILE}"
+  set_env_var APP_PASSWORD "${GENERATED}"
 fi
-chmod 600 "${ENV_FILE}" 2>/dev/null || true
+[ -n "${DOMAIN:-}" ] && set_env_var DOMAIN "${DOMAIN}"
 
-echo "==> 5/6  Build + run (puerto ${PORT})"
-PORT="${PORT}" $SUDO docker compose up -d --build
+# Dominio efectivo (del entorno o del .env ya guardado).
+EFFECTIVE_DOMAIN="${DOMAIN:-$(grep '^DOMAIN=' "${ENV_FILE}" 2>/dev/null | cut -d= -f2-)}"
+
+echo "==> 5/6  Build + run"
+if [ -n "${EFFECTIVE_DOMAIN}" ]; then
+  echo "    Modo HTTPS con Caddy para ${EFFECTIVE_DOMAIN} (la app no se publica al exterior)"
+  set_env_var BIND_IP 127.0.0.1   # app solo en localhost; Caddy la sirve por 443
+  $SUDO docker compose -f docker-compose.yml -f docker-compose.tls.yml up -d --build
+else
+  set_env_var BIND_IP 0.0.0.0
+  $SUDO docker compose up -d --build
+fi
 
 echo "==> 6/6  Firewall"
 if command -v ufw >/dev/null 2>&1 && $SUDO ufw status 2>/dev/null | grep -q "Status: active"; then
-  $SUDO ufw allow "${PORT}/tcp" || true
+  if [ -n "${EFFECTIVE_DOMAIN}" ]; then
+    $SUDO ufw allow 80/tcp || true
+    $SUDO ufw allow 443/tcp || true
+  else
+    $SUDO ufw allow "${PORT}/tcp" || true
+  fi
 fi
 
 IP="$(curl -fsS https://api.ipify.org 2>/dev/null || echo '<IP-DEL-VPS>')"
 echo
 echo "================================================================"
-echo "  Listo. Abrí:  http://${IP}:${PORT}"
+if [ -n "${EFFECTIVE_DOMAIN}" ]; then
+  echo "  Listo (HTTPS). Abrí:  https://${EFFECTIVE_DOMAIN}"
+  echo "  El certificado tarda ~30 s la primera vez (Let's Encrypt)."
+  echo "  Requisito: ${EFFECTIVE_DOMAIN} debe apuntar a ${IP} (DuckDNS)."
+else
+  echo "  Listo. Abrí:  http://${IP}:${PORT}"
+fi
 if [ -n "${GENERATED}" ]; then
   echo
   echo "  🔑 CONTRASEÑA GENERADA (guardala, se muestra una sola vez):"
   echo "       ${GENERATED}"
-  echo
   echo "  Para cambiarla:  editá ${ENV_FILE} y corré el redeploy."
 else
   echo "  🔒 Login activo con la contraseña de ${ENV_FILE}."
 fi
-echo "  Logs:        docker compose -f ${APP_DIR}/docker-compose.yml logs -f"
-echo "  Redeploy:    bash ${APP_DIR}/deploy/setup.sh"
+echo "  Logs:      $SUDO docker compose logs -f"
+echo "  Redeploy:  bash ${APP_DIR}/deploy/setup.sh"
 echo "================================================================"
-echo
-echo "  ⚠️  La app corre por HTTP (sin cifrado). Para protección real,"
-echo "      poné Caddy/nginx con HTTPS delante del :${PORT}."

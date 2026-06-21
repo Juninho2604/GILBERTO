@@ -37,6 +37,29 @@ contenedor y abre el puerto. Al terminar imprime la URL `http://<IP>:8501`.
 >   | REPO_URL="https://<TOKEN>@github.com/Juninho2604/GILBERTO.git" bash
 > ```
 
+## 🔐 HTTPS con dominio gratis (DuckDNS) — recomendado
+
+Para cifrar el tráfico (que la contraseña no viaje en texto plano) el deploy
+puede levantar **Caddy**, que saca y renueva el certificado de Let's Encrypt
+solo. Solo necesitás un subdominio gratis de DuckDNS.
+
+**1. Creá el subdominio (una sola vez):**
+   - Entrá a <https://www.duckdns.org> (login con Google/GitHub).
+   - Creá un subdominio, p. ej. `gilberto`.
+   - En "current ip" poné la IP de tu VPS y guardá. Queda `gilberto.duckdns.org`.
+
+**2. Deploy con HTTPS:**
+   ```bash
+   DOMAIN='gilberto.duckdns.org' APP_PASSWORD='miClave' bash deploy/setup.sh
+   ```
+   El script levanta Caddy, abre 80/443, **cierra el 8501 al público** (la app
+   queda solo detrás de HTTPS) y al terminar imprime `https://gilberto.duckdns.org`.
+   El certificado tarda ~30 s la primera vez.
+
+> El dominio se guarda en `.env`, así que en los próximos redeploys ya no hace
+> falta pasarlo: `bash deploy/setup.sh` mantiene el HTTPS.
+> Para **volver a HTTP** sin dominio, borrá la línea `DOMAIN=` del `.env`.
+
 ## Opción B — paso a paso
 
 ```bash

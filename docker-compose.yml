@@ -5,7 +5,9 @@ services:
     container_name: raee-optimizer
     restart: unless-stopped
     ports:
-      - "${PORT:-8501}:8501"
+      # BIND_IP=0.0.0.0 (default) publica al exterior. En modo HTTPS se pone
+      # 127.0.0.1 para que el único acceso público sea Caddy por 443.
+      - "${BIND_IP:-0.0.0.0}:${PORT:-8501}:8501"
     environment:
       # Contraseña de acceso. Se lee del archivo .env del proyecto (o del entorno).
       # Sin valor, la app queda SIN login (solo para desarrollo local).
