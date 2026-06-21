@@ -97,10 +97,12 @@ div[data-testid="stMetricValue"] { font-family:'Space Grotesk',sans-serif;
   font-weight:700; color:var(--text); letter-spacing:-.01em; }
 div[data-testid="stMetricLabel"] { color:var(--muted); font-weight:600; }
 
-/* Botón primario con gradiente verde */
+/* Botón primario con gradiente verde — texto blanco también en los hijos */
 .stButton > button[kind="primary"], button[data-testid="stBaseButton-primary"] {
   background:var(--grad); border:0; color:#fff; font-weight:700; border-radius:14px;
   box-shadow:0 8px 20px #2E8A2333; transition:transform .12s ease; }
+.stButton > button[kind="primary"] *,
+button[data-testid="stBaseButton-primary"] * { color:#fff !important; }
 .stButton > button[kind="primary"]:hover { transform:translateY(-1px);
   box-shadow:0 10px 26px #2E8A2344; }
 .stButton > button { border-radius:14px; }
@@ -109,6 +111,7 @@ div[data-testid="stMetricLabel"] { color:var(--muted); font-weight:600; }
 [data-testid="stPills"] button { border-radius:999px !important; font-weight:600; }
 
 /* Sidebar verde oscuro con texto claro */
+section[data-testid="stSidebar"] { background:var(--sidebar); }
 section[data-testid="stSidebar"] > div:first-child { background:var(--sidebar); }
 section[data-testid="stSidebar"] * { color:#C7D2CB; }
 section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2,
@@ -142,10 +145,15 @@ section[data-testid="stSidebar"] .stButton > button {
   box-shadow:none; }
 section[data-testid="stSidebar"] .stButton > button:hover {
   background:#18221C; color:#EAF3EC; transform:none; }
+section[data-testid="stSidebar"] .stButton > button[kind="primary"],
+section[data-testid="stSidebar"] .stButton > button[kind="primary"] * {
+  background-color:transparent; color:#10241A !important; font-weight:700; }
 section[data-testid="stSidebar"] .stButton > button[kind="primary"] {
-  background:#8DE05B !important; color:#10241A !important; font-weight:700; }
+  background:#8DE05B !important; }
 section[data-testid="stSidebar"] .stButton > button[kind="primary"]:hover {
   background:#9BE86E !important; }
+/* Etiqueta de sección un poco más clara para que se lea sobre el verde oscuro */
+.navsec { color:#8EA295; }
 
 /* Tablas / dataframes */
 [data-testid="stDataFrame"], [data-testid="stTable"] {
