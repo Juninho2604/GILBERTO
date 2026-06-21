@@ -18,7 +18,7 @@ import pandas as pd
 from app.data_access import optimizable_items
 from app.logistics import CONTAINERS
 from app.ui import brand, pile_label, usd
-from app.views.components import metal_table
+from app.views.components import metal_table, pallet_plan_section
 from app.viz3d import LotViz, container_figure
 from domain.models import PRECIOUS_METALS
 from domain.risk import blend_threshold_risk
@@ -27,6 +27,14 @@ from optimize.optimizer import best_partition
 
 _METAL_NOMBRE = {"CU": "cobre", "AU": "oro", "AG": "plata", "PT": "platino", "PD": "paladio"}
 _ROLE = {0: "LOTE RICO", 1: "MIXTO", 2: "RELLENO"}
+
+
+def _lot_below_threshold(valuation) -> bool:
+    """True si algún metal precioso del lote cae bajo el umbral (paga $0)."""
+    return any(
+        valuation.metals[m].content > 0 and valuation.metals[m].rr <= 1e-9
+        for m in PRECIOUS_METALS
+    )
 
 
 def render() -> None:
@@ -128,6 +136,7 @@ def render() -> None:
             util_pct=l.valuation.metal_utilization_pct,
             au_grade=l.valuation.metals["AU"].grade,
             codes=[p.item.code for p in l.components],
+            below_threshold=_lot_below_threshold(l.valuation),
         )
         for i, l in enumerate(res.lots)
     ]
@@ -136,6 +145,15 @@ def render() -> None:
         use_container_width=True,
         config={"displayModeBar": False},
     )
+
+    # --- Plano de carga: distribución de pallets ------------------------- #
+    st.markdown("##### Plano de carga · distribución de pallets")
+    st.caption(
+        "Cómo iría distribuido físicamente el contenedor, pallet por pallet y en "
+        "orden de carga: el sistema separa los **muy ricos** (concentran el oro) "
+        "de los de **relleno**, cuidando que ni el relleno caiga bajo el umbral."
+    )
+    pallet_plan_section(viz, container_kg)
 
     # --- ¿Algo queda en $0? (a nivel contenedor) -------------------------- #
     wasted = []

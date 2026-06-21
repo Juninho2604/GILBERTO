@@ -19,14 +19,23 @@ import streamlit as st
 from analysis.explain import explain_partition
 from app.data_access import default_optimum, demo_lot, resolvable_lot_ids
 from app.ui import brand, pile_label, why
-from app.views.components import explanation_block, metal_table
+from app.views.components import explanation_block, metal_table, pallet_plan_section
 from app.viz3d import LotViz, container_figure
+from domain.models import PRECIOUS_METALS
 from domain.risk import blend_threshold_risk
 from domain.valuation import BlendComponent, value_blend
 from optimize.optimizer import best_partition
 
 _METAL_NOMBRE = {"CU": "Cobre", "AU": "Oro", "AG": "Plata", "PT": "Platino", "PD": "Paladio"}
 _ROLE = {0: "LOTE RICO", 1: "MIXTO", 2: "RELLENO"}
+
+
+def _lot_below_threshold(valuation) -> bool:
+    """True si algún metal precioso del lote cae bajo el umbral (paga $0)."""
+    return any(
+        valuation.metals[m].content > 0 and valuation.metals[m].rr <= 1e-9
+        for m in PRECIOUS_METALS
+    )
 
 
 def _recovery_pct(metals: dict, m: str) -> float:
@@ -164,7 +173,8 @@ def render() -> None:
         LotViz(index=i + 1, weight_kg=l.total_weight_kg,
                util_pct=l.valuation.metal_utilization_pct,
                au_grade=l.valuation.metals["AU"].grade,
-               codes=[p.item.code for p in l.components])
+               codes=[p.item.code for p in l.components],
+               below_threshold=_lot_below_threshold(l.valuation))
         for i, l in enumerate(res.lots)
     ]
     st.caption("Cada bloque es un lote (tamaño = peso, color = % que paga: verde "
@@ -173,6 +183,15 @@ def render() -> None:
         container_figure(viz, max(shipped, 1.0)),
         use_container_width=True, config={"displayModeBar": False},
     )
+
+    # --- 4b) Plan de carga: distribución de pallets ----------------------- #
+    st.markdown("##### Plano de carga · distribución de pallets")
+    st.caption(
+        "Cómo se armaría físicamente el envío, pallet por pallet y numerado en "
+        "orden de carga: separa los **muy ricos** del **relleno**, sin que ningún "
+        "pallet quede bajo el umbral."
+    )
+    pallet_plan_section(viz, max(shipped, 1.0))
 
     # --- 5) Seguridad de cobro y confianza por lote ----------------------- #
     st.markdown("##### Seguridad y confianza por lote")
