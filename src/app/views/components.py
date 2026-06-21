@@ -18,6 +18,8 @@ from domain.models import METALS
 from domain.valuation import LotValuation
 
 _ROLE_LABEL = {"rico": "LOTE RICO", "relleno": "RELLENO", "mixto": "MIXTO"}
+_METAL_NOMBRE = {"CU": "Cobre", "AU": "Oro", "AG": "Plata", "PT": "Platino", "PD": "Paladio"}
+_TIER_NOMBRE = {"MEASURED": "medida", "ESTIMATED": "estimada", "NOT_DETERMINED": "sin determinar"}
 
 # Distintivo de color por categoría, alineado con el 3D.
 _TIER_DOT = {
@@ -189,6 +191,90 @@ def pallet_plan_section(lots_viz: list[LotViz], container_kg: float) -> None:
     ]
     st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True,
                  height=min(420, 60 + 35 * len(rows)))
+
+
+def completion_section(plan) -> None:
+    """Diagnóstico del sobrante y tabla de qué comprar para completar el contenedor.
+
+    Recibe un ``CompletionPlan`` (analysis.complete_container) y muestra: el % que
+    cobraría el sobrante tal cual, qué metales caen bajo el umbral (pagan $0), y la
+    pila concreta a comprar —con cuántos kg— para rescatarlos.
+    """
+    if plan is None or plan.leftover_kg <= 0:
+        st.caption("No hay sobrante para analizar.")
+        return
+
+    if plan.safe:
+        st.success(
+            f"El sobrante ({plan.leftover_kg/1000:,.1f} t) ya supera todos los "
+            f"umbrales: cobra el **{plan.leftover_util_pct:.0f}%** de su metal sin "
+            f"comprar nada. Se puede enviar tal cual.",
+            icon=":material/check_circle:",
+        )
+        return
+
+    below = [g for g in plan.gaps if g.below]
+    fragile = [g for g in plan.gaps if g.fragile and not g.below]
+
+    # Encabezado: el sobrante pierde metal bajo el umbral.
+    if below:
+        nombres = ", ".join(_METAL_NOMBRE.get(g.metal, g.metal) for g in below)
+        st.warning(
+            f"Si se envía el sobrante tal cual ({plan.leftover_kg/1000:,.1f} t), "
+            f"**{nombres}** cae bajo el umbral de la refinería y **paga $0**. "
+            f"Aprovecharía solo el **{plan.leftover_util_pct:.0f}%** de su metal.",
+            icon=":material/warning:",
+        )
+
+    # Recomendación de compra (si hay pila capaz).
+    if plan.booster_code and plan.recommend_kg > 0:
+        tier = _TIER_NOMBRE.get(plan.booster_tier, plan.booster_tier.lower())
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Sobrante hoy", f"{plan.leftover_util_pct:.0f}%",
+                  help="% del metal del sobrante que la refinería pagaría tal cual.")
+        c2.metric("Completando", f"{plan.after_util_pct:.0f}%",
+                  delta=f"+{plan.after_util_pct - plan.leftover_util_pct:.0f} pts",
+                  help="% del metal del sobrante que se cobra tras mezclar con la "
+                       "pila a comprar.")
+        c3.metric("Comprar", f"~{plan.recommend_kg:,.0f} kg",
+                  delta=f"pila {pile_label(plan.booster_code)}", delta_color="off")
+        st.success(
+            f"Comprar **~{plan.recommend_kg:,.0f} kg** de la pila "
+            f"**{pile_label(plan.booster_code)}** (oro {plan.booster_grade_au:,.0f} "
+            f"g/t, ley {tier}) levanta el sobrante por encima del umbral: pasaría de "
+            f"**{plan.leftover_util_pct:.0f}%** a **{plan.after_util_pct:.0f}%** de "
+            f"su metal cobrado, sin dejar nada en $0.",
+            icon=":material/shopping_cart:",
+        )
+
+    # Tabla por metal: qué comprar para cada uno.
+    rows = []
+    for g in below + fragile:
+        estado = "Bajo umbral ($0)" if g.below else "Frágil"
+        comprar = (f"{pile_label(g.booster_code)} · {g.booster_grade:,.0f} g/t"
+                   if g.booster_code else "— sin pila confiable")
+        rows.append({
+            "Metal": _METAL_NOMBRE.get(g.metal, g.metal),
+            "Estado": estado,
+            "Ley mezcla": f"{g.grade:,.1f} g/t",
+            "Umbral": f"{g.threshold:,.0f} g/t",
+            "P. cobro": f"{g.p_cobro*100:.0f}%",
+            "Comprar pila": comprar,
+            "kg a sumar": f"~{g.add_kg:,.0f}" if g.add_kg > 0 else "—",
+        })
+    if rows:
+        st.caption("Qué comprar, metal por metal (la compra recomendada cubre el "
+                   "más exigente):")
+        st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
+
+    if plan.unfixable:
+        nombres = ", ".join(_METAL_NOMBRE.get(m, m) for m in plan.unfixable)
+        st.error(
+            f"No hay en el catálogo una pila con ley **confiable** lo bastante rica "
+            f"para rescatar **{nombres}**. Hace falta conseguir material rico en "
+            f"ese metal (o un ensayo de laboratorio que confirme una pila candidata).",
+            icon=":material/error:",
+        )
 
 
 def components_table(components: list[dict], private: bool) -> None:

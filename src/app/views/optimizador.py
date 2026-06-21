@@ -15,10 +15,13 @@ import streamlit as st
 
 import pandas as pd
 
+import copy
+
+from analysis.complete_container import analyze_completion
 from app.data_access import optimizable_items
 from app.logistics import CONTAINERS
 from app.ui import brand, pile_label, usd
-from app.views.components import metal_table, pallet_plan_section
+from app.views.components import completion_section, metal_table, pallet_plan_section
 from app.viz3d import LotViz, container_figure
 from domain.models import PRECIOUS_METALS
 from domain.risk import blend_threshold_risk
@@ -255,3 +258,24 @@ def render() -> None:
             for c, kg in sorted(leftover, key=lambda x: -x[1])
         )
         st.caption(f"**{left_kg/1000:,.1f} t** en {len(leftover)} pilas: {chips}")
+
+        # --- Completar el próximo contenedor: qué comprar ----------------- #
+        st.markdown("##### Completar el próximo contenedor · qué comprar")
+        st.caption(
+            "El sobrante suele estar dominado por pilas de bajo grado: solo, algún "
+            "metal cae bajo el umbral y paga $0. El sistema detecta cuáles y "
+            "recomienda qué pila comprar —y cuántos kg— para que el próximo "
+            "contenedor no pierda material."
+        )
+        by_code = {it.code: it for it in items}
+        left_items = []
+        for c, kg in leftover:
+            if c in by_code:
+                it = copy.copy(by_code[c])
+                it.quantity_kg = kg
+                left_items.append(it)
+        plan = analyze_completion(
+            left_items, items, prices, terms,
+            k_safe=float(st.session_state.get("k_safe", 1.0)),
+        )
+        completion_section(plan)
