@@ -41,7 +41,7 @@ st.set_page_config(
     page_title="Aurix · Mezclas RAEE",
     page_icon="♻️",
     layout="wide",
-    initial_sidebar_state="auto",  # se colapsa solo en celular; abierto en escritorio
+    initial_sidebar_state="expanded",  # menú visible de entrada (también en celular)
 )
 inject_css()
 
