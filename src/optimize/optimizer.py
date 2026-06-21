@@ -116,6 +116,20 @@ def marginal_values(
 # --------------------------------------------------------------------------- #
 # Núcleo: expresión del valor neto de UN lote sobre variables de peso
 # --------------------------------------------------------------------------- #
+def _safe_grade(it: InventoryItem, metal: str, k_safe: float = 0.0) -> float:
+    """Ley conservadora para optimizar: ``max(0, grade − k_safe·σ)`` (Feature 3).
+
+    Descuenta el margen de error de la ley: las leyes ruidosas valen menos, así
+    el modelo no recomienda lotes que cobran sobre un número frágil — sin tirar
+    el material (la ley del combo de un bloque colineal sí se conoce). Con
+    ``k_safe=0`` o sin σ (datos sintéticos/manuales) usa el valor puntual.
+    """
+    g = it.grade(metal)
+    if k_safe <= 0:
+        return g
+    return max(0.0, g - k_safe * it.sigma(metal))
+
+
 def _add_lot_net_expr(
     prob: pulp.LpProblem,
     cand: Sequence[InventoryItem],
@@ -124,6 +138,7 @@ def _add_lot_net_expr(
     terms: ContractTerms,
     tag: str,
     big_m: float,
+    k_safe: float = 0.0,
 ):
     """Agrega a ``prob`` las variables/restricciones de un lote y devuelve
     ``(net_expr, wmt_expr, dmt_expr)``."""
@@ -136,7 +151,7 @@ def _add_lot_net_expr(
     # Cobre: lineal (umbral cu_deduction, sin tope).
     cu_unit = prices.price_cu - terms.rc_cu
     cu_recovered = pulp.lpSum(
-        dry[it.code] * (it.grade_cu - terms.cu_deduction) for it in cand
+        dry[it.code] * (_safe_grade(it, "CU", k_safe) - terms.cu_deduction) for it in cand
     )
     amounts.append(cu_recovered * cu_unit / 1000.0)
 
@@ -146,7 +161,7 @@ def _add_lot_net_expr(
         unit = prices.price(metal) - terms.rc(metal)
         if not rule.paid or unit <= 0:
             continue
-        content_g = pulp.lpSum(dry[it.code] * it.grade(metal) for it in cand) / 1000.0
+        content_g = pulp.lpSum(dry[it.code] * _safe_grade(it, metal, k_safe) for it in cand) / 1000.0
         uncapped = content_g - rule.deduction * (dmt / 1000.0)  # Σ dry(g−d)/1000
 
         r = pulp.LpVariable(f"r_{metal}_{tag}", lowBound=0)
@@ -198,6 +213,7 @@ def optimize_blend(
     min_lot_kg: float = 0.0,
     max_lot_kg: Optional[float] = None,
     required_codes: Sequence[str] = (),
+    k_safe: float = 0.0,
     solver: Optional[pulp.LpSolver] = None,
 ) -> OptimizeResult:
     """Mejor mezcla de un único lote (qué pilas y cuánto enviar ahora).
@@ -215,7 +231,7 @@ def optimize_blend(
         it.code: pulp.LpVariable(f"x_{it.code}", lowBound=0, upBound=it.quantity_kg)
         for it in cand
     }
-    net, wmt, _ = _add_lot_net_expr(prob, cand, x, prices, terms, "L0", big_m)
+    net, wmt, _ = _add_lot_net_expr(prob, cand, x, prices, terms, "L0", big_m, k_safe)
 
     if objective == "per_kg" and min_lot_kg > 0:
         prob += wmt == min_lot_kg
@@ -255,6 +271,7 @@ def optimize_partition(
     min_lot_kg: float = 0.0,
     max_lot_kg: Optional[float] = None,
     container_kg: Optional[float] = None,
+    k_safe: float = 0.0,
     solver: Optional[pulp.LpSolver] = None,
     time_limit_s: Optional[float] = 30.0,
 ) -> PartitionResult:
@@ -295,7 +312,7 @@ def optimize_partition(
     nets = []
     for k in range(num_lots):
         xk = {it.code: x[(it.code, k)] for it in cand}
-        net_k, wmt_k, _ = _add_lot_net_expr(prob, cand, xk, prices, terms, f"L{k}", big_m)
+        net_k, wmt_k, _ = _add_lot_net_expr(prob, cand, xk, prices, terms, f"L{k}", big_m, k_safe)
         nets.append(net_k)
         if min_lot_kg > 0:
             u = pulp.LpVariable(f"use_{k}", cat="Binary")
@@ -374,6 +391,7 @@ def best_partition(
     min_lot_kg: float = 0.0,
     max_lot_kg: Optional[float] = None,
     container_kg: Optional[float] = None,
+    k_safe: float = 0.0,
     time_limit_s: Optional[float] = 10.0,
     min_gain_usd: float = 50.0,
     solver: Optional[pulp.LpSolver] = None,
@@ -397,7 +415,7 @@ def best_partition(
     for k in range(1, upper + 1):
         r = optimize_partition(
             cand, prices, terms, num_lots=k, min_lot_kg=min_lot_kg,
-            max_lot_kg=max_lot_kg, container_kg=container_kg,
+            max_lot_kg=max_lot_kg, container_kg=container_kg, k_safe=k_safe,
             time_limit_s=time_limit_s, solver=solver,
         )
         if not r.lots:

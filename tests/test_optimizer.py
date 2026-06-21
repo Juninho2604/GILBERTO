@@ -91,6 +91,21 @@ def test_container_figure_builds():
     assert len(fig.to_json()) > 0
 
 
+def test_conservative_valuation_discounts_noisy_grades():
+    """k_safe>0 valoriza con grade−k·σ: una ley ruidosa rinde menos (Feature 3)."""
+    prices, terms = default_prices(), default_terms()
+    it = _item("N", quantity_kg=10_000, grade_cu=0.20, grade_au=120, grade_ag=600, grade_pd=40)
+    it.grade_sigma = {"AU": 60.0, "AG": 200.0, "PD": 15.0, "CU": 0.02}  # ruidosa
+    base = optimize_blend([it], prices, terms, max_lot_kg=18_000, k_safe=0.0)
+    cons = optimize_blend([it], prices, terms, max_lot_kg=18_000, k_safe=1.0)
+    assert cons.net_value_usd <= base.net_value_usd  # el descuento baja el valor
+    # Sin σ (datos sin confianza), k_safe no cambia nada.
+    plain = _item("P", quantity_kg=10_000, grade_cu=0.20, grade_au=120, grade_ag=600)
+    a = optimize_blend([plain], prices, terms, max_lot_kg=18_000, k_safe=0.0)
+    b = optimize_blend([plain], prices, terms, max_lot_kg=18_000, k_safe=1.0)
+    assert a.net_value_usd == pytest.approx(b.net_value_usd)
+
+
 def test_best_partition_stops_when_flat():
     """Si un lote alcanza, no infla la cantidad de lotes."""
     prices, terms = default_prices(), default_terms()

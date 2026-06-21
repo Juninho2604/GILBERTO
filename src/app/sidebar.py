@@ -71,9 +71,23 @@ def render_sidebar() -> tuple[MetalPrices, ContractTerms, bool]:
         min_lot_charge=t.min_lot_charge, moisture_penalty=t.moisture_penalty,
     )
 
+    with st.sidebar.expander("🎯 Riesgo de umbral", expanded=False):
+        st.caption("Cuán seguro debe ser el cobro de cada metal (margen en σ).")
+        z_min = st.number_input(
+            "z mínimo (margen en σ)", value=1.5, step=0.1, format="%.1f",
+            help="Margen mínimo sobre el umbral, en desviaciones estándar. 1.5 ≈ "
+            "93% de probabilidad de cobro. Más alto = más conservador.",
+        )
+        k_safe = st.number_input(
+            "k (ley conservadora)", value=1.0, step=0.5, format="%.1f",
+            help="Cuántas σ se descuentan para valorizar conservador (grade − k·σ).",
+        )
+
     st.session_state.prices = prices
     st.session_state.terms = terms
     st.session_state.private = private
+    st.session_state.z_min = z_min
+    st.session_state.k_safe = k_safe
 
     st.sidebar.markdown("---")
     st.sidebar.caption(

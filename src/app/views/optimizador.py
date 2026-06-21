@@ -13,12 +13,16 @@ from math import ceil
 
 import streamlit as st
 
+import pandas as pd
+
 from app.data_access import optimizable_items
 from app.logistics import CONTAINERS
 from app.ui import brand, pile_label, usd
 from app.views.components import metal_table
 from app.viz3d import LotViz, container_figure
 from domain.models import PRECIOUS_METALS
+from domain.risk import blend_threshold_risk
+from domain.valuation import BlendComponent
 from optimize.optimizer import best_partition
 
 _METAL_NOMBRE = {"CU": "cobre", "AU": "oro", "AG": "plata", "PT": "platino", "PD": "paladio"}
@@ -62,6 +66,7 @@ def render() -> None:
         with st.spinner("Armando el contenedor y dividiéndolo en lotes óptimos…"):
             bp = best_partition(
                 items, prices, terms, max_num_lots=5, container_kg=container_kg,
+                k_safe=float(st.session_state.get("k_safe", 1.0)),
             )
         st.session_state.cont_bp = bp
         st.session_state.cont_kg = container_kg
@@ -137,10 +142,30 @@ def render() -> None:
         st.success("✅ Todos los metales superan el umbral: **no se pierde material en $0**.")
     st.write("")
 
+    # --- Riesgo de umbral a nivel contenedor ------------------------------ #
+    z_min = float(st.session_state.get("z_min", 1.5))
+    fragile = []
+    for i, l in enumerate(res.lots, 1):
+        comps = [BlendComponent(p.item, p.weight_kg) for p in l.components]
+        for m, r in blend_threshold_risk(comps, terms).items():
+            if r.counts_value and not r.safe(z_min):
+                fragile.append((i, m, r))
+    if fragile:
+        for i, m, r in fragile:
+            st.warning(
+                f"🎲 Lote {i} · **{_METAL_NOMBRE[m]}**: la mezcla queda en "
+                f"{r.grade:.0f} ±{r.sigma:.0f} g/t vs umbral {r.threshold:.0f} → "
+                f"probabilidad de cobro **{r.p_cobro*100:.0f}%** (z={r.z:.1f} < "
+                f"{z_min:.1f}). Riesgo de que la refinería analice por debajo y no "
+                f"pague ese metal. Conviene diluir con una pila más rica."
+            )
+
     # --- Detalle de cada lote --------------------------------------------- #
     st.markdown("##### Lotes del contenedor")
     for i, l in enumerate(res.lots, 1):
         v = l.valuation
+        comps = [BlendComponent(p.item, p.weight_kg) for p in l.components]
+        risk = blend_threshold_risk(comps, terms)
         with st.expander(
             f"{_ROLE.get(i-1, '📦 LOTE')} {i} — {v.metal_utilization_pct:.0f}% "
             f"aprovechado · {l.total_weight_kg/1000:,.1f} t · Au {v.metals['AU'].grade:.0f} g/t",
@@ -157,11 +182,27 @@ def render() -> None:
                     }
                     for p in sorted(l.components, key=lambda p: -p.weight_kg)
                 ]
-                import pandas as pd
                 st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True, height=240)
             with cc2:
                 st.caption("Cuánto paga cada metal (barra = % recuperado)")
                 metal_table(v)
+
+            # Riesgo de umbral por metal: ley ± σ, P_cobro, semáforo.
+            st.caption("Seguridad de cobro por metal (ley ± margen vs. umbral)")
+            rrows = []
+            for m, r in risk.items():
+                if r.grade <= 0:
+                    continue
+                sem = "🟢" if r.safe(z_min) else ("🟡" if r.z >= 0 else "🔴")
+                rrows.append({
+                    "Metal": m,
+                    "Ley ± σ (g/t)": f"{r.grade:.0f} ± {r.sigma:.0f}",
+                    "Umbral": f"{r.threshold:.0f}",
+                    "P. cobro": f"{r.p_cobro*100:.0f}%",
+                    "Seguro": sem,
+                })
+            if rrows:
+                st.dataframe(pd.DataFrame(rrows), width="stretch", hide_index=True)
 
     # --- Qué queda para el próximo contenedor ----------------------------- #
     assigned: dict[str, float] = {}
