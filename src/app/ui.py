@@ -1,13 +1,12 @@
 """Sistema de diseño de la interfaz: CSS, formato y componentes reutilizables.
 
 Mantiene toda la apariencia en un solo lugar para que las vistas se concentren
-en el contenido. La estética es "panel financiero": fondo oscuro, tarjetas con
-bordes suaves, acentos por color y tipografía clara.
+en el contenido. La estética es "panel de control premium": fondo oscuro con
+profundidad, tarjetas de vidrio (glassmorphism), acentos con glow y tipografía
+Inter.
 
-Confidencialidad: las pilas se muestran por **número** (como las nombra
-Gilberto: #1, #2, #14…) y el nombre real solo aparece si se activa el *modo
-privado / leyenda* en la barra lateral. Así el material y las fórmulas no se
-filtran en una demo.
+Confidencialidad: las pilas se muestran **solo por su código** (nunca el nombre
+del material), para no filtrar materiales ni fórmulas de Gilberto y su socio.
 """
 
 from __future__ import annotations
@@ -22,41 +21,69 @@ MUTED = "#8b949e"
 
 _CSS = """
 <style>
-:root { --accent:#3b82f6; --good:#22c55e; --warn:#f59e0b; --bad:#ef4444; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-/* Lienzo general */
-.stApp { background: radial-gradient(1200px 600px at 20% -10%, #15233b 0%, #0d1117 55%); }
-#MainMenu, footer, header [data-testid="stToolbar"] { visibility: hidden; }
-.block-container { padding-top: 2.2rem; max-width: 1280px; }
+:root { --accent:#3b82f6; --accent2:#22d3ee; --good:#22c55e; --warn:#f59e0b;
+  --bad:#ef4444; --ink:#e8eefc; --muted:#8b97ad; --line:#202836; }
 
-h1, h2, h3 { letter-spacing: -0.02em; }
-h1 { font-weight: 800; }
+html, body, .stApp, [class*="css"] { font-family:'Inter',system-ui,sans-serif; }
+
+/* Lienzo: profundidad con varias capas + grid muy sutil */
+.stApp {
+  background:
+    radial-gradient(1100px 520px at 12% -8%, #15294a 0%, rgba(13,17,23,0) 55%),
+    radial-gradient(900px 480px at 92% 0%, #112b33 0%, rgba(13,17,23,0) 50%),
+    linear-gradient(180deg, #0b0f16 0%, #0a0d13 100%);
+}
+.stApp::before {
+  content:""; position:fixed; inset:0; pointer-events:none; opacity:.35;
+  background-image:linear-gradient(#ffffff05 1px,transparent 1px),
+    linear-gradient(90deg,#ffffff05 1px,transparent 1px);
+  background-size:42px 42px; mask-image:radial-gradient(circle at 50% 0%,#000,transparent 75%);
+}
+#MainMenu, footer, header [data-testid="stToolbar"] { visibility:hidden; }
+.block-container { padding-top:2.1rem; max-width:1300px; }
+
+h1, h2, h3 { letter-spacing:-0.025em; color:var(--ink); }
+h1 { font-weight:900; }
+h3 { font-weight:800; }
 
 /* Encabezado de marca */
-.brand { display:flex; align-items:center; gap:.7rem; margin-bottom:.2rem; }
-.brand .dot { width:12px; height:12px; border-radius:50%;
-  background:linear-gradient(135deg,#3b82f6,#22d3ee); box-shadow:0 0 16px #3b82f6aa; }
-.brand .title { font-size:1.55rem; font-weight:800; color:#e6edf3; }
-.subtle { color:#8b949e; font-size:.92rem; }
+.brand { display:flex; align-items:center; gap:.7rem; margin-bottom:.15rem; }
+.brand .dot { width:13px; height:13px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 0 18px #3b82f6cc, 0 0 6px #22d3eeaa; }
+.brand .title { font-size:1.6rem; font-weight:900; color:var(--ink);
+  background:linear-gradient(90deg,#eaf1ff,#9fc6ff); -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent; }
+.subtle { color:var(--muted); font-size:.92rem; }
 
-/* Tarjeta KPI */
-.kpi { background:linear-gradient(180deg,#161b22,#0f141b); border:1px solid #232b36;
-  border-radius:16px; padding:1.05rem 1.15rem; height:100%; }
-.kpi .label { color:#8b949e; font-size:.78rem; text-transform:uppercase;
-  letter-spacing:.06em; font-weight:600; }
-.kpi .value { color:#e6edf3; font-size:1.7rem; font-weight:800; margin-top:.25rem;
-  line-height:1.1; }
-.kpi .delta { font-size:.85rem; font-weight:600; margin-top:.2rem; }
-.kpi .hint { color:#6b7686; font-size:.76rem; margin-top:.45rem; }
-.kpi.accent { border-color:#27406b; box-shadow:0 0 0 1px #1d3a66 inset, 0 8px 24px #00000040; }
+/* Tarjeta KPI — vidrio con realce superior */
+.kpi { position:relative; background:linear-gradient(180deg,#141a23cc,#0e131bcc);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  border:1px solid var(--line); border-radius:18px; padding:1.05rem 1.15rem;
+  height:100%; transition:transform .15s ease, border-color .15s ease; overflow:hidden; }
+.kpi::after { content:""; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,#ffffff22,transparent); }
+.kpi:hover { transform:translateY(-2px); border-color:#2c3950; }
+.kpi .label { color:var(--muted); font-size:.74rem; text-transform:uppercase;
+  letter-spacing:.07em; font-weight:700; }
+.kpi .value { color:var(--ink); font-size:1.85rem; font-weight:900; margin-top:.25rem;
+  line-height:1.05; }
+.kpi .delta { font-size:.84rem; font-weight:600; margin-top:.2rem; }
+.kpi .hint { color:#6b7789; font-size:.76rem; margin-top:.45rem; line-height:1.3; }
+.kpi.accent { border-color:#2a4a7e;
+  box-shadow:0 0 0 1px #1d3a66 inset, 0 10px 30px #0b1b3a55, 0 0 26px #1e62d033; }
+.kpi.accent .value { background:linear-gradient(90deg,#eafff3,#7ee6a8);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
 
 /* Tarjeta genérica / panel */
-.card { background:#11161d; border:1px solid #232b36; border-radius:16px;
-  padding:1.1rem 1.25rem; margin-bottom:.6rem; }
+.card { background:#10151ccc; backdrop-filter:blur(6px); border:1px solid var(--line);
+  border-radius:18px; padding:1.1rem 1.25rem; margin-bottom:.6rem; }
 
 /* Pills / badges */
-.pill { display:inline-block; padding:.16rem .6rem; border-radius:999px;
-  font-size:.74rem; font-weight:700; letter-spacing:.02em; }
+.pill { display:inline-block; padding:.18rem .62rem; border-radius:999px;
+  font-size:.74rem; font-weight:800; letter-spacing:.02em; }
 .pill.rico { background:#10331f; color:#46d989; border:1px solid #1c5635; }
 .pill.relleno { background:#2a2031; color:#c98bdb; border:1px solid #4a2f57; }
 .pill.mixto { background:#2a2410; color:#e6c351; border:1px solid #574b1c; }
@@ -64,20 +91,37 @@ h1 { font-weight: 800; }
 .pill.warn { background:#332810; color:#e6b451; }
 .pill.bad  { background:#331516; color:#f08a8a; }
 
-/* Sección */
-.section-h { font-size:1.05rem; font-weight:700; color:#e6edf3; margin:.2rem 0 .15rem; }
+.section-h { font-size:1.05rem; font-weight:800; color:var(--ink); margin:.2rem 0 .15rem; }
 
 /* Listas de "por qué" */
-.why { border-left:3px solid var(--accent); padding:.35rem 0 .35rem .8rem;
-  margin:.35rem 0; color:#c9d4e0; font-size:.92rem; }
+.why { border-left:3px solid var(--accent); padding:.4rem 0 .4rem .85rem;
+  margin:.35rem 0; color:#c9d4e0; font-size:.92rem; line-height:1.5; }
 .why.good { border-color:var(--good); }
 .why.warn { border-color:var(--warn); }
 
-div[data-testid="stMetric"] { background:#11161d; border:1px solid #232b36;
-  border-radius:14px; padding:.7rem .9rem; }
+/* Métricas nativas */
+div[data-testid="stMetric"] { background:linear-gradient(180deg,#141a23cc,#0e131bcc);
+  border:1px solid var(--line); border-radius:16px; padding:.8rem 1rem;
+  backdrop-filter:blur(6px); transition:transform .15s ease; }
+div[data-testid="stMetric"]:hover { transform:translateY(-2px); }
+div[data-testid="stMetricValue"] { font-weight:900; letter-spacing:-.02em; }
+
+/* Botón primario con gradiente y glow */
+.stButton > button[kind="primary"], button[data-testid="stBaseButton-primary"] {
+  background:linear-gradient(135deg,#2f6bff,#22d3ee); border:0; font-weight:800;
+  border-radius:12px; box-shadow:0 8px 22px #2f6bff44; transition:transform .12s ease; }
+.stButton > button[kind="primary"]:hover { transform:translateY(-1px);
+  box-shadow:0 10px 28px #2f6bff66; }
+
+/* Expanders y tabs */
+[data-testid="stExpander"] { border:1px solid var(--line); border-radius:14px;
+  background:#10151ccc; overflow:hidden; }
 .stTabs [data-baseweb="tab-list"] { gap:.3rem; }
-.stTabs [data-baseweb="tab"] { background:#11161d; border:1px solid #232b36;
+.stTabs [data-baseweb="tab"] { background:#11161d; border:1px solid var(--line);
   border-radius:10px 10px 0 0; padding:.3rem .9rem; }
+
+/* Alertas suaves */
+div[data-testid="stAlert"] { border-radius:14px; }
 </style>
 """
 

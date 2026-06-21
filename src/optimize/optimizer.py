@@ -254,6 +254,7 @@ def optimize_partition(
     num_lots: int = 2,
     min_lot_kg: float = 0.0,
     max_lot_kg: Optional[float] = None,
+    container_kg: Optional[float] = None,
     solver: Optional[pulp.LpSolver] = None,
     time_limit_s: Optional[float] = 30.0,
 ) -> PartitionResult:
@@ -262,8 +263,9 @@ def optimize_partition(
     Responde a "¿cuáles son las mezclas óptimas?": decide cuánto de cada pila va
     a cada lote (puede dejar material sin asignar si no conviene enviarlo).
     ``min_lot_kg`` impone un tamaño mínimo por lote activo; ``max_lot_kg`` impone
-    el tope físico de un lote (p. ej. el lote final de ~18-19 t que se arma en
-    Miami, o la capacidad del contenedor).
+    el tope físico de cada lote. ``container_kg`` limita el **total** de todos los
+    lotes juntos: modela **un contenedor** (p. ej. 23 t) armado con varios lotes
+    que la refinería tasa por separado; el resto del stock espera otro envío.
     """
     cand = [it for it in items if it.quantity_kg > 0]
     if not cand:
@@ -282,6 +284,10 @@ def optimize_partition(
     # No usar más que el stock de cada pila.
     for it in cand:
         prob += pulp.lpSum(x[(it.code, k)] for k in range(num_lots)) <= it.quantity_kg
+
+    # Capacidad del contenedor: la suma de todos los lotes no la supera.
+    if container_kg is not None:
+        prob += pulp.lpSum(x.values()) <= container_kg
 
     # Tope superior de un lote: el menor entre el stock total y el max físico.
     cap = min(total_stock, max_lot_kg) if max_lot_kg else total_stock
@@ -367,6 +373,7 @@ def best_partition(
     max_num_lots: int = 6,
     min_lot_kg: float = 0.0,
     max_lot_kg: Optional[float] = None,
+    container_kg: Optional[float] = None,
     time_limit_s: Optional[float] = 10.0,
     min_gain_usd: float = 50.0,
     solver: Optional[pulp.LpSolver] = None,
@@ -390,7 +397,8 @@ def best_partition(
     for k in range(1, upper + 1):
         r = optimize_partition(
             cand, prices, terms, num_lots=k, min_lot_kg=min_lot_kg,
-            max_lot_kg=max_lot_kg, time_limit_s=time_limit_s, solver=solver,
+            max_lot_kg=max_lot_kg, container_kg=container_kg,
+            time_limit_s=time_limit_s, solver=solver,
         )
         if not r.lots:
             continue

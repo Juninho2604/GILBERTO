@@ -54,6 +54,43 @@ def test_best_partition_picks_and_beats_single_lot():
     assert vals == sorted(vals)
 
 
+def test_partition_respects_container_cap():
+    """El total de todos los lotes no supera la capacidad del contenedor."""
+    prices, terms = default_prices(), default_terms()
+    items = [
+        _item(f"P{i}", quantity_kg=9_000, grade_cu=0.22, grade_au=140, grade_ag=700, grade_pd=40)
+        for i in range(5)  # 45 t de stock
+    ]
+    res = optimize_partition(items, prices, terms, num_lots=3, container_kg=23_000)
+    shipped = sum(l.total_weight_kg for l in res.lots)
+    assert shipped <= 23_000 + 1.0  # no pasa la capacidad del contenedor
+    assert shipped > 22_000  # y la llena bien (hay material de sobra)
+
+
+def test_best_partition_container_leaves_rest_in_stock():
+    """Con un contenedor más chico que el stock, deja material para el próximo."""
+    prices, terms = default_prices(), default_terms()
+    items = [
+        _item(f"P{i}", quantity_kg=9_000, grade_cu=0.22, grade_au=140, grade_ag=700, grade_pd=40)
+        for i in range(5)
+    ]
+    bp = best_partition(items, prices, terms, max_num_lots=4, container_kg=23_000)
+    shipped = sum(l.total_weight_kg for l in bp.result.lots)
+    assert shipped <= 23_000 + 1.0
+    assert sum(it.quantity_kg for it in items) - shipped > 1_000  # queda en depósito
+
+
+def test_container_figure_builds():
+    """La figura 3D del contenedor se construye y serializa (sin romper)."""
+    from app.viz3d import LotViz, container_figure
+
+    lots = [LotViz(1, 17_000, 92.0, 175, ["012", "009"]),
+            LotViz(2, 6_000, 90.0, 116, ["006", "001"])]
+    fig = container_figure(lots, 23_000)
+    assert len(fig.data) == 4  # wireframe + piso + 2 lotes
+    assert len(fig.to_json()) > 0
+
+
 def test_best_partition_stops_when_flat():
     """Si un lote alcanza, no infla la cantidad de lotes."""
     prices, terms = default_prices(), default_terms()
