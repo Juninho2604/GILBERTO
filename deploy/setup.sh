@@ -71,12 +71,19 @@ elif ! grep -q '^APP_PASSWORD=' "${ENV_FILE}" 2>/dev/null; then
   set_env_var APP_PASSWORD "${GENERATED}"
 fi
 [ -n "${DOMAIN:-}" ] && set_env_var DOMAIN "${DOMAIN}"
+[ -n "${EXTERNAL_PROXY:-}" ] && set_env_var EXTERNAL_PROXY "${EXTERNAL_PROXY}"
 
-# Dominio efectivo (del entorno o del .env ya guardado).
+# Modo "proxy externo": ya tenés tu propio reverse proxy (nginx) en el VPS.
+# La app queda solo en 127.0.0.1 y NO se levanta Caddy (evita pelear por el :80).
+EXT_PROXY="${EXTERNAL_PROXY:-$(grep '^EXTERNAL_PROXY=' "${ENV_FILE}" 2>/dev/null | cut -d= -f2-)}"
 EFFECTIVE_DOMAIN="${DOMAIN:-$(grep '^DOMAIN=' "${ENV_FILE}" 2>/dev/null | cut -d= -f2-)}"
 
 echo "==> 5/6  Build + run"
-if [ -n "${EFFECTIVE_DOMAIN}" ]; then
+if [ "${EXT_PROXY:-}" = "1" ]; then
+  echo "    Modo proxy externo: app en 127.0.0.1:${PORT}, sin Caddy (la sirve tu nginx)."
+  set_env_var BIND_IP 127.0.0.1
+  $SUDO docker compose up -d --build
+elif [ -n "${EFFECTIVE_DOMAIN}" ]; then
   echo "    Modo HTTPS con Caddy para ${EFFECTIVE_DOMAIN} (la app no se publica al exterior)"
   set_env_var BIND_IP 127.0.0.1   # app solo en localhost; Caddy la sirve por 443
   $SUDO docker compose -f docker-compose.yml -f docker-compose.tls.yml up -d --build
@@ -86,7 +93,9 @@ else
 fi
 
 echo "==> 6/6  Firewall"
-if command -v ufw >/dev/null 2>&1 && $SUDO ufw status 2>/dev/null | grep -q "Status: active"; then
+if [ "${EXT_PROXY:-}" = "1" ]; then
+  echo "    (proxy externo: el firewall lo maneja tu nginx, no toco puertos)"
+elif command -v ufw >/dev/null 2>&1 && $SUDO ufw status 2>/dev/null | grep -q "Status: active"; then
   if [ -n "${EFFECTIVE_DOMAIN}" ]; then
     $SUDO ufw allow 80/tcp || true
     $SUDO ufw allow 443/tcp || true
@@ -98,10 +107,12 @@ fi
 IP="$(curl -fsS https://api.ipify.org 2>/dev/null || echo '<IP-DEL-VPS>')"
 echo
 echo "================================================================"
-if [ -n "${EFFECTIVE_DOMAIN}" ]; then
+if [ "${EXT_PROXY:-}" = "1" ]; then
+  echo "  Listo. App en 127.0.0.1:${PORT} — publicala desde tu nginx (proxy_pass)."
+elif [ -n "${EFFECTIVE_DOMAIN}" ]; then
   echo "  Listo (HTTPS). Abrí:  https://${EFFECTIVE_DOMAIN}"
   echo "  El certificado tarda ~30 s la primera vez (Let's Encrypt)."
-  echo "  Requisito: ${EFFECTIVE_DOMAIN} debe apuntar a ${IP} (DuckDNS)."
+  echo "  Requisito: ${EFFECTIVE_DOMAIN} debe apuntar a ${IP}."
 else
   echo "  Listo. Abrí:  http://${IP}:${PORT}"
 fi
