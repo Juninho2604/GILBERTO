@@ -54,7 +54,7 @@ def _cuboid(x0, x1, y0, y1, z0, z1, color, name, hover, opacity=0.92):
     )
 
 
-def _wire_box(x0, x1, y0, y1, z0, z1, color="rgba(120,160,220,0.55)"):
+def _wire_box(x0, x1, y0, y1, z0, z1, color="rgba(46,138,35,0.45)"):
     """Aristas del contenedor (12 líneas) como una sola traza."""
     v = [
         (x0, y0, z0), (x1, y0, z0), (x1, y1, z0), (x0, y1, z0),
@@ -84,7 +84,7 @@ def container_figure(lots: list[LotViz], container_kg: float) -> go.Figure:
     # Caja de vidrio del contenedor (capacidad total) + piso tenue.
     fig.add_trace(_wire_box(0, _LEN, 0, _WID, 0, _HGT))
     fig.add_trace(_cuboid(
-        0, _LEN, 0, _WID, 0, 0.02, "rgba(90,120,170,0.25)", "piso", "Contenedor",
+        0, _LEN, 0, _WID, 0, 0.02, "rgba(141,224,91,0.20)", "piso", "Contenedor",
         opacity=0.3,
     ))
 
@@ -107,7 +107,7 @@ def container_figure(lots: list[LotViz], container_kg: float) -> go.Figure:
         annos.append(dict(
             x=(x0 + x1) / 2, y=_WID / 2, z=_HGT + 0.45,
             text=f"<b>Lote {l.index}</b><br>{l.util_pct:.0f}%",
-            showarrow=False, font=dict(size=13, color="#e8eefc"),
+            showarrow=False, font=dict(size=13, color="#16241B"),
         ))
 
     fill_pct = 100.0 * shipped / container_kg
@@ -128,7 +128,7 @@ def container_figure(lots: list[LotViz], container_kg: float) -> go.Figure:
         title=dict(
             text=f"Contenedor · {shipped/1000:,.1f} t / {container_kg/1000:,.0f} t "
             f"({fill_pct:.0f}% lleno)",
-            x=0.5, y=0.97, font=dict(size=14, color="#9fb3d1"),
+            x=0.5, y=0.97, font=dict(size=14, color="#5B6660", family="Space Grotesk"),
         ),
     )
     return fig

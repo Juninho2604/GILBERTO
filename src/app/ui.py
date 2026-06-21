@@ -1,9 +1,9 @@
 """Sistema de diseño de la interfaz: CSS, formato y componentes reutilizables.
 
 Mantiene toda la apariencia en un solo lugar para que las vistas se concentren
-en el contenido. La estética es "panel de control premium": fondo oscuro con
-profundidad, tarjetas de vidrio (glassmorphism), acentos con glow y tipografía
-Inter.
+en el contenido. Estética **Aurix**: tema claro (fondo verde-gris muy suave),
+tarjetas blancas redondeadas con sombra leve, acento verde, sidebar verde
+oscuro, y tipografía Space Grotesk (títulos/números) + Manrope (texto).
 
 Confidencialidad: las pilas se muestran **solo por su código** (nunca el nombre
 del material), para no filtrar materiales ni fórmulas de Gilberto y su socio.
@@ -13,115 +13,126 @@ from __future__ import annotations
 
 import streamlit as st
 
-ACCENT = "#3b82f6"
-GOOD = "#22c55e"
-WARN = "#f59e0b"
-BAD = "#ef4444"
-MUTED = "#8b949e"
+ACCENT = "#46B22C"   # verde primario
+GOOD = "#2E8A23"     # verde profundo (positivo)
+WARN = "#B5851F"     # ámbar (medio)
+BAD = "#C0654A"      # terracota (bajo/riesgo)
+MUTED = "#9AA89F"    # texto terciario
 
 _CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 
-:root { --accent:#3b82f6; --accent2:#22d3ee; --good:#22c55e; --warn:#f59e0b;
-  --bad:#ef4444; --ink:#e8eefc; --muted:#8b97ad; --line:#202836; }
-
-html, body, .stApp, [class*="css"] { font-family:'Inter',system-ui,sans-serif; }
-
-/* Lienzo: profundidad con varias capas + grid muy sutil */
-.stApp {
-  background:
-    radial-gradient(1100px 520px at 12% -8%, #15294a 0%, rgba(13,17,23,0) 55%),
-    radial-gradient(900px 480px at 92% 0%, #112b33 0%, rgba(13,17,23,0) 50%),
-    linear-gradient(180deg, #0b0f16 0%, #0a0d13 100%);
+:root {
+  --bg:#F3F6F3; --sidebar:#0F1713; --sidebar-soft:#18221C;
+  --card:#FFFFFF; --border:#EDEFEC; --border2:#E7EBE7;
+  --text:#16241B; --text-soft:#5B6660; --muted:#9AA89F;
+  --accent:#8DE05B; --accent-deep:#46B22C; --accent-deeper:#2E8A23;
+  --grad:linear-gradient(135deg,#5FBE3A,#3E9E2C,#2E8A23);
+  --shadow:0 2px 14px rgba(20,40,25,.05);
 }
-.stApp::before {
-  content:""; position:fixed; inset:0; pointer-events:none; opacity:.35;
-  background-image:linear-gradient(#ffffff05 1px,transparent 1px),
-    linear-gradient(90deg,#ffffff05 1px,transparent 1px);
-  background-size:42px 42px; mask-image:radial-gradient(circle at 50% 0%,#000,transparent 75%);
-}
+
+html, body, .stApp, [class*="css"] { font-family:'Manrope',system-ui,sans-serif;
+  color:var(--text); }
+.stApp { background:var(--bg); }
 #MainMenu, footer, header [data-testid="stToolbar"] { visibility:hidden; }
-.block-container { padding-top:2.1rem; max-width:1300px; }
+.block-container { padding-top:2rem; max-width:1300px; }
 
-h1, h2, h3 { letter-spacing:-0.025em; color:var(--ink); }
-h1 { font-weight:900; }
-h3 { font-weight:800; }
+h1, h2, h3, h4 { font-family:'Space Grotesk',sans-serif; color:var(--text);
+  letter-spacing:-0.02em; font-weight:700; }
 
 /* Encabezado de marca */
 .brand { display:flex; align-items:center; gap:.7rem; margin-bottom:.15rem; }
-.brand .dot { width:13px; height:13px; border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  box-shadow:0 0 18px #3b82f6cc, 0 0 6px #22d3eeaa; }
-.brand .title { font-size:1.6rem; font-weight:900; color:var(--ink);
-  background:linear-gradient(90deg,#eaf1ff,#9fc6ff); -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent; }
-.subtle { color:var(--muted); font-size:.92rem; }
+.brand .dot { width:13px; height:13px; border-radius:50%; background:var(--grad);
+  box-shadow:0 0 14px #8DE05B66; }
+.brand .title { font-family:'Space Grotesk',sans-serif; font-size:1.55rem;
+  font-weight:700; color:var(--text); }
+.subtle { color:var(--text-soft); font-size:.92rem; }
 
-/* Tarjeta KPI — vidrio con realce superior */
-.kpi { position:relative; background:linear-gradient(180deg,#141a23cc,#0e131bcc);
-  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-  border:1px solid var(--line); border-radius:18px; padding:1.05rem 1.15rem;
-  height:100%; transition:transform .15s ease, border-color .15s ease; overflow:hidden; }
-.kpi::after { content:""; position:absolute; top:0; left:0; right:0; height:1px;
-  background:linear-gradient(90deg,transparent,#ffffff22,transparent); }
-.kpi:hover { transform:translateY(-2px); border-color:#2c3950; }
-.kpi .label { color:var(--muted); font-size:.74rem; text-transform:uppercase;
-  letter-spacing:.07em; font-weight:700; }
-.kpi .value { color:var(--ink); font-size:1.85rem; font-weight:900; margin-top:.25rem;
-  line-height:1.05; }
+/* Tarjeta KPI — blanca, redondeada, sombra suave */
+.kpi { background:var(--card); border:1px solid var(--border); border-radius:22px;
+  padding:20px 22px; height:100%; box-shadow:var(--shadow);
+  transition:transform .15s ease, box-shadow .15s ease; }
+.kpi:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(20,40,25,.08); }
+.kpi .label { color:var(--muted); font-size:.72rem; text-transform:uppercase;
+  letter-spacing:.06em; font-weight:700; }
+.kpi .value { font-family:'Space Grotesk',sans-serif; color:var(--text);
+  font-size:1.95rem; font-weight:700; margin-top:.3rem; line-height:1.05; }
 .kpi .delta { font-size:.84rem; font-weight:600; margin-top:.2rem; }
-.kpi .hint { color:#6b7789; font-size:.76rem; margin-top:.45rem; line-height:1.3; }
-.kpi.accent { border-color:#2a4a7e;
-  box-shadow:0 0 0 1px #1d3a66 inset, 0 10px 30px #0b1b3a55, 0 0 26px #1e62d033; }
-.kpi.accent .value { background:linear-gradient(90deg,#eafff3,#7ee6a8);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.kpi .hint { color:var(--muted); font-size:.76rem; margin-top:.45rem; line-height:1.35; }
+/* KPI destacado = hero verde */
+.kpi.accent { background:var(--grad); border:0; box-shadow:0 10px 26px #2E8A2333; }
+.kpi.accent .label, .kpi.accent .hint, .kpi.accent .delta { color:#E6F6DF !important; }
+.kpi.accent .value { color:#fff; }
 
 /* Tarjeta genérica / panel */
-.card { background:#10151ccc; backdrop-filter:blur(6px); border:1px solid var(--line);
-  border-radius:18px; padding:1.1rem 1.25rem; margin-bottom:.6rem; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:22px;
+  padding:20px 22px; margin-bottom:.6rem; box-shadow:var(--shadow); }
 
-/* Pills / badges */
-.pill { display:inline-block; padding:.18rem .62rem; border-radius:999px;
-  font-size:.74rem; font-weight:800; letter-spacing:.02em; }
-.pill.rico { background:#10331f; color:#46d989; border:1px solid #1c5635; }
-.pill.relleno { background:#2a2031; color:#c98bdb; border:1px solid #4a2f57; }
-.pill.mixto { background:#2a2410; color:#e6c351; border:1px solid #574b1c; }
-.pill.good { background:#10331f; color:#46d989; }
-.pill.warn { background:#332810; color:#e6b451; }
-.pill.bad  { background:#331516; color:#f08a8a; }
+/* Pills / badges (estados Aurix) */
+.pill { display:inline-block; padding:.2rem .66rem; border-radius:999px;
+  font-size:.74rem; font-weight:700; letter-spacing:.01em; }
+.pill.rico, .pill.good { background:#EAF8E2; color:#2E8A23; }
+.pill.mixto, .pill.warn { background:#FFF3DC; color:#B5851F; }
+.pill.relleno { background:#EEF1EE; color:#5B6660; }
+.pill.bad { background:#FBEDE8; color:#C0654A; }
 
-.section-h { font-size:1.05rem; font-weight:800; color:var(--ink); margin:.2rem 0 .15rem; }
+.section-h { font-family:'Space Grotesk',sans-serif; font-size:1.05rem;
+  font-weight:700; color:var(--text); margin:.2rem 0 .15rem; }
 
 /* Listas de "por qué" */
-.why { border-left:3px solid var(--accent); padding:.4rem 0 .4rem .85rem;
-  margin:.35rem 0; color:#c9d4e0; font-size:.92rem; line-height:1.5; }
-.why.good { border-color:var(--good); }
+.why { border-left:3px solid var(--accent-deep); padding:.5rem 0 .5rem .9rem;
+  margin:.4rem 0; color:var(--text-soft); font-size:.92rem; line-height:1.5;
+  background:#FAFCF9; border-radius:0 12px 12px 0; }
+.why b { color:var(--text); }
+.why.good { border-color:var(--accent-deeper); }
 .why.warn { border-color:var(--warn); }
 
-/* Métricas nativas */
-div[data-testid="stMetric"] { background:linear-gradient(180deg,#141a23cc,#0e131bcc);
-  border:1px solid var(--line); border-radius:16px; padding:.8rem 1rem;
-  backdrop-filter:blur(6px); transition:transform .15s ease; }
+/* Métricas nativas → tarjeta blanca */
+div[data-testid="stMetric"] { background:var(--card); border:1px solid var(--border);
+  border-radius:18px; padding:.9rem 1.1rem; box-shadow:var(--shadow);
+  transition:transform .15s ease; }
 div[data-testid="stMetric"]:hover { transform:translateY(-2px); }
-div[data-testid="stMetricValue"] { font-weight:900; letter-spacing:-.02em; }
+div[data-testid="stMetricValue"] { font-family:'Space Grotesk',sans-serif;
+  font-weight:700; color:var(--text); letter-spacing:-.01em; }
+div[data-testid="stMetricLabel"] { color:var(--muted); font-weight:600; }
 
-/* Botón primario con gradiente y glow */
+/* Botón primario con gradiente verde */
 .stButton > button[kind="primary"], button[data-testid="stBaseButton-primary"] {
-  background:linear-gradient(135deg,#2f6bff,#22d3ee); border:0; font-weight:800;
-  border-radius:12px; box-shadow:0 8px 22px #2f6bff44; transition:transform .12s ease; }
+  background:var(--grad); border:0; color:#fff; font-weight:700; border-radius:14px;
+  box-shadow:0 8px 20px #2E8A2333; transition:transform .12s ease; }
 .stButton > button[kind="primary"]:hover { transform:translateY(-1px);
-  box-shadow:0 10px 28px #2f6bff66; }
+  box-shadow:0 10px 26px #2E8A2344; }
+.stButton > button { border-radius:14px; }
+
+/* Navegación (st.pills) — activo en verde */
+[data-testid="stPills"] button { border-radius:999px !important; font-weight:600; }
+
+/* Sidebar verde oscuro con texto claro */
+section[data-testid="stSidebar"] > div:first-child { background:var(--sidebar); }
+section[data-testid="stSidebar"] * { color:#C7D2CB; }
+section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3 { color:#EAF3EC; }
+section[data-testid="stSidebar"] input, section[data-testid="stSidebar"] textarea,
+section[data-testid="stSidebar"] [data-baseweb="select"] > div {
+  background:var(--sidebar-soft) !important; color:#EAF3EC !important;
+  border-color:#2A352E !important; }
+section[data-testid="stSidebar"] [data-testid="stExpander"] {
+  background:var(--sidebar-soft); border-color:#2A352E; }
+
+/* Tablas / dataframes */
+[data-testid="stDataFrame"], [data-testid="stTable"] {
+  border:1px solid var(--border2); border-radius:14px; overflow:hidden; }
 
 /* Expanders y tabs */
-[data-testid="stExpander"] { border:1px solid var(--line); border-radius:14px;
-  background:#10151ccc; overflow:hidden; }
+[data-testid="stExpander"] { border:1px solid var(--border); border-radius:18px;
+  background:var(--card); box-shadow:var(--shadow); overflow:hidden; }
 .stTabs [data-baseweb="tab-list"] { gap:.3rem; }
-.stTabs [data-baseweb="tab"] { background:#11161d; border:1px solid var(--line);
-  border-radius:10px 10px 0 0; padding:.3rem .9rem; }
+.stTabs [data-baseweb="tab"] { background:var(--card); border:1px solid var(--border);
+  border-radius:12px 12px 0 0; padding:.3rem .9rem; }
 
-/* Alertas suaves */
-div[data-testid="stAlert"] { border-radius:14px; }
+/* Alertas redondeadas */
+div[data-testid="stAlert"] { border-radius:16px; }
 </style>
 """
 
