@@ -117,8 +117,31 @@ button[data-testid="stBaseButton-primary"] * { color:#fff !important; }
   box-shadow:0 10px 26px #2E8A2344; }
 .stButton > button { border-radius:14px; }
 
-/* Navegación (st.pills) — activo en verde */
-[data-testid="stPills"] button { border-radius:999px !important; font-weight:600; }
+/* Navegación principal — barra de módulos en el cuerpo (no en el sidebar).
+   Cada botón tiene key nav_<Módulo> → Streamlit le pone la clase st-key-nav_. */
+[class*="st-key-nav_"] button {
+  height:52px; border-radius:15px; font-weight:700; font-size:.97rem;
+  border:1px solid var(--border2); background:var(--card); color:var(--text-soft);
+  box-shadow:var(--shadow); transition:transform .14s ease, box-shadow .14s ease,
+  border-color .14s ease, color .14s ease; }
+[class*="st-key-nav_"] button:hover {
+  border-color:var(--accent-deep); color:var(--text); transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(20,40,25,.09); }
+[class*="st-key-nav_"] button[kind="primary"] {
+  background:var(--grad) !important; border:0 !important; color:#fff !important;
+  box-shadow:0 10px 24px #2E8A2340 !important; }
+[class*="st-key-nav_"] button[kind="primary"] * { color:#fff !important; }
+[class*="st-key-nav_"] button[kind="primary"]:hover { transform:translateY(-2px); }
+
+/* Encabezado de la app (marca + ajustes), siempre en el cuerpo */
+.appbar { display:flex; align-items:center; gap:.7rem; }
+.appbar .logo { width:34px; height:34px; border-radius:10px; background:var(--grad);
+  display:grid; place-items:center; box-shadow:0 6px 16px #2E8A2544; flex:0 0 auto; }
+.appbar .logo span { color:#fff; font-family:'Space Grotesk',sans-serif; font-weight:700;
+  font-size:1.05rem; }
+.appbar .appname { font-family:'Space Grotesk',sans-serif; font-weight:700;
+  font-size:1.35rem; letter-spacing:-.02em; color:var(--text); line-height:1; }
+.appbar .appsub { color:var(--text-soft); font-size:.82rem; margin-top:.1rem; }
 
 /* Sidebar verde oscuro con texto claro */
 section[data-testid="stSidebar"] { background:var(--sidebar); }
@@ -257,6 +280,41 @@ def brand(title: str, subtitle: str = "") -> None:
     )
     if subtitle:
         st.markdown(f'<div class="subtle">{subtitle}</div>', unsafe_allow_html=True)
+
+
+def app_brand(name: str = "Aurix", subtitle: str = "") -> None:
+    """Logo + nombre de la app, en el cuerpo (siempre visible, sin sidebar)."""
+    sub = f'<div class="appsub">{subtitle}</div>' if subtitle else ""
+    st.markdown(
+        f'<div class="appbar"><div class="logo"><span>A</span></div>'
+        f'<div><div class="appname">{name}</div>{sub}</div></div>',
+        unsafe_allow_html=True,
+    )
+
+
+def nav_bar(options: list[str], icons: dict[str, str]) -> str:
+    """Barra de navegación de módulos, amigable y SIEMPRE en el cuerpo.
+
+    Botones grandes con ícono; el módulo activo va en verde. No depende del panel
+    lateral, así que no hay forma de "perder" la navegación al ocultar nada.
+    Devuelve el módulo elegido (persistido en ``nav_module``).
+    """
+    active = st.session_state.get("nav_module")
+    if active not in options:
+        active = options[0]
+        st.session_state["nav_module"] = active
+
+    cols = st.columns(len(options), gap="small")
+    for col, name in zip(cols, options):
+        is_active = name == active
+        if col.button(
+            name, icon=f":material/{icons.get(name, 'circle')}:",
+            key=f"nav_{name}", use_container_width=True,
+            type="primary" if is_active else "secondary",
+        ):
+            st.session_state["nav_module"] = name
+            st.rerun()
+    return st.session_state["nav_module"]
 
 
 def kpi(label: str, value: str, *, delta: str = "", delta_color: str = MUTED,

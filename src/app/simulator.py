@@ -26,8 +26,8 @@ if str(SRC) not in sys.path:
 import streamlit as st
 
 from app.auth import demo_mode, require_access
-from app.sidebar import render_sidebar
-from app.ui import inject_css, sidebar_account, sidebar_brand
+from app.sidebar import render_settings
+from app.ui import app_brand, inject_css, nav_bar
 from app.views import (
     demo,
     historico,
@@ -41,7 +41,7 @@ st.set_page_config(
     page_title="Aurix · Mezclas RAEE",
     page_icon="♻️",
     layout="wide",
-    initial_sidebar_state="expanded",  # menú visible de entrada (también en celular)
+    initial_sidebar_state="collapsed",  # sin barra lateral: la navegación va en el cuerpo
 )
 inject_css()
 
@@ -49,7 +49,8 @@ inject_css()
 require_access()
 
 # --------------------------------------------------------------------------- #
-# Navegación en el sidebar (estilo Aurix): marca + cuenta + ítems con ícono.
+# Módulos (ícono Material + función de render). En modo demo solo Demo +
+# Inventario; en la app completa, los módulos reales (sin "Demo").
 # --------------------------------------------------------------------------- #
 if demo_mode():
     MODULES = {
@@ -58,7 +59,6 @@ if demo_mode():
     }
 else:
     MODULES = {
-        "Demo": ("smart_display", demo.render),
         "Panel": ("dashboard", panel.render),
         "Inventario": ("inventory_2", inventario.render),
         "Simulador": ("science", simulador.render),
@@ -66,30 +66,23 @@ else:
         "Histórico": ("history", historico.render),
     }
 _OPTIONS = list(MODULES)
+_ICONS = {name: icon for name, (icon, _) in MODULES.items()}
 if st.session_state.get("nav_module") not in MODULES:
     st.session_state["nav_module"] = _OPTIONS[0]
 
-# Marca + cuenta + parámetros en el sidebar (opcional, no afecta navegar).
-sidebar_brand("Aurix")
-sidebar_account("Servicios Megabytes", "Cuenta comercial", initials="SM")
-if demo_mode():
-    st.sidebar.caption(
-        "Modo demo: solo Demo e Inventario. Para ver todos los módulos, quitá "
-        "DEMO_MODE del .env y redeployá."
-    )
-render_sidebar()
+# --------------------------------------------------------------------------- #
+# Encabezado: marca a la izquierda, "Ajustes" (popover) a la derecha. Todo en el
+# cuerpo — sin barra lateral, así la navegación nunca se "pierde" al ocultar nada.
+# --------------------------------------------------------------------------- #
+head_l, head_r = st.columns([4, 1], vertical_alignment="center")
+with head_l:
+    app_brand("Aurix", "Optimizador de Mezclas RAEE · Servicios Megabytes")
+with head_r:
+    render_settings()  # deja prices/terms/z_min/k_safe en session_state
 
-# --------------------------------------------------------------------------- #
-# Navegación SIEMPRE visible, ARRIBA (no depende del panel lateral).
-# --------------------------------------------------------------------------- #
-choice = st.pills(
-    "Navegación", _OPTIONS,
-    default=st.session_state["nav_module"],
-    selection_mode="single", label_visibility="collapsed",
-    width="stretch", key="nav_top",
-)
-if not choice:  # si se deselecciona, quedate en el módulo actual
-    choice = st.session_state["nav_module"]
-st.session_state["nav_module"] = choice
+st.write("")
+
+# Barra de módulos: SIEMPRE visible en el cuerpo, el activo en verde.
+choice = nav_bar(_OPTIONS, _ICONS)
 st.divider()
 MODULES[choice][1]()
