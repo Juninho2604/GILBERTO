@@ -70,8 +70,11 @@ código).
 
 ## Parte 2 — Guía de uso (módulo por módulo)
 
-La navegación está **siempre arriba**, en pestañas. Seis módulos:
-**Demo · Panel · Inventario · Simulador · Optimizador · Histórico.**
+La navegación está **siempre arriba**, en una barra de módulos amigable (botones
+grandes con ícono; el activo en verde). No hay barra lateral. Seis módulos:
+**Panel · Inventario · Simulador · Optimizador · Histórico · Bono.**
+(El módulo **Demo** solo aparece en el modo demo con PIN.) Los **Ajustes**
+—precios, términos, riesgo y bono— viven en un botón arriba a la derecha.
 
 > En toda la app las pilas se muestran **solo por código** (001, 009, 998…), nunca
 > por nombre del material — privacidad de las fórmulas.
@@ -146,7 +149,20 @@ sistema.
 buenas** (la mejora histórica es chica) — el sistema **valida su criterio**. El
 salto de valor está hacia adelante, con el inventario completo.
 
-### 2.6 Demo — el recorrido de 2 minutos para la reunión
+### 2.6 Bono — el bono de éxito (acuerdo comercial)
+Calcula el bono definido en el presupuesto, en tres piezas:
+- **Base — sub-pago histórico:** lo que la mezcla óptima habría rendido por encima
+  de lo que la refinería pagó, sobre los 53 lotes. Se muestra **descompuesto con
+  honestidad**: ganancia de mezcla **verificable** (mismo mundo) vs. **brecha de
+  proyección** (estimado vs. medido, que se reconcilia con los datos reales).
+- **Disparador:** la **mejora** de uno o varios envíos reales por encima del
+  **10%** (piso de ruido del ensayo). Se cargan los envíos ejecutados.
+- **Bono:** **15% × base**, una vez cumplido el disparador.
+
+Los parámetros (umbral, tasa, ventana de envíos) se editan en **Ajustes › Bono**.
+El monto es una estimación que **se reconcilia** con cada liquidación real.
+
+### 2.7 Demo — el recorrido de 2 minutos para la reunión
 Pensada para mostrar sin preparar nada.
 - **"Tomar un lote al azar"** o buscar uno puntual.
 - Compara **cómo se envió vs. cómo lo optimiza el sistema**, en %.

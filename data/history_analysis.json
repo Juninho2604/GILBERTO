@@ -71,6 +71,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 1.4551915228366852e-11,
       "extra_pct": 2.0689237165867156e-14,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "006",
@@ -193,6 +195,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [
@@ -233,6 +237,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 332.04698218273097,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "011",
@@ -340,6 +346,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "025",
@@ -447,6 +455,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "054",
@@ -554,6 +564,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "016",
@@ -661,6 +673,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 1.4551915228366852e-11,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "050",
@@ -768,6 +782,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [
@@ -808,6 +824,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "053",
@@ -915,6 +933,8 @@
       "optimal_num_lots": 2,
       "extra_usd": 73.3909353181989,
       "extra_pct": 0.43189487086367545,
+      "sub_pago_usd": 959.8085778593195,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "011",
@@ -1091,6 +1111,8 @@
       "optimal_num_lots": 2,
       "extra_usd": 368.52972258848604,
       "extra_pct": 0.109665757846416,
+      "sub_pago_usd": 36405.65537833277,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "015",
@@ -1268,6 +1290,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 17551.49725526027,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "009",
@@ -1375,6 +1399,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [],
@@ -1407,6 +1433,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [],
@@ -1439,6 +1467,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [],
@@ -1471,6 +1501,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [
@@ -1511,6 +1543,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "027",
@@ -1618,6 +1652,8 @@
       "optimal_num_lots": 2,
       "extra_usd": 78.44206946663326,
       "extra_pct": 0.06736326346078463,
+      "sub_pago_usd": 1141.9394249324832,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "015",
@@ -1786,6 +1822,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "009",
@@ -1893,6 +1931,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [
@@ -1933,6 +1973,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [],
@@ -1965,6 +2007,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "006",
@@ -2078,6 +2122,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "011",
@@ -2185,6 +2231,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "016",
@@ -2292,6 +2340,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 113.26693601721263,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "027",
@@ -2407,6 +2457,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [],
@@ -2439,6 +2491,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "028",
@@ -2560,6 +2614,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [],
@@ -2592,6 +2648,8 @@
       "optimal_num_lots": 2,
       "extra_usd": 143.4431917402544,
       "extra_pct": 0.08929073806568891,
+      "sub_pago_usd": 803.7188971968135,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "015",
@@ -2760,6 +2818,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 2015.1069757768855,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "009",
@@ -2867,6 +2927,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [],
@@ -2899,6 +2961,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [
@@ -2939,6 +3003,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 5728.136509903779,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "016",
@@ -3046,6 +3112,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 232.73445778636597,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "011",
@@ -3161,6 +3229,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 422.4146574782244,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "027",
@@ -3268,6 +3338,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 24.31339141713397,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "028",
@@ -3389,6 +3461,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [],
@@ -3421,6 +3495,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [],
@@ -3453,6 +3529,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 5100.956823494525,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "006",
@@ -3566,6 +3644,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "049",
@@ -3673,6 +3753,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [
@@ -3713,6 +3795,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [],
@@ -3745,6 +3829,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "052",
@@ -3852,6 +3938,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 4528.096188516312,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "054",
@@ -3959,6 +4047,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 13841.377294857652,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "053",
@@ -4066,6 +4156,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 15332.461201147758,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "054",
@@ -4173,6 +4265,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "053",
@@ -4280,6 +4374,8 @@
       "optimal_num_lots": 2,
       "extra_usd": 47.806549055167125,
       "extra_pct": 0.07055447199556586,
+      "sub_pago_usd": 2305.1744706757236,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "015",
@@ -4457,6 +4553,8 @@
       "optimal_num_lots": null,
       "extra_usd": null,
       "extra_pct": null,
+      "sub_pago_usd": null,
+      "low_conf_share": 0.0,
       "components": [],
       "explanation": null,
       "sub_threshold": [],
@@ -4489,6 +4587,8 @@
       "optimal_num_lots": 2,
       "extra_usd": 1206.4927596632915,
       "extra_pct": 2.013633465439576,
+      "sub_pago_usd": 1206.4927596633352,
+      "low_conf_share": 1.0,
       "components": [
         {
           "code": "002",
@@ -4672,6 +4772,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 7621.970980734397,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "052",
@@ -4779,6 +4881,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 740.095308967102,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "053",
@@ -4886,6 +4990,8 @@
       "optimal_num_lots": 1,
       "extra_usd": 0.0,
       "extra_pct": 0.0,
+      "sub_pago_usd": 0.0,
+      "low_conf_share": 0.0,
       "components": [
         {
           "code": "054",

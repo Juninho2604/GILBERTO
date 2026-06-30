@@ -29,6 +29,7 @@ from app.auth import demo_mode, require_access
 from app.sidebar import render_settings
 from app.ui import app_brand, inject_css, nav_bar
 from app.views import (
+    bono,
     demo,
     historico,
     inventario,
@@ -64,6 +65,7 @@ else:
         "Simulador": ("science", simulador.render),
         "Optimizador": ("bolt", optimizador.render),
         "Histórico": ("history", historico.render),
+        "Bono": ("workspace_premium", bono.render),
     }
 _OPTIONS = list(MODULES)
 _ICONS = {name: icon for name, (icon, _) in MODULES.items()}

@@ -30,7 +30,12 @@ from dataclasses import asdict, dataclass, field
 from typing import Optional
 
 from analysis.explain import explain_partition
-from data.estimate_grades import GradeEstimate, estimate_grades, reconstruction_report
+from data.estimate_grades import (
+    Confidence,
+    GradeEstimate,
+    estimate_grades,
+    reconstruction_report,
+)
 from data.load_history import HistoricLot, load_history
 from data.load_inventory import load_raee_inventory
 from domain.models import (
@@ -90,6 +95,10 @@ class LotComparison:
     optimal_num_lots: Optional[int] = None
     extra_usd: Optional[float] = None
     extra_pct: Optional[float] = None
+    # Bono de éxito: sub-pago del lote = max(0, óptimo − real) y cuánta de esa
+    # base se apoya en pilas de baja confianza (para la banda del bono).
+    sub_pago_usd: Optional[float] = None
+    low_conf_share: float = 0.0
     components: list[dict] = field(default_factory=list)
     explanation: Optional[dict] = None
     sub_threshold: list[dict] = field(default_factory=list)
@@ -197,6 +206,29 @@ def _sub_threshold_losses(
     return out
 
 
+def _low_conf_share(items, estimates: dict[str, GradeEstimate]) -> float:
+    """Fracción del peso seco del lote que se apoya en pilas de **baja confianza**.
+
+    Una pila es de baja confianza si su ley no está bien determinada: pertenece a
+    un bloque colineal (no separable) o su confianza es ``ASSUMED``/``NONE``. Sirve
+    para mostrar cuánta de la base del bono descansa en estimaciones frágiles.
+    """
+    dmt = sum(it.quantity_kg * (1.0 - it.moisture) for it in items)
+    if dmt <= 0:
+        return 0.0
+    low = 0.0
+    for it in items:
+        est = estimates.get(it.code)
+        is_low = (
+            est is None
+            or est.block is not None
+            or est.confidence in (Confidence.ASSUMED, Confidence.NONE)
+        )
+        if is_low:
+            low += it.quantity_kg * (1.0 - it.moisture)
+    return low / dmt
+
+
 def _best_partition(items, prices, terms, max_lots: int):
     """Mejor partición probando 1..max_lots lotes; devuelve (result, k)."""
     best, best_k = None, 1
@@ -266,6 +298,10 @@ def analyze_lot(
     comp.optimal_num_lots = best_k
     comp.extra_usd = extra
     comp.extra_pct = (100.0 * extra / aswas.net_value_usd) if aswas.net_value_usd else 0.0
+    # Base del bono: lo que el óptimo (estimado) rinde por encima del pago real
+    # (medido). Floor a 0: el azar de la estimación no resta. Confianza del lote.
+    comp.sub_pago_usd = max(0.0, optimal_usd - comp.actual_net_usd)
+    comp.low_conf_share = _low_conf_share(items, estimates)
     comp.components = [
         {
             "code": it.code,

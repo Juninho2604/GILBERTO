@@ -25,6 +25,10 @@ def _ensure_defaults() -> None:
     st.session_state.setdefault("private", False)
     st.session_state.setdefault("z_min", 1.5)
     st.session_state.setdefault("k_safe", 1.0)
+    # Bono de éxito (§4 del change-order).
+    st.session_state.setdefault("umbral_mejora", 0.10)
+    st.session_state.setdefault("tasa_bono", 0.15)
+    st.session_state.setdefault("ventana_envios", 1)
 
 
 def render_settings() -> tuple[MetalPrices, ContractTerms, bool]:
@@ -50,7 +54,9 @@ def render_settings() -> tuple[MetalPrices, ContractTerms, bool]:
             "Precios del día, términos del contrato y riesgo. Las pilas se "
             "muestran siempre solo por **código** (sin nombres)."
         )
-        tab_p, tab_c, tab_r = st.tabs(["Precios", "Contrato y RR", "Riesgo"])
+        tab_p, tab_c, tab_r, tab_b = st.tabs(
+            ["Precios", "Contrato y RR", "Riesgo", "Bono"]
+        )
 
         with tab_p:
             st.caption("Cu en USD/t · preciosos en USD/onza troy (referencia §10).")
@@ -94,6 +100,26 @@ def render_settings() -> tuple[MetalPrices, ContractTerms, bool]:
                 help="Cuántas σ se descuentan para valorizar conservador (grade − k·σ).",
             )
 
+        with tab_b:
+            st.caption("Bono de éxito: umbral de mejora, tasa y ventana de envíos.")
+            umbral_mejora = st.number_input(
+                "Umbral de mejora", value=float(st.session_state.get("umbral_mejora", 0.10)),
+                min_value=0.0, step=0.01, format="%.2f",
+                help="Mejora mínima de un envío real para activar el bono. 0.10 = "
+                "10% (piso de ruido del ensayo).",
+            )
+            tasa_bono = st.number_input(
+                "Tasa del bono", value=float(st.session_state.get("tasa_bono", 0.15)),
+                min_value=0.0, step=0.01, format="%.2f",
+                help="Fracción del sub-pago histórico que se paga como bono. 0.15 = 15%.",
+            )
+            ventana_envios = st.number_input(
+                "Ventana de envíos", value=int(st.session_state.get("ventana_envios", 1)),
+                min_value=1, step=1, format="%d",
+                help="Cuántos envíos reales (promediados) se usan para medir la "
+                "mejora. Más envíos = disparador más robusto al ruido.",
+            )
+
     terms = ContractTerms(
         rc_cu=rc_cu, rc_au=rc_au, rc_ag=rc_ag, rc_pt=t.rc_pt, rc_pd=rc_pd,
         cu_deduction=cu_ded,
@@ -110,6 +136,9 @@ def render_settings() -> tuple[MetalPrices, ContractTerms, bool]:
     st.session_state.private = False
     st.session_state.z_min = z_min
     st.session_state.k_safe = k_safe
+    st.session_state.umbral_mejora = umbral_mejora
+    st.session_state.tasa_bono = tasa_bono
+    st.session_state.ventana_envios = int(ventana_envios)
     return prices, terms, False
 
 
