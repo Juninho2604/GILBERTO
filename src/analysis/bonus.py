@@ -1,27 +1,20 @@
 """Bono de éxito — cálculo del bono definido en el presupuesto (§11).
 
-Tres piezas independientes (change-order "Motor RAEE — Cálculo del bono de éxito"):
+Tres piezas independientes:
 
-- **Base** = *sub-pago histórico*: la suma, sobre los 53 lotes, de cuánto habría
-  rendido la mezcla **óptima** por encima de lo que la refinería **pagó** en
-  realidad — el dinero que el modelo "destraba".
+- **Base** = *rescate demostrado*: el valor del metal que la mezcla **"tal cual"**
+  (el método que ya usaba Gilberto) dejaba en **$0** por caer bajo el umbral de la
+  refinería, y que el **optimizador** logra cobrar al mezclarlo por encima del
+  umbral. Es, exactamente, "el material que no se hubiese cobrado, pero que con el
+  optimizador logramos que se cobrara" — medido en el mismo mundo (leyes
+  estimadas), así que aísla el efecto del optimizador sin sesgo de estimación.
 - **Disparador** = la *mejora* de uno o varios envíos reales por encima del
-  **10%**: prueba de que el modelo funciona (por encima del ruido del ensayo).
+  **10%** (piso de ruido del ensayo).
 - **Bono** = ``tasa_bono`` (15%) × base, una vez cumplido el disparador.
 
-Reglas (del change-order):
-
-- Todas las comparaciones se hacen **a los precios del envío correspondiente**
-  (no a los de hoy); como el lado "real" usa las leyes medidas de la liquidación
-  y el "óptimo" es proyección del modelo, ambos se valorizan con los **mismos
-  precios por lote** para que el mercado no distorsione (§3, §3.4).
-- ``sub_pago_i = max(0, valor_optimo_i − valor_real_i)``: el azar de la
-  estimación no resta a la base.
-- La *mejora* se puede medir sobre una **ventana** de los primeros envíos
-  (promediados) para que el disparador sea robusto al ruido (§2).
-
-Este módulo es **aritmética pura** sobre datos ya calculados (``historical.py``);
-no toca la valorización ni el optimizador.
+Reglas (del change-order): comparaciones a los **mismos precios por lote** (no a
+los de hoy); el bono es una estimación que **se reconcilia** con los datos reales.
+Este módulo es aritmética pura sobre datos ya calculados (``historical.py``).
 """
 
 from __future__ import annotations
@@ -39,8 +32,6 @@ class BonusConfig:
     tasa_bono: float = 0.15               # 15% de la base
     ventana_envios: int = 1               # nº de envíos reales para medir la mejora
     precios: str = "del_envio"            # nunca "de_hoy"
-    modo_subpago: str = "historico_unico"  # | "por_envio"
-    baseline_mejora: str = "ingenua_proyeccion"
     modo_liquidacion_bono: str = "proyeccion"  # | "reconciliado_real"
 
 
@@ -48,38 +39,24 @@ class BonusConfig:
 # Resultados
 # --------------------------------------------------------------------------- #
 @dataclass
-class SubPagoLot:
-    """Sub-pago de un lote: óptimo − real, con su confianza."""
+class RescateLot:
+    """Rescate de un lote: metal que pasaba a $0 y el optimizador cobra."""
 
     customer_lot: object
-    valor_real_usd: float
-    valor_optimo_usd: float
-    sub_pago_usd: float
+    rescatado_usd: float
     low_conf_share: float                 # 0..1 del peso en pilas de baja confianza
-    valor_aswas_usd: float = 0.0          # valorización del modelo de la mezcla "tal cual"
 
 
 @dataclass
-class SubPagoResult:
-    """Sub-pago histórico (la base del bono) con banda de confianza.
+class RescateResult:
+    """Rescate histórico (la base del bono) con banda de confianza."""
 
-    La base ``total_usd = Σ max(0, óptimo − real)`` se descompone en dos partes,
-    para no presentar un número inflado:
-
-    - ``mixing_usd``: ganancia **verificable** de re-mezclar (óptimo − "tal cual",
-      ambos en el mundo estimado) — el efecto real del optimizador.
-    - ``projection_usd``: la brecha entre la valorización estimada y el pago
-      **medido** real — proyección que **se reconcilia** contra las liquidaciones.
-    """
-
-    total_usd: float                      # base puntual (óptimo − real)
+    total_usd: float                      # base: Σ rescate por lote
     firm_usd: float                       # piso: porción de alta confianza por pila
     low_conf_usd: float                   # porción apoyada en pilas frágiles
     low_conf_share: float                 # low_conf_usd / total
-    n_lots: int                           # lotes que aportan sub-pago (>0)
-    mixing_usd: float = 0.0               # ganancia de mezcla verificable (mismo mundo)
-    projection_usd: float = 0.0           # brecha de proyección (a reconciliar con real)
-    lots: list[SubPagoLot] = field(default_factory=list)
+    n_lots: int                           # lotes que aportan rescate (>0)
+    lots: list[RescateLot] = field(default_factory=list)
 
 
 @dataclass
@@ -101,56 +78,47 @@ class BonoResult:
     activado: bool
     monto_usd: float                      # tasa × base (puntual)
     monto_firme_usd: float                # tasa × base de alta confianza (banda baja)
-    base_usd: float                       # sub-pago histórico
+    base_usd: float                       # rescate histórico
     tasa: float
     umbral: float
-    subpago: SubPagoResult
+    rescate: RescateResult
     mejora: Optional[MejoraResult] = None
 
 
 # --------------------------------------------------------------------------- #
-# 1) Sub-pago histórico — la base
+# 1) Rescate histórico — la base
 # --------------------------------------------------------------------------- #
-def subpago_historico(
+def rescate_historico(
     lots: Sequence[dict], config: Optional[BonusConfig] = None
-) -> SubPagoResult:
-    """Suma ``max(0, óptimo − real)`` sobre los lotes resolubles del histórico.
+) -> RescateResult:
+    """Suma el **rescate demostrado** sobre los lotes resolubles del histórico.
 
     ``lots`` son los comparativos por lote (``HistoryAnalysis.lots`` serializado):
-    cada uno con ``actual_net_usd`` (real, leyes medidas) y ``model_optimal_usd``
-    (óptimo del modelo). Si el lote trae ``sub_pago_usd``/``low_conf_share`` se
-    usan; si no, ``sub_pago`` se deriva de los dos valores.
+    cada uno con ``rescued_usd`` (metal que "tal cual" pagaba $0 y el óptimo cobra)
+    y ``low_conf_share``.
     """
     config = config or BonusConfig()
-    rows: list[SubPagoLot] = []
+    rows: list[RescateLot] = []
     for L in lots:
-        opt = L.get("model_optimal_usd")
-        if opt is None:
+        resc = L.get("rescued_usd")
+        if resc is None:
             continue
-        real = float(L.get("actual_net_usd") or 0.0)
-        sp = L.get("sub_pago_usd")
-        sp = max(0.0, opt - real) if sp is None else float(sp)
-        if sp <= 0:
+        resc = float(resc)
+        if resc <= 0:
             continue
         share = float(L.get("low_conf_share", 0.0) or 0.0)
-        aswas = float(L.get("model_aswas_usd") or 0.0)
-        rows.append(SubPagoLot(
+        rows.append(RescateLot(
             customer_lot=L.get("customer_lot"),
-            valor_real_usd=real, valor_optimo_usd=float(opt),
-            sub_pago_usd=sp, low_conf_share=share, valor_aswas_usd=aswas,
+            rescatado_usd=resc, low_conf_share=share,
         ))
-    total = sum(r.sub_pago_usd for r in rows)
-    low = sum(r.sub_pago_usd * r.low_conf_share for r in rows)
+    total = sum(r.rescatado_usd for r in rows)
+    low = sum(r.rescatado_usd * r.low_conf_share for r in rows)
     firm = max(0.0, total - low)
-    # Descomposición honesta: ganancia de mezcla verificable vs. brecha de proyección.
-    mixing = sum(max(0.0, r.valor_optimo_usd - r.valor_aswas_usd)
-                 for r in rows if r.valor_aswas_usd > 0)
-    projection = max(0.0, total - mixing)
-    rows.sort(key=lambda r: -r.sub_pago_usd)
-    return SubPagoResult(
+    rows.sort(key=lambda r: -r.rescatado_usd)
+    return RescateResult(
         total_usd=total, firm_usd=firm, low_conf_usd=low,
         low_conf_share=(low / total if total else 0.0),
-        n_lots=len(rows), mixing_usd=mixing, projection_usd=projection, lots=rows,
+        n_lots=len(rows), lots=rows,
     )
 
 
@@ -198,15 +166,15 @@ def calcular_bono(
     config: Optional[BonusConfig] = None,
 ) -> BonoResult:
     """Calcula el bono: ``activado`` y ``monto = tasa × base`` si la mejora supera
-    el umbral; si no, el bono queda en 0."""
+    el umbral; si no, el bono queda en 0. La base es el rescate demostrado."""
     config = config or BonusConfig()
-    sp = subpago_historico(lots, config)
+    rc = rescate_historico(lots, config)
     mj = mejora_envio(envios, config) if envios else None
     activado = bool(mj and mj.supera_umbral)
-    monto = config.tasa_bono * sp.total_usd if activado else 0.0
-    monto_firme = config.tasa_bono * sp.firm_usd if activado else 0.0
+    monto = config.tasa_bono * rc.total_usd if activado else 0.0
+    monto_firme = config.tasa_bono * rc.firm_usd if activado else 0.0
     return BonoResult(
         activado=activado, monto_usd=monto, monto_firme_usd=monto_firme,
-        base_usd=sp.total_usd, tasa=config.tasa_bono, umbral=config.umbral_mejora,
-        subpago=sp, mejora=mj,
+        base_usd=rc.total_usd, tasa=config.tasa_bono, umbral=config.umbral_mejora,
+        rescate=rc, mejora=mj,
     )

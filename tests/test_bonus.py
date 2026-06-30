@@ -1,43 +1,41 @@
-"""Tests del bono de éxito (analysis.bonus) — criterios de aceptación §8."""
+"""Tests del bono de éxito (analysis.bonus) — base = rescate demostrado (§8)."""
 
 from analysis.bonus import (
     BonusConfig,
     calcular_bono,
     mejora_envio,
-    subpago_historico,
+    rescate_historico,
 )
 
 
 def _lots():
-    # 3 lotes: dos con sub-pago (óptimo > real), uno sin (óptimo ≤ real).
+    # 3 lotes: dos con rescate (>0), uno sin rescate.
     return [
-        {"customer_lot": 1, "actual_net_usd": 1000.0, "model_optimal_usd": 1200.0,
-         "sub_pago_usd": 200.0, "low_conf_share": 0.0},
-        {"customer_lot": 2, "actual_net_usd": 5000.0, "model_optimal_usd": 5500.0,
-         "sub_pago_usd": 500.0, "low_conf_share": 0.5},
-        {"customer_lot": 3, "actual_net_usd": 800.0, "model_optimal_usd": 700.0,
-         "sub_pago_usd": 0.0, "low_conf_share": 0.0},
+        {"customer_lot": 1, "rescued_usd": 200.0, "low_conf_share": 0.0},
+        {"customer_lot": 2, "rescued_usd": 500.0, "low_conf_share": 0.5},
+        {"customer_lot": 3, "rescued_usd": 0.0, "low_conf_share": 0.0},
     ]
 
 
-def test_subpago_suma_solo_positivos():
-    sp = subpago_historico(_lots())
-    assert sp.total_usd == 700.0          # 200 + 500 (el tercero no aporta)
-    assert sp.n_lots == 2
+def test_rescate_suma_solo_positivos():
+    rc = rescate_historico(_lots())
+    assert rc.total_usd == 700.0          # 200 + 500 (el tercero no aporta)
+    assert rc.n_lots == 2
 
 
-def test_subpago_banda_de_confianza():
-    sp = subpago_historico(_lots())
+def test_rescate_banda_de_confianza():
+    rc = rescate_historico(_lots())
     # low = 200*0 + 500*0.5 = 250 ; firme = 700 - 250 = 450
-    assert sp.low_conf_usd == 250.0
-    assert sp.firm_usd == 450.0
-    assert abs(sp.low_conf_share - 250.0 / 700.0) < 1e-9
+    assert rc.low_conf_usd == 250.0
+    assert rc.firm_usd == 450.0
+    assert abs(rc.low_conf_share - 250.0 / 700.0) < 1e-9
 
 
-def test_subpago_deriva_si_falta_sub_pago_usd():
-    lots = [{"customer_lot": 9, "actual_net_usd": 100.0, "model_optimal_usd": 175.0}]
-    sp = subpago_historico(lots)
-    assert sp.total_usd == 75.0           # max(0, 175 - 100)
+def test_rescate_ignora_lotes_sin_dato():
+    lots = [{"customer_lot": 9, "low_conf_share": 0.0}]  # sin rescued_usd
+    rc = rescate_historico(lots)
+    assert rc.total_usd == 0.0
+    assert rc.n_lots == 0
 
 
 def test_mejora_supera_umbral():
@@ -61,7 +59,7 @@ def test_mejora_ventana_promedia_varios_envios():
 
 
 def test_bono_se_activa_con_mejora_mayor_10():
-    # §8: con mejora > 10%, bono = 0.15 × sub_pago_historico
+    # §8: con mejora > 10%, bono = 0.15 × rescate
     b = calcular_bono(_lots(), [(1200.0, 1000.0)])
     assert b.activado is True
     assert abs(b.monto_usd - 0.15 * 700.0) < 1e-9
@@ -83,11 +81,8 @@ def test_bono_sin_envios_no_se_activa():
 
 
 def test_parametros_recalculan_sin_tocar_codigo():
-    # §8: cambiar umbral / tasa recalcula.
     lots = _lots()
-    # tasa 0.20 en vez de 0.15
     b = calcular_bono(lots, [(1200.0, 1000.0)], BonusConfig(tasa_bono=0.20))
     assert abs(b.monto_usd - 0.20 * 700.0) < 1e-9
-    # umbral 0.25 → +20% ya no dispara
     b2 = calcular_bono(lots, [(1200.0, 1000.0)], BonusConfig(umbral_mejora=0.25))
     assert b2.activado is False

@@ -1,9 +1,9 @@
 """Bono de éxito — panel del bono definido en el presupuesto (§11).
 
-Muestra las tres piezas: la **base** (sub-pago histórico que el modelo destraba),
-el **disparador** (mejora de un envío real por encima del 10%) y el **bono**
-(15% de la base, una vez cumplido el disparador). El monto es una estimación que
-se reconcilia con los datos reales que vaya devolviendo la refinería.
+La **base** es el *rescate demostrado*: el metal que la mezcla "tal cual" dejaba
+en $0 (bajo umbral) y que el optimizador logra cobrar. El **disparador** es la
+mejora de un envío real por encima del umbral. El **bono** es 15% de la base.
+El monto es una estimación que se reconcilia con los datos reales de la refinería.
 """
 
 from __future__ import annotations
@@ -34,8 +34,8 @@ def render() -> None:
 
     brand(
         "Bono de éxito",
-        "El modelo recupera metal que antes se perdía. Si demuestra una mejora "
-        "mayor al umbral en un envío real, se activa el bono.",
+        "El bono se calcula sobre el material que no se hubiese cobrado y que el "
+        "optimizador logra cobrar — no sobre el contenedor completo.",
     )
     st.write("")
 
@@ -68,54 +68,39 @@ def render() -> None:
             envios.append((vm, vb))
 
     res = calcular_bono(lots, envios, cfg)
-    sp = res.subpago
+    rc = res.rescate
     mj = res.mejora
 
-    # --- 1) La base: sub-pago histórico, descompuesto con honestidad ------ #
-    st.markdown("##### Base · sub-pago histórico (lo que el modelo destraba)")
+    # --- 1) La base: rescate demostrado ----------------------------------- #
+    st.markdown("##### Base · material rescatado del umbral (lo que el modelo cobra)")
     b1, b2, b3 = st.columns(3)
-    b1.metric("Sub-pago histórico", usd(sp.total_usd),
-              help="Σ de (óptimo − real) sobre los lotes del histórico, a los "
-              "mismos precios por lote. Definición del change-order (§3.1).")
-    b2.metric("Ganancia de mezcla verificable", usd(sp.mixing_usd),
-              help="Óptimo − 'tal cual', ambos en el mundo estimado: el efecto "
-              "real del optimizador, sin mezclar mundos.")
-    b3.metric("Brecha de proyección", usd(sp.projection_usd),
-              delta="se reconcilia con datos reales", delta_color="off",
-              help="Diferencia entre la valorización estimada y el pago medido "
-              "real. No es dinero asegurado: se ajusta con cada liquidación.")
-    st.warning(
-        f"**Lectura honesta de la base.** De los {_u(sp.total_usd)}, solo "
-        f"**{_u(sp.mixing_usd)}** son ganancia de mezcla **verificable** (mismo "
-        f"mundo); los **{_u(sp.projection_usd)}** restantes son la **brecha** "
-        f"entre la valorización estimada del modelo y el pago real medido — "
-        f"proyección que **se reconcilia** contra las liquidaciones reales. "
-        f"Conviene acordar (decisión de negocio §5) si el bono se liquida sobre la "
-        f"proyección o reconciliado contra el dato real.",
-        icon=":material/balance:",
-    )
+    b1.metric("Rescate demostrado", usd(rc.total_usd),
+              help="Metal que la mezcla 'tal cual' dejaba en $0 por caer bajo el "
+              "umbral, y que el optimizador logra cobrar. Mismo mundo (leyes "
+              "estimadas): aísla el efecto del optimizador, sin sesgo.")
+    b2.metric("Piso de alta confianza", usd(rc.firm_usd),
+              help="Porción del rescate que NO depende de pilas de baja confianza.")
+    b3.metric("Lotes que aportan", f"{rc.n_lots}",
+              delta=f"{rc.low_conf_share*100:.0f}% en pilas frágiles",
+              delta_color="off")
     st.caption(
-        f"Confianza por pila: el **{sp.low_conf_share*100:.0f}%** de la base se "
-        f"apoya en pilas de baja confianza; piso firme **{_u(sp.firm_usd)}**."
+        f"La base es **{_u(rc.total_usd)}** (no el contenedor completo): solo el "
+        f"metal sub-umbral que el optimizador rescata respecto al método actual. "
+        f"Históricamente es chico porque **las mezclas de Gilberto ya eran muy "
+        f"buenas** — el grueso del rescate está hacia adelante, optimizando todo el "
+        f"inventario acumulado."
     )
-    if sp.lots:
-        top = sp.lots[:10]
+    if rc.lots:
         df = pd.DataFrame([
             {"Lote": str(r.customer_lot),
-             "Pagó la refinería": round(r.valor_real_usd, 0),
-             "Óptimo del modelo": round(r.valor_optimo_usd, 0),
-             "Sub-pago": round(r.sub_pago_usd, 0),
+             "Rescatado": round(r.rescatado_usd, 0),
              "Baja conf.": f"{r.low_conf_share*100:.0f}%"}
-            for r in top
+            for r in rc.lots[:10]
         ])
-        st.caption("Lotes que más aportan a la base:")
+        st.caption("Lotes donde el optimizador rescata metal sub-umbral:")
         st.dataframe(
             df, width="stretch", hide_index=True,
-            column_config={
-                "Pagó la refinería": st.column_config.NumberColumn(format="$%d"),
-                "Óptimo del modelo": st.column_config.NumberColumn(format="$%d"),
-                "Sub-pago": st.column_config.NumberColumn(format="$%d"),
-            },
+            column_config={"Rescatado": st.column_config.NumberColumn(format="$%d")},
         )
 
     # --- 2) El disparador: mejora del envío ------------------------------- #
@@ -153,9 +138,9 @@ def render() -> None:
     if res.activado:
         st.markdown(f"### Bono activado · {_u(res.monto_usd)}")
         st.caption(
-            f"**{cfg.tasa_bono*100:.0f}%** de la base de **{_u(res.base_usd)}**. "
-            f"Banda: entre **{_u(res.monto_firme_usd)}** (sobre el piso de alta "
-            f"confianza) y **{_u(res.monto_usd)}** (sobre la base puntual)."
+            f"**{cfg.tasa_bono*100:.0f}%** de la base de **{_u(res.base_usd)}** "
+            f"(material rescatado). Banda: entre **{_u(res.monto_firme_usd)}** "
+            f"(piso de alta confianza) y **{_u(res.monto_usd)}** (base puntual)."
         )
     else:
         st.markdown("### Bono no activado")
@@ -163,14 +148,14 @@ def render() -> None:
             f"Cuando un envío real supere el **{cfg.umbral_mejora*100:.0f}%** de "
             f"mejora, el bono sería **{cfg.tasa_bono*100:.0f}% × "
             f"{_u(res.base_usd)} = {_u(cfg.tasa_bono * res.base_usd)}** "
-            f"(estimación sobre la base actual)."
+            f"(15% del material rescatado, estimación sobre la base actual)."
         )
 
     why(
-        "El monto es una <b>estimación</b> calculada por el propio modelo a partir "
-        "de leyes estimadas: el lado <b>real</b> usa las liquidaciones medidas "
-        "(alta confianza) y el <b>óptimo/ingenuo</b> son proyección. Se "
-        "<b>reconcilia</b> con los datos reales que devuelva la refinería en cada "
-        "envío. Los parámetros (umbral, tasa, ventana) se editan en <b>Ajustes</b>.",
+        "La base es <b>solo el material que no se hubiese cobrado</b> y que el "
+        "optimizador rescata — no el contenedor completo. Es una <b>estimación</b> "
+        "en el mundo de leyes estimadas que <b>se reconcilia</b> con los datos "
+        "reales de cada liquidación. Los parámetros (umbral, tasa, ventana) se "
+        "editan en <b>Ajustes › Bono</b>.",
         "good",
     )

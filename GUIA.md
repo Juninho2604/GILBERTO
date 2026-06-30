@@ -151,10 +151,12 @@ salto de valor está hacia adelante, con el inventario completo.
 
 ### 2.6 Bono — el bono de éxito (acuerdo comercial)
 Calcula el bono definido en el presupuesto, en tres piezas:
-- **Base — sub-pago histórico:** lo que la mezcla óptima habría rendido por encima
-  de lo que la refinería pagó, sobre los 53 lotes. Se muestra **descompuesto con
-  honestidad**: ganancia de mezcla **verificable** (mismo mundo) vs. **brecha de
-  proyección** (estimado vs. medido, que se reconcilia con los datos reales).
+- **Base — material rescatado del umbral:** solo el metal que la mezcla "tal cual"
+  dejaba en **$0** (bajo umbral) y que el **optimizador logra cobrar** — no el
+  contenedor completo. Medido en el mismo mundo (leyes estimadas), aísla el efecto
+  del optimizador sin sesgo. Históricamente es chico porque las mezclas de Gilberto
+  ya eran muy buenas; el grueso del rescate está **hacia adelante**, optimizando
+  todo el inventario.
 - **Disparador:** la **mejora** de uno o varios envíos reales por encima del
   **10%** (piso de ruido del ensayo). Se cargan los envíos ejecutados.
 - **Bono:** **15% × base**, una vez cumplido el disparador.

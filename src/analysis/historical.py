@@ -99,6 +99,9 @@ class LotComparison:
     # base se apoya en pilas de baja confianza (para la banda del bono).
     sub_pago_usd: Optional[float] = None
     low_conf_share: float = 0.0
+    # Base del bono (elegida): metal que la mezcla "tal cual" dejaba en $0 (bajo
+    # umbral) y que el optimizador hace que se cobre — rescate demostrado.
+    rescued_usd: Optional[float] = None
     components: list[dict] = field(default_factory=list)
     explanation: Optional[dict] = None
     sub_threshold: list[dict] = field(default_factory=list)
@@ -302,6 +305,18 @@ def analyze_lot(
     # (medido). Floor a 0: el azar de la estimación no resta. Confianza del lote.
     comp.sub_pago_usd = max(0.0, optimal_usd - comp.actual_net_usd)
     comp.low_conf_share = _low_conf_share(items, estimates)
+    # Rescate demostrado (base del bono): metal que la mezcla "tal cual" dejaba en
+    # $0 (sub-umbral) y que el óptimo logra cobrar, en el mismo mundo estimado.
+    opt_by_metal: dict[str, float] = {}
+    for l in best.lots:
+        for m, r in l.valuation.metals.items():
+            opt_by_metal[m] = opt_by_metal.get(m, 0.0) + r.amount_usd
+    rescued = 0.0
+    for m in PRECIOUS_METALS:
+        ar = aswas.metals[m]
+        if ar.content > 0 and ar.rr <= 1e-9:  # "tal cual" dejaba este metal en $0
+            rescued += max(0.0, opt_by_metal.get(m, 0.0))
+    comp.rescued_usd = rescued
     comp.components = [
         {
             "code": it.code,
