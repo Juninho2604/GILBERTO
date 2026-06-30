@@ -1,11 +1,38 @@
-"""Tests del bono de éxito (analysis.bonus) — base = rescate demostrado (§8)."""
+"""Tests del bono de éxito (analysis.bonus): por envío (forward) e histórico."""
 
 from analysis.bonus import (
     BonusConfig,
+    bono_de_envio,
     calcular_bono,
     mejora_envio,
     rescate_historico,
 )
+
+
+# --- Bono por envío (la base elegida: metal rescatado, hacia adelante) ----- #
+def test_bono_envio_se_activa_con_rescate_y_mejora():
+    be = bono_de_envio(rescatado_usd=3212.0, mejora=0.20)  # +20% > 10%
+    assert be.supera_umbral is True
+    assert be.activado is True
+    assert abs(be.bono_usd - 0.15 * 3212.0) < 1e-9
+
+
+def test_bono_envio_sin_rescate_no_paga():
+    be = bono_de_envio(rescatado_usd=0.0, mejora=0.50)
+    assert be.activado is False
+    assert be.bono_usd == 0.0
+
+
+def test_bono_envio_bajo_umbral_no_paga():
+    be = bono_de_envio(rescatado_usd=3212.0, mejora=0.05)  # +5% ≤ 10%
+    assert be.supera_umbral is False
+    assert be.activado is False
+    assert be.bono_usd == 0.0
+
+
+def test_bono_envio_respeta_tasa_configurable():
+    be = bono_de_envio(3000.0, 0.20, BonusConfig(tasa_bono=0.20))
+    assert abs(be.bono_usd - 0.20 * 3000.0) < 1e-9
 
 
 def _lots():

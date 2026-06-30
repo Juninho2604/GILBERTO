@@ -72,6 +72,35 @@ class MejoraResult:
 
 
 @dataclass
+class BonoEnvio:
+    """Bono de un envío individual (hacia adelante): base = metal rescatado."""
+
+    activado: bool
+    bono_usd: float                       # tasa × rescatado (si dispara)
+    rescatado_usd: float                  # metal sub-umbral que el sistema cobra
+    mejora: float                         # mejora del envío (after/before − 1)
+    supera_umbral: bool
+
+
+def bono_de_envio(
+    rescatado_usd: float, mejora: float, config: Optional[BonusConfig] = None
+) -> BonoEnvio:
+    """Bono de un envío: ``tasa × rescatado`` si la mejora supera el umbral.
+
+    La base es **solo el metal rescatado** (lo que pagaba $0 y el sistema cobra)
+    de ese envío — no el contenedor completo, ni el histórico (que ya se pagó).
+    """
+    config = config or BonusConfig()
+    supera = mejora > config.umbral_mejora
+    activado = bool(supera and rescatado_usd > 0)
+    bono = config.tasa_bono * rescatado_usd if activado else 0.0
+    return BonoEnvio(
+        activado=activado, bono_usd=bono, rescatado_usd=rescatado_usd,
+        mejora=mejora, supera_umbral=supera,
+    )
+
+
+@dataclass
 class BonoResult:
     """Estado y monto del bono."""
 

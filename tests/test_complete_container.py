@@ -63,6 +63,16 @@ def test_completion_raises_leftover_utilization():
     assert plan.recommend_kg > 0
 
 
+def test_rescued_value_positive_when_completing():
+    # Pd sub-umbral en el sobrante (paga $0); al completar pasa a cobrarse → rescate>0.
+    prices, terms = _prices_terms()
+    left = [_item("LOW", 15000, au=40, ag=300, pd=12)]
+    catalog = left + [_item("RICH", 3000, au=300, ag=600, pd=200)]
+    plan = analyze_completion(left, catalog, prices, terms)
+    assert plan.rescued_usd > 0
+    assert plan.mejora_pct > 0       # el aprovechamiento sube al rescatar el Pd
+
+
 def test_unfixable_when_no_reliable_rich_pile():
     # Solo hay una pila Pd-rica pero sin determinar → Pd no rescatable.
     prices, terms = _prices_terms()

@@ -1,23 +1,30 @@
-"""Bono de éxito — panel del bono definido en el presupuesto (§11).
+"""Bono de éxito — bono por envío, hacia adelante (no sobre el histórico).
 
-La **base** es el *rescate demostrado*: el metal que la mezcla "tal cual" dejaba
-en $0 (bajo umbral) y que el optimizador logra cobrar. El **disparador** es la
-mejora de un envío real por encima del umbral. El **bono** es 15% de la base.
-El monto es una estimación que se reconcilia con los datos reales de la refinería.
+El histórico ya se pagó y está cerrado. El bono mira **hacia adelante**: en cada
+envío, el sistema rescata metal que pagaría **$0** por caer bajo el umbral (típico
+del material de bajo grado que queda en depósito). El bono es **15% de ese metal
+rescatado**, por envío, cuando la mejora supera el umbral. Se acumula a medida que
+los envíos se ejecutan, y se reconcilia con las liquidaciones reales.
 """
 
 from __future__ import annotations
 
+import copy
+
 import pandas as pd
 import streamlit as st
 
-from analysis.bonus import BonusConfig, calcular_bono
-from app.data_access import history_analysis
+from analysis.bonus import BonusConfig, bono_de_envio
+from analysis.complete_container import analyze_completion
+from app.data_access import optimizable_items
 from app.ui import brand, usd, why
+from optimize.optimizer import best_partition
+
+_CONTAINER_KG = 23_000.0
+_METAL = {"AU": "oro", "AG": "plata", "PD": "paladio", "PT": "platino"}
 
 
 def _u(v: float) -> str:
-    """USD para texto markdown: escapa el '$' para que no active modo matemático."""
     return usd(v).replace("$", "\\$")
 
 
@@ -29,133 +36,140 @@ def _cfg() -> BonusConfig:
     )
 
 
+def _next_shipment_rescue(prices, terms, k_safe):
+    """Próximo envío de material de depósito: arma el contenedor óptimo, toma el
+    sobrante (lo que queda para el siguiente envío) y analiza cuánto rescata."""
+    items = optimizable_items()
+    bp = best_partition(items, prices, terms, max_num_lots=8,
+                        container_kg=_CONTAINER_KG, k_safe=k_safe)
+    if not bp.result.lots:
+        return None
+    assigned: dict[str, float] = {}
+    for l in bp.result.lots:
+        for p in l.components:
+            assigned[p.item.code] = assigned.get(p.item.code, 0.0) + p.weight_kg
+    leftover = []
+    for it in items:
+        rem = it.quantity_kg - assigned.get(it.code, 0.0)
+        if rem > 1.0:
+            c = copy.copy(it)
+            c.quantity_kg = rem
+            leftover.append(c)
+    if not leftover:
+        return None
+    return analyze_completion(leftover, items, prices, terms, k_safe=k_safe)
+
+
 def render() -> None:
+    prices = st.session_state.prices
+    terms = st.session_state.terms
+    k_safe = float(st.session_state.get("k_safe", 1.0))
     cfg = _cfg()
 
     brand(
-        "Bono de éxito",
-        "El bono se calcula sobre el material que no se hubiese cobrado y que el "
-        "optimizador logra cobrar — no sobre el contenedor completo.",
+        "Bono de éxito · por envío",
+        "Hacia adelante: en cada envío, 15% del metal que pagaría $0 y el sistema "
+        "logra cobrar. El histórico no cuenta — ya se pagó.",
     )
     st.write("")
 
-    analysis = history_analysis()
-    lots = analysis.get("lots", [])
+    st.session_state.setdefault("bono_ledger", [])
 
-    # --- Registro de envíos reales ejecutados con el modelo (el disparador) --- #
-    st.markdown("##### Envío(s) real(es) ejecutado(s) con el modelo")
+    # --- Proyección del próximo envío de material de depósito ------------- #
+    st.markdown("##### Próximo envío de material de depósito (proyección)")
     st.caption(
-        f"La mejora se mide sobre los primeros **{cfg.ventana_envios}** envío(s) "
-        f"(promediados, para que el ruido del ensayo no la distorsione). Cargá, por "
-        f"cada envío: lo que **pagó la refinería** (real) y lo que ese material "
-        f"habría rendido **sin optimizar** (mezcla ingenua)."
+        "El material de bajo grado que queda en depósito es donde el sistema "
+        "rescata metal: solo, algún metal cae bajo el umbral y paga $0; el sistema "
+        "lo hace cobrar al completar/mezclar. Ese metal rescatado es la base del "
+        "bono de ese envío."
     )
-    envios = []
-    for i in range(1, cfg.ventana_envios + 1):
-        c1, c2 = st.columns(2)
-        vm = c1.number_input(
-            f"Envío {i} · pagó la refinería (USD)", min_value=0.0, value=0.0,
-            step=1000.0, key=f"bono_vm_{i}",
-            help="Valor real de la liquidación del envío optimizado.",
-        )
-        vb = c2.number_input(
-            f"Envío {i} · sin optimizar (USD)", min_value=0.0, value=0.0,
-            step=1000.0, key=f"bono_vb_{i}",
-            help="Contrafáctico: lo que ese mismo material habría rendido con la "
-            "mezcla anterior (proyección del modelo).",
-        )
-        if vb > 0:
-            envios.append((vm, vb))
+    if st.button("Calcular el próximo envío", icon=":material/play_arrow:",
+                 type="primary"):
+        with st.spinner("Armando el contenedor y analizando el sobrante…"):
+            st.session_state["bono_envio"] = _next_shipment_rescue(prices, terms, k_safe)
 
-    res = calcular_bono(lots, envios, cfg)
-    rc = res.rescate
-    mj = res.mejora
-
-    # --- 1) La base: rescate demostrado ----------------------------------- #
-    st.markdown("##### Base · material rescatado del umbral (lo que el modelo cobra)")
-    b1, b2, b3 = st.columns(3)
-    b1.metric("Rescate demostrado", usd(rc.total_usd),
-              help="Metal que la mezcla 'tal cual' dejaba en $0 por caer bajo el "
-              "umbral, y que el optimizador logra cobrar. Mismo mundo (leyes "
-              "estimadas): aísla el efecto del optimizador, sin sesgo.")
-    b2.metric("Piso de alta confianza", usd(rc.firm_usd),
-              help="Porción del rescate que NO depende de pilas de baja confianza.")
-    b3.metric("Lotes que aportan", f"{rc.n_lots}",
-              delta=f"{rc.low_conf_share*100:.0f}% en pilas frágiles",
-              delta_color="off")
-    st.caption(
-        f"La base es **{_u(rc.total_usd)}** (no el contenedor completo): solo el "
-        f"metal sub-umbral que el optimizador rescata respecto al método actual. "
-        f"Históricamente es chico porque **las mezclas de Gilberto ya eran muy "
-        f"buenas** — el grueso del rescate está hacia adelante, optimizando todo el "
-        f"inventario acumulado."
-    )
-    if rc.lots:
-        df = pd.DataFrame([
-            {"Lote": str(r.customer_lot),
-             "Rescatado": round(r.rescatado_usd, 0),
-             "Baja conf.": f"{r.low_conf_share*100:.0f}%"}
-            for r in rc.lots[:10]
-        ])
-        st.caption("Lotes donde el optimizador rescata metal sub-umbral:")
-        st.dataframe(
-            df, width="stretch", hide_index=True,
-            column_config={"Rescatado": st.column_config.NumberColumn(format="$%d")},
-        )
-
-    # --- 2) El disparador: mejora del envío ------------------------------- #
-    st.markdown("##### Disparador · mejora del envío real")
-    if mj is None:
-        st.info(
-            f"Aún no hay envíos ejecutados con el modelo. El bono se activa cuando "
-            f"un envío real demuestre una mejora mayor al "
-            f"**{cfg.umbral_mejora*100:.0f}%** (por encima del ruido del ensayo).",
-            icon=":material/hourglass_empty:",
+    plan = st.session_state.get("bono_envio")
+    if plan is None:
+        st.info("Tocá **Calcular el próximo envío** para proyectar el rescate y el "
+                "bono de ese envío.")
+    elif plan.safe or plan.rescued_usd <= 0:
+        st.success(
+            "En el próximo envío el material ya supera todos los umbrales: no hay "
+            "metal en $0 para rescatar, así que ese envío no genera bono. El bono "
+            "aparece cuando el sobrante tiene metal bajo el umbral.",
+            icon=":material/check_circle:",
         )
     else:
-        d1, d2, d3 = st.columns(3)
-        d1.metric("Mejora medida", f"{mj.mejora*100:+.1f}%",
-                  help="(pagó la refinería − sin optimizar) / sin optimizar.")
-        d2.metric("Umbral", f"{cfg.umbral_mejora*100:.0f}%")
-        d3.metric("Envíos usados", f"{mj.n_envios}")
-        if mj.supera_umbral:
+        be = bono_de_envio(plan.rescued_usd, plan.mejora_pct, cfg)
+        riesgo = ", ".join(_METAL.get(g.metal, g.metal) for g in plan.gaps if g.below)
+        st.warning(
+            f"Sin el sistema, este envío ({plan.leftover_kg/1000:,.1f} t) dejaría "
+            f"**{riesgo}** bajo el umbral → pagaría **$0**. El sistema lo rescata "
+            f"completando/mezclando.",
+            icon=":material/warning:",
+        )
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Metal rescatado", usd(plan.rescued_usd),
+                  help="Valor del metal que pagaba $0 y pasa a cobrarse en este envío.")
+        c2.metric("Mejora del envío", f"{plan.mejora_pct*100:+.0f}%",
+                  delta=f"aprovechado {plan.leftover_util_pct:.0f}% → {plan.after_util_pct:.0f}%",
+                  delta_color="off")
+        c3.metric("Bono de este envío", usd(be.bono_usd),
+                  help="15% del metal rescatado, si la mejora supera el umbral.")
+        if be.activado:
             st.success(
-                f"La mejora (**{mj.mejora*100:+.1f}%**) supera el umbral de "
-                f"**{cfg.umbral_mejora*100:.0f}%**: es demasiado grande para ser "
-                f"ruido del ensayo → atribuible al modelo. **Disparador cumplido.**",
-                icon=":material/check_circle:",
+                f"La mejora (**{plan.mejora_pct*100:+.0f}%**) supera el "
+                f"**{cfg.umbral_mejora*100:.0f}%**: el bono de este envío es "
+                f"**{cfg.tasa_bono*100:.0f}% × {_u(plan.rescued_usd)} = "
+                f"{_u(be.bono_usd)}**.",
+                icon=":material/redeem:",
             )
+            if st.button("Registrar este envío como ejecutado", icon=":material/add:"):
+                led = st.session_state["bono_ledger"]
+                led.append({
+                    "Envío": f"#{len(led)+1}",
+                    "Rescatado": round(plan.rescued_usd, 0),
+                    "Bono": round(be.bono_usd, 0),
+                })
+                st.rerun()
         else:
-            st.warning(
-                f"La mejora (**{mj.mejora*100:+.1f}%**) no supera el umbral de "
-                f"**{cfg.umbral_mejora*100:.0f}%**: dentro del ruido natural del "
-                f"ensayo, todavía no atribuible al modelo con confianza.",
+            st.info(
+                f"La mejora (**{plan.mejora_pct*100:+.0f}%**) no supera el "
+                f"**{cfg.umbral_mejora*100:.0f}%**: este envío todavía no genera bono.",
                 icon=":material/info:",
             )
 
-    # --- 3) El bono ------------------------------------------------------- #
-    st.markdown("##### El bono")
-    if res.activado:
-        st.markdown(f"### Bono activado · {_u(res.monto_usd)}")
-        st.caption(
-            f"**{cfg.tasa_bono*100:.0f}%** de la base de **{_u(res.base_usd)}** "
-            f"(material rescatado). Banda: entre **{_u(res.monto_firme_usd)}** "
-            f"(piso de alta confianza) y **{_u(res.monto_usd)}** (base puntual)."
-        )
+    # --- Acumulado de envíos ejecutados ----------------------------------- #
+    st.write("")
+    st.markdown("##### Acumulado · envíos ejecutados con el modelo")
+    led = st.session_state["bono_ledger"]
+    if not led:
+        st.caption("Todavía no registraste envíos ejecutados. A medida que los "
+                   "envíos salen, se acumulan acá con su bono.")
     else:
-        st.markdown("### Bono no activado")
-        st.caption(
-            f"Cuando un envío real supere el **{cfg.umbral_mejora*100:.0f}%** de "
-            f"mejora, el bono sería **{cfg.tasa_bono*100:.0f}% × "
-            f"{_u(res.base_usd)} = {_u(cfg.tasa_bono * res.base_usd)}** "
-            f"(15% del material rescatado, estimación sobre la base actual)."
+        df = pd.DataFrame(led)
+        st.dataframe(
+            df, width="stretch", hide_index=True,
+            column_config={
+                "Rescatado": st.column_config.NumberColumn(format="$%d"),
+                "Bono": st.column_config.NumberColumn(format="$%d"),
+            },
         )
+        tot_resc = sum(r["Rescatado"] for r in led)
+        tot_bono = sum(r["Bono"] for r in led)
+        a1, a2, a3 = st.columns(3)
+        a1.metric("Envíos registrados", f"{len(led)}")
+        a2.metric("Metal rescatado acumulado", usd(tot_resc))
+        a3.metric("Bono acumulado", usd(tot_bono))
+        if st.button("Vaciar acumulado", icon=":material/delete:"):
+            st.session_state["bono_ledger"] = []
+            st.rerun()
 
     why(
-        "La base es <b>solo el material que no se hubiese cobrado</b> y que el "
-        "optimizador rescata — no el contenedor completo. Es una <b>estimación</b> "
-        "en el mundo de leyes estimadas que <b>se reconcilia</b> con los datos "
-        "reales de cada liquidación. Los parámetros (umbral, tasa, ventana) se "
-        "editan en <b>Ajustes › Bono</b>.",
+        "La base es <b>solo el metal que no se hubiese cobrado</b> y que el sistema "
+        "rescata, <b>por envío y hacia adelante</b> — no el contenedor completo ni "
+        "el histórico (que ya se pagó). Es una proyección sobre leyes estimadas que "
+        "<b>se reconcilia</b> con la liquidación real de cada envío. Los parámetros "
+        "(umbral, tasa) se editan en <b>Ajustes › Bono</b>.",
         "good",
     )

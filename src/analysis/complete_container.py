@@ -95,6 +95,10 @@ class CompletionPlan:
     recommend_kg: float = 0.0      # kg (WMT) a comprar (rescata todos los metales)
     after_util_pct: float = 0.0    # % aprovechado tras agregar recommend_kg
     unfixable: list[str] = field(default_factory=list)  # metales sin pila capaz
+    # Rescate (base del bono por envío): valor del metal del sobrante que pagaba
+    # $0 (bajo umbral) y que pasa a cobrarse al completar, y la mejora relativa.
+    rescued_usd: float = 0.0
+    mejora_pct: float = 0.0
 
 
 def _eligible_metals(risk: dict, z_min: float) -> list[str]:
@@ -220,6 +224,17 @@ def analyze_completion(
             comps + [BlendComponent(best_pile, best_total_kg)], prices, terms
         )
         plan.after_util_pct = _leftover_utilization(base, after)
+        # Rescate: valor del metal del sobrante que estaba bajo umbral ($0) y que,
+        # al completar, pasa a cobrarse (valorizado al RR de la mezcla completa).
+        rescued = 0.0
+        for m, br in base.metals.items():
+            if br.content > 0 and br.rr <= 1e-9 and after.metals[m].rr > 0:
+                rescued += br.gross_amount_usd * after.metals[m].rr
+        plan.rescued_usd = rescued
+        if plan.leftover_util_pct > 0:
+            plan.mejora_pct = (
+                (plan.after_util_pct - plan.leftover_util_pct) / plan.leftover_util_pct
+            )
     return plan
 
 
