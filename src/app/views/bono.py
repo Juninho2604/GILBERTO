@@ -152,6 +152,7 @@ def render() -> None:
                 "Bono": e.get("bono_usd", 0.0),
                 "Mejora": f"{e.get('mejora_pct', 0.0)*100:+.0f}%",
                 "Estado": e.get("estado", "registrado"),
+                "Liquidación real": e.get("real_usd"),
             }
             for i, e in enumerate(ledger)
         ])
@@ -160,7 +161,15 @@ def render() -> None:
             column_config={
                 "Rescatado": st.column_config.NumberColumn(format="$%d"),
                 "Bono": st.column_config.NumberColumn(format="$%d"),
+                "Liquidación real": st.column_config.NumberColumn(
+                    format="$%d",
+                    help="Valor de la liquidación real vinculada desde "
+                    "Histórico › Cargar liquidación (reconciliación)."),
             },
+        )
+        st.caption(
+            "Los envíos se **reconcilian** desde Histórico › *Cargar liquidación "
+            "nueva*, vinculando la liquidación real de la refinería con el envío."
         )
         tot_resc = sum(e.get("rescatado_usd", 0.0) for e in ledger)
         tot_bono = sum(e.get("bono_usd", 0.0) for e in ledger)

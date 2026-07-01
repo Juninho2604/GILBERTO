@@ -27,6 +27,7 @@ htmlcov/
 # Estado de runtime (no versionar): inventario editado, ledger del bono, logs
 data/inventory_state.json
 data/bono_ledger.json
+data/history_extra.json
 data/logs/
 
 # Secretos del deploy (contraseña de acceso)

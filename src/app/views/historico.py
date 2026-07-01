@@ -1,11 +1,16 @@
-"""Histórico — cada lote real vs. la mezcla óptima, con su explicación."""
+"""Histórico — cada lote real vs. la mezcla óptima, con su explicación.
+
+Incluye la **carga de liquidaciones nuevas** (el loop de datos): cada
+liquidación registrada re-estima las leyes al instante y deja el estudio
+completo listo para regenerarse bajo demanda — sin tocar archivos ni redeployar.
+"""
 
 from __future__ import annotations
 
 import pandas as pd
 import streamlit as st
 
-from app.data_access import history_analysis
+from app.data_access import history_analysis, history_lot_count, invalidate_caches
 from app.ui import GOOD, brand, kpi, usd, why
 from app.views.components import (
     charges_breakdown,
@@ -20,6 +25,85 @@ from domain.valuation import value_lot
 _METAL_NAME = {"AU": "oro", "AG": "plata", "PD": "paladio", "PT": "platino"}
 
 
+def _render_cargar_liquidacion() -> None:
+    """Formulario para registrar una liquidación real nueva de la refinería."""
+    from data.history_store import append_lot, validate_lot
+    from data.ledger_store import load_ledger, reconcile_entry
+    from data.load_history import load_history
+
+    # Mensaje del guardado anterior (sobrevive el rerun).
+    if msg := st.session_state.pop("_liq_msg", None):
+        st.success(msg, icon=":material/model_training:")
+
+    with st.expander("Cargar liquidación nueva · el modelo se afina solo",
+                     icon=":material/upload_file:"):
+        st.caption(
+            "Registrá acá cada liquidación que devuelva la refinería: el sistema "
+            "re-estima las leyes de las pilas con ese dato **al instante** y "
+            "mejora con cada envío. Cu en fracción (0.21 = 21%); el resto en g/t."
+        )
+        with st.form("nueva_liquidacion"):
+            c1, c2, c3, c4 = st.columns(4)
+            customer_lot = c1.text_input("Lote (cliente)", placeholder="ej: 95i")
+            jx_lot = c2.text_input("Lote JX", placeholder="ej: 2145")
+            wmt = c3.number_input("WMT (kg)", min_value=0.0, step=100.0)
+            moisture = c4.number_input("Humedad (fracción)", min_value=0.0,
+                                       max_value=0.9, value=0.01, step=0.005,
+                                       format="%.3f")
+            g1, g2, g3, g4, g5 = st.columns(5)
+            cu = g1.number_input("Cu (fracción)", min_value=0.0, format="%.4f")
+            au = g2.number_input("Au (g/t)", min_value=0.0, step=1.0)
+            ag = g3.number_input("Ag (g/t)", min_value=0.0, step=1.0)
+            pt = g4.number_input("Pt (g/t)", min_value=0.0, step=1.0)
+            pd_g = g5.number_input("Pd (g/t)", min_value=0.0, step=1.0)
+            recipe = st.text_input(
+                "Receta (por código de pila)",
+                placeholder="ej: 1*(28%) + 2*(58%) + 14*(14%)",
+                help="La mezcla que formó el lote. Con receta resoluble, la "
+                "liquidación además afina las leyes por regresión.",
+            )
+            # Reconciliación opcional contra un envío registrado en el Bono.
+            pendientes = [e for e in load_ledger() if e.get("estado") == "registrado"]
+            link_n = None
+            if pendientes:
+                opts: dict[str, int | None] = {"— no vincular —": None}
+                for e in pendientes:
+                    opts[f"Envío #{e['n']} ({str(e.get('timestamp', ''))[:10]})"] = e["n"]
+                pick = st.selectbox(
+                    "¿Corresponde a un envío registrado en el Bono? (reconciliar)",
+                    list(opts),
+                )
+                link_n = opts[pick]
+            ok = st.form_submit_button("Registrar liquidación", type="primary",
+                                       icon=":material/save:")
+        if ok:
+            data = {
+                "customer_lot": customer_lot, "jx_lot": jx_lot, "wmt": wmt,
+                "moisture": moisture, "recipe_raw": recipe,
+                "grades": {"CU": cu, "AU": au, "AG": ag, "PT": pt, "PD": pd_g},
+            }
+            existing_jx = {str(L.jx_lot) for L in load_history() if L.jx_lot}
+            errors = validate_lot(data, existing_jx)
+            if errors:
+                for e in errors:
+                    st.error(e, icon=":material/error:")
+                return
+            append_lot(data)
+            if link_n is not None:
+                v = value_lot(wmt, moisture, data["grades"],
+                              default_prices(), default_terms())
+                reconcile_entry(link_n, v.net_value_usd)
+            invalidate_caches()
+            n = history_lot_count()
+            st.session_state["_liq_msg"] = (
+                f"Liquidación del lote {customer_lot} registrada. El histórico "
+                f"ahora tiene **{n} lotes** y las leyes se re-estimaron con este "
+                f"dato." + (" El envío del Bono quedó **reconciliado**."
+                            if link_n is not None else "")
+            )
+            st.rerun()
+
+
 def render() -> None:
     private = st.session_state.get("private", False)
     a = history_analysis()
@@ -28,6 +112,28 @@ def render() -> None:
         "Histórico de lotes",
         f"{a['n_lots']} envíos reales a la refinería · comparados contra la mezcla óptima.",
     )
+    st.write("")
+
+    _render_cargar_liquidacion()
+
+    # Estudio precomputado desactualizado: hay liquidaciones nuevas sin analizar.
+    live_n = history_lot_count()
+    if live_n > a.get("n_lots", 0):
+        st.warning(
+            f"El estudio de esta página cubre **{a['n_lots']} de {live_n} lotes**: "
+            f"hay liquidaciones nuevas que ya afinan las leyes pero aún no entran "
+            f"en la comparación real-vs-óptimo. Recalculá para incluirlas.",
+            icon=":material/update:",
+        )
+        if st.button("Recalcular estudio completo ahora (~1–2 min)",
+                     icon=":material/refresh:", type="primary"):
+            with st.spinner("Re-analizando todos los lotes (corre ~200 "
+                            "optimizaciones)…"):
+                from analysis.build_analysis import build
+
+                build()
+            invalidate_caches()
+            st.rerun()
     st.write("")
 
     c1, c2, c3, c4 = st.columns(4)

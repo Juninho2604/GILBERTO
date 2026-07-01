@@ -57,6 +57,25 @@ def append_entry(
     return entries
 
 
+def reconcile_entry(
+    n: int, real_usd: float, path: Path = LEDGER_PATH
+) -> list[dict]:
+    """Marca el envío ``n`` como reconciliado contra la liquidación real.
+
+    Guarda el valor real y la fecha: el bono deja de ser proyección y queda
+    atado al dato de la refinería (la regla acordada con el cliente).
+    """
+    entries = load_ledger(path)
+    for e in entries:
+        if e.get("n") == n:
+            e["estado"] = "reconciliado"
+            e["real_usd"] = round(float(real_usd), 2)
+            e["reconciled_at"] = datetime.now().isoformat(timespec="seconds")
+            break
+    _write(entries, path)
+    return entries
+
+
 def clear_ledger(path: Path = LEDGER_PATH) -> None:
     """Vacía el registro (borra el archivo)."""
     if path.exists():

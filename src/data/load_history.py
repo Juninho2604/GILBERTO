@@ -64,7 +64,23 @@ def _label_map(block) -> dict[str, int]:
     return out
 
 
-def load_history(path: str | Path = DEFAULT_HISTORY_XLSX) -> list[HistoricLot]:
+def load_history(
+    path: str | Path = DEFAULT_HISTORY_XLSX,
+    include_extra: bool = True,
+    extra_path: Optional[Path] = None,
+) -> list[HistoricLot]:
+    """Histórico completo: los lotes del ``.xlsx`` + las liquidaciones cargadas
+    desde la app (``history_store``). Así una liquidación nueva alimenta la
+    estimación de leyes y el análisis sin tocar archivos ni redeployar."""
+    lots = _load_xlsx(path)
+    if include_extra:
+        from .history_store import EXTRA_PATH, extra_lots
+
+        lots.extend(extra_lots(extra_path or EXTRA_PATH))
+    return lots
+
+
+def _load_xlsx(path: str | Path = DEFAULT_HISTORY_XLSX) -> list[HistoricLot]:
     wb = load_workbook(path, data_only=True)
     ws = wb["Hoja1"] if "Hoja1" in wb.sheetnames else wb.worksheets[0]
     rows = list(ws.iter_rows(values_only=True))

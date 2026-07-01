@@ -69,6 +69,14 @@ def using_sample_data() -> bool:
 
 
 @st.cache_data(show_spinner=False)
+def history_lot_count() -> int:
+    """Lotes en el histórico VIVO (xlsx + liquidaciones cargadas en la app)."""
+    from data.load_history import load_history
+
+    return len(load_history())
+
+
+@st.cache_data(show_spinner=False)
 def resolvable_lot_ids() -> list[str]:
     """IDs de lotes históricos para la demo: resolubles y de ≥2 pilas (interesantes
     para mostrar la partición y el 3D). Si no hubiera, cae a todos los resolubles."""
