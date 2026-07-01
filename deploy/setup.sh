@@ -53,14 +53,16 @@ cd "${APP_DIR}"
 ENV_FILE="${APP_DIR}/.env"
 touch "${ENV_FILE}"; chmod 600 "${ENV_FILE}" 2>/dev/null || true
 
-# Setea KEY=VALUE en .env sin pisar las otras claves.
+# Setea KEY=VALUE en .env sin pisar las otras claves. Sin sed: los valores con
+# caracteres especiales (& | / \) rompían el patrón de reemplazo y podían dejar
+# la contraseña corrupta. grep -v + append es inmune al contenido del valor.
 set_env_var() {
   local key="$1" val="$2"
-  if grep -q "^${key}=" "${ENV_FILE}" 2>/dev/null; then
-    sed -i "s|^${key}=.*|${key}=${val}|" "${ENV_FILE}"
-  else
-    printf '%s=%s\n' "${key}" "${val}" >> "${ENV_FILE}"
-  fi
+  local tmp="${ENV_FILE}.tmp"
+  { grep -v "^${key}=" "${ENV_FILE}" 2>/dev/null || true; } > "${tmp}"
+  printf '%s=%s\n' "${key}" "${val}" >> "${tmp}"
+  mv "${tmp}" "${ENV_FILE}"
+  chmod 600 "${ENV_FILE}" 2>/dev/null || true
 }
 
 GENERATED=""
@@ -79,6 +81,12 @@ fi
 # La app queda solo en 127.0.0.1 y NO se levanta Caddy (evita pelear por el :80).
 EXT_PROXY="${EXTERNAL_PROXY:-$(grep '^EXTERNAL_PROXY=' "${ENV_FILE}" 2>/dev/null | cut -d= -f2- || true)}"
 EFFECTIVE_DOMAIN="${DOMAIN:-$(grep '^DOMAIN=' "${ENV_FILE}" 2>/dev/null | cut -d= -f2- || true)}"
+
+# El contenedor corre SIN root (uid 1000) y monta ./data como volumen: el
+# directorio en el host tiene que ser escribible por ese uid (estado del
+# inventario, ledger del bono, logs).
+mkdir -p "${APP_DIR}/data/logs"
+$SUDO chown -R 1000:1000 "${APP_DIR}/data" 2>/dev/null || true
 
 echo "==> 5/6  Build + run"
 if [ "${EXT_PROXY:-}" = "1" ]; then

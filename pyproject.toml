@@ -9,12 +9,12 @@ description = "Simulador y optimizador de mezclas RAEE para Servicios Megabytes,
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "pandas>=2.0",
-    "openpyxl>=3.1",
-    "numpy>=1.24",
-    "streamlit>=1.30",
-    "pulp>=2.7",
-    "plotly>=5.18",
+    "pandas>=2.0,<4.0",
+    "openpyxl>=3.1,<4.0",
+    "numpy>=1.24,<3.0",
+    "streamlit>=1.30,<2.0",
+    "pulp>=2.7,<4.0",
+    "plotly>=5.18,<7.0",
 ]
 
 [project.optional-dependencies]

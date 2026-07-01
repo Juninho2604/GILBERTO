@@ -81,6 +81,12 @@ def render() -> None:
                 items, prices, terms, max_num_lots=8, container_kg=container_kg,
                 k_safe=float(st.session_state.get("k_safe", 1.0)),
             )
+        from applog import get_logger
+
+        get_logger("aurix.optimizador").info(
+            "Contenedor optimizado: %.0f kg, %d lotes, status=%s",
+            container_kg, len(bp.result.lots), bp.result.status,
+        )
         st.session_state.cont_bp = bp
         st.session_state.cont_kg = container_kg
 

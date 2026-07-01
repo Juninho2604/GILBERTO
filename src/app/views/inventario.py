@@ -12,8 +12,11 @@ import streamlit as st
 
 from app.data_access import inventory_items, invalidate_caches
 from app.ui import brand, pile_label, usd
+from applog import get_logger
 from data.inventory_store import has_saved_state, reset_state, save_state
 from domain.models import Category, GradeSource, InventoryItem
+
+_LOG = get_logger("aurix.inventario")
 
 _COLS = [
     "code", "name", "quantity_kg", "moisture",
@@ -135,15 +138,22 @@ def render() -> None:
             "agrega las nuevas. Las leyes ya conocidas se conservan."
         )
         uploaded = st.file_uploader("Archivo de inventario", type=["xlsx"], key="inv_upload")
-        if uploaded is not None and st.button("Aplicar carga", type="primary"):
+        _MAX_UPLOAD_BYTES = 5 * 1024 * 1024  # un inventario real pesa KBs, no MBs
+        if uploaded is not None and uploaded.size > _MAX_UPLOAD_BYTES:
+            st.error("El archivo supera los 5 MB. Un inventario válido pesa mucho "
+                     "menos; verificá que sea el xlsx correcto.")
+        elif uploaded is not None and st.button("Aplicar carga", type="primary"):
             try:
                 merged, upd, add = _merge_uploaded(uploaded, items)
                 save_state(merged)
                 invalidate_caches()
+                _LOG.info("Inventario cargado por xlsx: %d actualizadas, %d nuevas.", upd, add)
                 st.success(f"Inventario cargado: {upd} pilas actualizadas, {add} nuevas.")
                 st.rerun()
             except Exception as e:  # noqa: BLE001 - mostrar el error al usuario
-                st.error(f"No se pudo leer el archivo: {e}")
+                _LOG.exception("Fallo al cargar xlsx de inventario")
+                st.error(f"No se pudo leer el archivo (¿es un xlsx de inventario "
+                         f"válido?): {type(e).__name__}")
 
     # --- Edición manual ---------------------------------------------------- #
     st.markdown("##### Editar inventario")
@@ -185,6 +195,7 @@ def render() -> None:
         else:
             save_state(new_items)
             invalidate_caches()
+            _LOG.info("Inventario guardado a mano: %d pilas.", len(new_items))
             st.success(f"Inventario guardado ({len(new_items)} pilas). Aplicado a todos los módulos.")
             st.rerun()
     if b2.button("Restablecer al original", icon=":material/restart_alt:", width="stretch"):

@@ -18,6 +18,7 @@ from analysis.bonus import BonusConfig, bono_de_envio
 from analysis.complete_container import analyze_completion
 from app.data_access import optimizable_items
 from app.ui import brand, usd, why
+from data.ledger_store import append_entry, clear_ledger, load_ledger
 from optimize.optimizer import best_partition
 
 _CONTAINER_KG = 23_000.0
@@ -73,7 +74,8 @@ def render() -> None:
     )
     st.write("")
 
-    st.session_state.setdefault("bono_ledger", [])
+    # Ledger persistente en disco (registro contractual): sobrevive reinicios.
+    ledger = load_ledger()
 
     # --- Proyección del próximo envío de material de depósito ------------- #
     st.markdown("##### Próximo envío de material de depósito (proyección)")
@@ -125,12 +127,7 @@ def render() -> None:
                 icon=":material/redeem:",
             )
             if st.button("Registrar este envío como ejecutado", icon=":material/add:"):
-                led = st.session_state["bono_ledger"]
-                led.append({
-                    "Envío": f"#{len(led)+1}",
-                    "Rescatado": round(plan.rescued_usd, 0),
-                    "Bono": round(be.bono_usd, 0),
-                })
+                append_entry(plan.rescued_usd, be.bono_usd, plan.mejora_pct)
                 st.rerun()
         else:
             st.info(
@@ -139,15 +136,25 @@ def render() -> None:
                 icon=":material/info:",
             )
 
-    # --- Acumulado de envíos ejecutados ----------------------------------- #
+    # --- Acumulado de envíos ejecutados (persistente en disco) ------------ #
     st.write("")
     st.markdown("##### Acumulado · envíos ejecutados con el modelo")
-    led = st.session_state["bono_ledger"]
-    if not led:
+    if not ledger:
         st.caption("Todavía no registraste envíos ejecutados. A medida que los "
-                   "envíos salen, se acumulan acá con su bono.")
+                   "envíos salen, se acumulan acá con su bono — y quedan "
+                   "guardados aunque el servidor se reinicie.")
     else:
-        df = pd.DataFrame(led)
+        df = pd.DataFrame([
+            {
+                "Envío": f"#{e.get('n', i + 1)}",
+                "Fecha": str(e.get("timestamp", ""))[:16].replace("T", " "),
+                "Rescatado": e.get("rescatado_usd", 0.0),
+                "Bono": e.get("bono_usd", 0.0),
+                "Mejora": f"{e.get('mejora_pct', 0.0)*100:+.0f}%",
+                "Estado": e.get("estado", "registrado"),
+            }
+            for i, e in enumerate(ledger)
+        ])
         st.dataframe(
             df, width="stretch", hide_index=True,
             column_config={
@@ -155,14 +162,14 @@ def render() -> None:
                 "Bono": st.column_config.NumberColumn(format="$%d"),
             },
         )
-        tot_resc = sum(r["Rescatado"] for r in led)
-        tot_bono = sum(r["Bono"] for r in led)
+        tot_resc = sum(e.get("rescatado_usd", 0.0) for e in ledger)
+        tot_bono = sum(e.get("bono_usd", 0.0) for e in ledger)
         a1, a2, a3 = st.columns(3)
-        a1.metric("Envíos registrados", f"{len(led)}")
+        a1.metric("Envíos registrados", f"{len(ledger)}")
         a2.metric("Metal rescatado acumulado", usd(tot_resc))
         a3.metric("Bono acumulado", usd(tot_bono))
         if st.button("Vaciar acumulado", icon=":material/delete:"):
-            st.session_state["bono_ledger"] = []
+            clear_ledger()
             st.rerun()
 
     why(

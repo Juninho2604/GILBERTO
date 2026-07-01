@@ -14,8 +14,61 @@ from __future__ import annotations
 
 import hmac
 import os
+import time
 
 import streamlit as st
+
+from applog import get_logger
+
+_LOG = get_logger("aurix.auth")
+
+# ---------------------------------------------------------------------------
+# Límite de intentos (anti fuerza bruta). Estado a nivel PROCESO, no sesión:
+# abrir sesiones nuevas no resetea el contador. Tras _MAX_ATTEMPTS fallos, el
+# login queda bloqueado _LOCK_SECONDS para todos (trade-off aceptado: un
+# atacante puede molestar 5 min, pero no adivinar un PIN de 4 dígitos).
+# ---------------------------------------------------------------------------
+_MAX_ATTEMPTS = 5
+_LOCK_SECONDS = 300.0
+_LOCK = {"failures": 0, "until": 0.0}
+
+
+def _locked_remaining_s() -> int:
+    """Segundos que faltan para desbloquear el login (0 = desbloqueado)."""
+    return max(0, int(_LOCK["until"] - time.time()))
+
+
+def _register_failure(kind: str) -> None:
+    _LOCK["failures"] += 1
+    _LOG.warning("Intento de %s fallido (%d/%d).", kind, _LOCK["failures"], _MAX_ATTEMPTS)
+    if _LOCK["failures"] >= _MAX_ATTEMPTS:
+        _LOCK["until"] = time.time() + _LOCK_SECONDS
+        _LOCK["failures"] = 0
+        _LOG.warning("Login bloqueado por %d s (demasiados intentos).", int(_LOCK_SECONDS))
+
+
+def _register_success() -> None:
+    _LOCK["failures"] = 0
+    _LOCK["until"] = 0.0
+
+
+def _check_secret(entered: str, expected: str, kind: str) -> bool:
+    """Compara en tiempo constante, con límite de intentos. True si pasa."""
+    if _locked_remaining_s() > 0:
+        return False
+    if hmac.compare_digest(str(entered), str(expected)):
+        _register_success()
+        return True
+    _register_failure(kind)
+    return False
+
+
+def _lockout_error() -> None:
+    mins = max(1, -(-_locked_remaining_s() // 60))  # ceil
+    st.error(
+        f"Demasiados intentos fallidos. Probá de nuevo en ~{mins} minuto(s).",
+        icon=":material/lock_clock:",
+    )
 
 
 def _expected_password() -> str | None:
@@ -73,9 +126,13 @@ def _render_pin(expected: str) -> None:
                                 placeholder="• • • •")
             ok = st.form_submit_button("Entrar", type="primary", width="stretch")
         if ok:
-            if hmac.compare_digest(str(pin), str(expected)):
+            if _locked_remaining_s() > 0:
+                _lockout_error()
+            elif _check_secret(pin, expected, "PIN"):
                 st.session_state["_pin_ok"] = True
                 st.rerun()
+            elif _locked_remaining_s() > 0:
+                _lockout_error()  # este fallo activó el bloqueo: avisar ya
             else:
                 st.error("PIN incorrecto.")
 
@@ -119,9 +176,13 @@ def _render_login(expected: str) -> None:
                                 placeholder="Contraseña")
             ok = st.form_submit_button("Entrar", type="primary", width="stretch")
         if ok:
-            if hmac.compare_digest(str(pwd), str(expected)):
+            if _locked_remaining_s() > 0:
+                _lockout_error()
+            elif _check_secret(pwd, expected, "contraseña"):
                 st.session_state["_auth_ok"] = True
                 st.rerun()
+            elif _locked_remaining_s() > 0:
+                _lockout_error()  # este fallo activó el bloqueo: avisar ya
             else:
                 st.error("Contraseña incorrecta.")
         st.caption("Datos comerciales confidenciales. Acceso solo autorizado.")

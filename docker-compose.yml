@@ -15,6 +15,9 @@ services:
       # Modo demo (reunión): DEMO_MODE=1 + DEMO_PIN=xxxx → solo Inventario y Demo, con PIN.
       - DEMO_MODE=${DEMO_MODE:-}
       - DEMO_PIN=${DEMO_PIN:-}
-    # Para regenerar el artefacto del histórico sin reconstruir la imagen,
-    # montá el repo y corré: docker compose exec raee-optimizer \
-    #   python -m analysis.build_analysis
+    volumes:
+      # Datos persistentes (inventario editado, ledger del bono, logs): viven en
+      # el host, así sobreviven rebuilds y redeploys del contenedor.
+      - ./data:/app/data
+    # Para regenerar el artefacto del histórico sin reconstruir la imagen:
+    #   docker compose exec raee-optimizer python -m analysis.build_analysis

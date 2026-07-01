@@ -53,6 +53,21 @@ def invalidate_caches() -> None:
     st.cache_resource.clear()
 
 
+def using_sample_data() -> bool:
+    """True si la app está corriendo con inventario de EJEMPLO (no el real).
+
+    Pasa cuando faltan los xlsx en el servidor y no hay estado guardado: el
+    fallback evita el crash, pero el usuario TIENE que saber que esos números
+    no son su inventario.
+    """
+    if load_saved_state() is not None:
+        return False
+    from data import bootstrap
+
+    inventory_items()  # fuerza la carga (cacheada) para que el flag sea fiable
+    return bootstrap.LAST_LOAD_FALLBACK
+
+
 @st.cache_data(show_spinner=False)
 def resolvable_lot_ids() -> list[str]:
     """IDs de lotes históricos para la demo: resolubles y de ≥2 pilas (interesantes

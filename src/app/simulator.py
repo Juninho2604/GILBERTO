@@ -49,6 +49,18 @@ inject_css()
 # Portón de acceso: PIN en modo demo, contraseña (APP_PASSWORD) en modo normal.
 require_access()
 
+# Aviso fuerte si la app cayó a datos de EJEMPLO (faltan los xlsx reales):
+# nadie debe optimizar inventario falso creyendo que es el suyo.
+from app.data_access import using_sample_data  # noqa: E402  (tras el login)
+
+if using_sample_data():
+    st.error(
+        "**Atención: estás viendo datos de EJEMPLO, no tu inventario real.** "
+        "Faltan los archivos de datos en el servidor (`data/inventory.xlsx` / "
+        "`refining_history.xlsx`). No tomes decisiones con estos números.",
+        icon=":material/dangerous:",
+    )
+
 # --------------------------------------------------------------------------- #
 # Módulos (ícono Material + función de render). En modo demo solo Demo +
 # Inventario; en la app completa, los módulos reales (sin "Demo").
