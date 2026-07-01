@@ -307,6 +307,58 @@ def _pure_observations(lots: list[HistoricLot]) -> dict[str, list[dict]]:
 # determinada por la regresión (caso pila 26: 2% de un solo lote → no usable).
 MIN_LEVERAGE = 0.10
 
+# Piso del CV calibrado: el ensayo de la refinería siempre tiene algo de ruido;
+# un CV observado menor a esto sería suerte de muestreo, no precisión real.
+_CV_FLOOR = 0.02
+
+
+def estimate_moisture(lots: list[HistoricLot]) -> dict[str, float]:
+    """Humedad estimada por pila: promedio ponderado de los lotes donde viajó.
+
+    El inventario no trae humedad medida (default 1% uniforme), pero cada
+    liquidación sí la trae para su lote. La humedad de una pila se aproxima con
+    el promedio de las humedades de sus lotes, ponderado por los kg que aportó
+    (``fracción × WMT``). Con Cu cerca del umbral (3%), 2 puntos de humedad
+    pueden decidir si un metal cobra o no.
+    """
+    wsum: dict[str, float] = {}
+    wkg: dict[str, float] = {}
+    for L in lots:
+        if not L.recipe.resolvable or L.moisture <= 0 or L.wmt <= 0:
+            continue
+        for c, f in L.recipe.fractions.items():
+            kg = f * L.wmt
+            wsum[c] = wsum.get(c, 0.0) + L.moisture * kg
+            wkg[c] = wkg.get(c, 0.0) + kg
+    return {c: wsum[c] / wkg[c] for c in wsum if wkg[c] > 0}
+
+
+def calibrate_cvs(lots: list[HistoricLot]) -> dict[str, float]:
+    """CV por metal **medido** en las pilas que viajaron solas ≥2 veces.
+
+    Reemplaza los defaults arbitrarios (``CV_DEFAULT``) por la dispersión real
+    observada entre liquidaciones repetidas de la misma pila — y se recalibra
+    solo con cada liquidación nueva que se cargue. Mediana entre pilas para que
+    un outlier no domine; si un metal no tiene repeticiones, cae al default.
+    """
+    pure = _pure_observations(lots)
+    observed: dict[str, list[float]] = {m: [] for m in METALS}
+    for obs in pure.values():
+        if len(obs) < 2:
+            continue
+        for m in METALS:
+            vals = [o.get(m, 0.0) for o in obs]
+            mean = float(np.mean(vals))
+            if mean > 0:
+                observed[m].append(float(np.std(vals, ddof=1)) / mean)
+    out: dict[str, float] = {}
+    for m in METALS:
+        if observed[m]:
+            out[m] = max(_CV_FLOOR, float(np.median(observed[m])))
+        else:
+            out[m] = CV_DEFAULT.get(m, 0.3)
+    return out
+
 
 def _compute_confidence(
     lots: list[HistoricLot], estimates: dict[str, GradeEstimate]
@@ -315,6 +367,7 @@ def _compute_confidence(
     pure = _pure_observations(lots)
     blocks = _colinear_blocks(lots)
     se = _regression_se(lots)
+    cv_cal = calibrate_cvs(lots)  # CV medidos en lotes puros repetidos
 
     # Apalancamiento: mayor fracción que tuvo cada pila en un lote resoluble.
     max_frac: dict[str, float] = {}
@@ -329,7 +382,7 @@ def _compute_confidence(
         low_leverage = max_frac.get(c, 0.0) < MIN_LEVERAGE
         for m in METALS:
             val = est.grades.get(m, 0.0)
-            cv = CV_DEFAULT.get(m, 0.3)
+            cv = cv_cal.get(m, CV_DEFAULT.get(m, 0.3))
             if c in pure:                          # MEASURED (viajó sola)
                 vals = [o.get(m, 0.0) for o in pure[c]]
                 sigma = float(np.std(vals, ddof=1)) if len(vals) >= 2 else val * cv
@@ -412,6 +465,7 @@ def apply_estimates_to_inventory(
             }[est.confidence]
             it.grade_sigma = dict(est.sigmas)
             it.grade_tier = dict(est.tiers)
+            it.grade_block = est.block
         out.append(it)
     return out
 

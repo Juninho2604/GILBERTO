@@ -20,14 +20,35 @@ def _pile(code, ag, ag_sigma, qty=1000.0):
 
 
 def test_ag_on_the_edge_is_risky():
-    """Ag 112 ±70 (umbral 100): P_cobro ≈ 57% y z < z_min → lote frágil."""
+    """Ag 112 ±70 (umbral 100): P_cobro ≈ 60% y z < z_min → lote frágil.
+
+    P_cobro usa la normal TRUNCADA en 0 (una ley no puede ser negativa):
+    Φ(0.171)/Φ(1.6) = 0.568/0.945 ≈ 0.601 — algo más alta que la normal simple
+    (0.568), que repartía probabilidad en leyes imposibles (<0).
+    """
     terms = default_terms()
     comps = [BlendComponent(_pile("X", 112, 70), 1000.0)]
     risk = blend_threshold_risk(comps, terms)["AG"]
     assert risk.grade == pytest.approx(112)
     assert risk.sigma == pytest.approx(70)
-    assert risk.p_cobro == pytest.approx(0.568, abs=0.02)   # ~57%
+    assert risk.p_cobro == pytest.approx(0.601, abs=0.02)   # ~60% (truncada)
     assert not risk.safe(DEFAULT_Z_MIN)                     # z ≈ 0.17 < 1.5
+
+
+def test_mismo_bloque_colineal_suma_sigma_lineal():
+    """Pilas del MISMO bloque: σ correlacionada → suma lineal, no cuadratura.
+
+    50/50 con σ=70 cada una: independientes daría sqrt(2·(0.5·70)²) ≈ 49.5;
+    correlacionadas (mismo bloque) da 0.5·70 + 0.5·70 = 70. Tratarlas como
+    independientes haría ver la mezcla más segura de lo que es.
+    """
+    terms = default_terms()
+    a, b = _pile("A", 112, 70), _pile("B", 112, 70)
+    a.grade_block = b.grade_block = ("A", "B")
+    risk = blend_threshold_risk(
+        [BlendComponent(a, 1000.0), BlendComponent(b, 1000.0)], terms
+    )["AG"]
+    assert risk.sigma == pytest.approx(70.0, abs=0.5)       # lineal, no 49.5
 
 
 def test_diluting_with_rich_pile_stabilizes():

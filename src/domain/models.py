@@ -64,6 +64,9 @@ class InventoryItem:
     # riesgo leen σ/tier. Vacíos = sin info de confianza.
     grade_sigma: dict[str, float] = field(default_factory=dict)  # metal → σ
     grade_tier: dict[str, str] = field(default_factory=dict)     # metal → MEASURED/ESTIMATED/NOT_DETERMINED
+    # Bloque colineal al que pertenece la pila (pilas que solo viajaron juntas):
+    # sus σ están CORRELACIONADAS y la propagación de riesgo las trata como una.
+    grade_block: Optional[tuple] = None
 
     def grade(self, metal: str) -> float:
         """Devuelve la ley de un metal por su símbolo (``"CU"``, ``"AU"``, ...)."""

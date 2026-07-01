@@ -32,6 +32,7 @@ lineal en los pesos ``dry_i``. Las dos no linealidades se modelan exactas:
 
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass, field
 from typing import Optional, Sequence
 
@@ -430,3 +431,86 @@ def best_partition(
     if best is None:
         return BestPartitionResult(PartitionResult(status="infeasible"), 0, sweep)
     return BestPartitionResult(best, best_k, sweep)
+
+
+# --------------------------------------------------------------------------- #
+# Modo 4 — plan de rotación: todos los envíos hasta agotar el stock
+# --------------------------------------------------------------------------- #
+@dataclass
+class RotationShipment:
+    """Un envío del plan de rotación."""
+
+    index: int                   # 1, 2, 3…
+    total_kg: float
+    util_pct: float              # % del metal del envío que paga la refinería
+    num_lots: int
+    codes: list[str]             # pilas que viajan en este envío
+
+
+@dataclass
+class RotationPlan:
+    """Plan de rotación del inventario completo, envío por envío."""
+
+    shipments: list[RotationShipment] = field(default_factory=list)
+    stuck: dict[str, float] = field(default_factory=dict)  # code → kg que nunca sale
+
+    @property
+    def total_shipped_kg(self) -> float:
+        return sum(s.total_kg for s in self.shipments)
+
+
+def rotation_plan(
+    items: Sequence[InventoryItem],
+    prices: MetalPrices,
+    terms: ContractTerms,
+    *,
+    container_kg: float = 23_000.0,
+    max_shipments: int = 8,
+    max_num_lots: int = 4,
+    k_safe: float = 0.0,
+    time_limit_s: float = 6.0,
+) -> RotationPlan:
+    """Simula los envíos sucesivos hasta agotar el stock (rotación).
+
+    Corre el optimizador de contenedor sobre el stock restante, descuenta lo
+    enviado y repite. Responde dos preguntas del negocio: **cuántos envíos**
+    lleva rotar todo el inventario, y **qué pilas no salen nunca** (el
+    optimizador las deja porque restan valor: candidatas a refuerzo, ensayo de
+    laboratorio o venta aparte — mercancía que envejece en el galpón).
+    """
+    remaining = {it.code: it.quantity_kg for it in items if it.quantity_kg > 0}
+    by_code = {it.code: it for it in items}
+    shipments: list[RotationShipment] = []
+
+    for i in range(1, max_shipments + 1):
+        cand = []
+        for c, kg in remaining.items():
+            if kg > 1.0:
+                it = copy.copy(by_code[c])
+                it.quantity_kg = kg
+                cand.append(it)
+        if not cand:
+            break
+        bp = best_partition(
+            cand, prices, terms, max_num_lots=max_num_lots,
+            container_kg=container_kg, k_safe=k_safe, time_limit_s=time_limit_s,
+        )
+        lots = bp.result.lots
+        shipped = sum(l.total_weight_kg for l in lots)
+        if not lots or shipped < 1.0:
+            break  # lo que queda no justifica otro envío
+        gross = sum(l.valuation.gross_metal_total for l in lots)
+        paid = sum(l.valuation.metal_total for l in lots)
+        codes: set[str] = set()
+        for l in lots:
+            for p in l.components:
+                remaining[p.item.code] = remaining.get(p.item.code, 0.0) - p.weight_kg
+                codes.add(p.item.code)
+        shipments.append(RotationShipment(
+            index=i, total_kg=shipped,
+            util_pct=(100.0 * paid / gross if gross else 0.0),
+            num_lots=len(lots), codes=sorted(codes),
+        ))
+
+    stuck = {c: kg for c, kg in remaining.items() if kg > 1.0}
+    return RotationPlan(shipments=shipments, stuck=stuck)

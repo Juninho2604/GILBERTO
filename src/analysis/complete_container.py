@@ -129,7 +129,7 @@ def analyze_completion(
     prices: MetalPrices,
     terms: ContractTerms,
     *,
-    margin: float = DEFAULT_MARGIN,
+    margin: Optional[float] = None,
     z_min: float = DEFAULT_Z_MIN,
     k_safe: float = DEFAULT_K_SAFE,
 ) -> CompletionPlan:
@@ -139,6 +139,11 @@ def analyze_completion(
     ``catalog``: pilas que se podrían comprar (con ley **confiable**). Se elige la
     que rescata todos los metales en riesgo con el **menor peso agregado**, usando
     la ley conservadora (``grade − k·σ``) para no apostar a estimaciones ruidosas.
+
+    ``margin=None`` (default) usa un **margen adaptativo por metal**: la holgura
+    sobre el umbral escala con el ruido de la mezcla (``2σ/umbral``, acotado a
+    5–40%). Mucho ruido → más holgura; ley bien conocida → no se sobre-compra.
+    Un float fijo mantiene el comportamiento clásico (ej. 0.20).
     """
     comps = [BlendComponent(it, it.quantity_kg) for it in leftover if it.quantity_kg > 0]
     leftover_kg = sum(c.weight_kg for c in comps)
@@ -148,6 +153,15 @@ def analyze_completion(
     base = value_blend(comps, prices, terms)
     risk = blend_threshold_risk(comps, terms)
     dmt = sum(c.dry_weight_kg for c in comps)
+
+    def _margin_for(m: str) -> float:
+        """Margen sobre el umbral para el metal ``m`` (fijo o adaptativo a σ)."""
+        if margin is not None:
+            return margin
+        r = risk[m]
+        if r.sigma <= 0 or r.threshold <= 0:
+            return DEFAULT_MARGIN  # sin info de ruido: holgura clásica
+        return min(0.40, max(0.05, 2.0 * r.sigma / r.threshold))
 
     metals = _eligible_metals(risk, z_min)
     if not metals:
@@ -163,7 +177,7 @@ def analyze_completion(
     gaps: list[MetalGap] = []
     for m in metals:
         r = risk[m]
-        target = r.threshold * (1.0 + margin)
+        target = r.threshold * (1.0 + _margin_for(m))
         best_code, best_grade, best_tier, best_kg = None, 0.0, "", inf
         for it in cand:
             if not _eligible_booster(it, m):
@@ -194,7 +208,7 @@ def analyze_completion(
         need = 0.0
         ok = bool(must_fix)
         for m in must_fix:
-            target = risk[m].threshold * (1.0 + margin)
+            target = risk[m].threshold * (1.0 + _margin_for(m))
             if not _eligible_booster(it, m):
                 ok = False
                 break

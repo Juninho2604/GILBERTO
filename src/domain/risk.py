@@ -7,14 +7,16 @@ superar el umbral y cobrar**, y avisa cuando un lote se sienta peligrosamente
 pegado a un umbral con un metal ruidoso.
 
     grade_blend(m) = Σ f_i · grade_i(m)              # f_i = fracción de peso seco
-    sigma_blend(m) = sqrt( Σ f_i² · sigma_i(m)² )    # asume pilas independientes
+    sigma_blend(m) = sqrt( Σ_grupos (Σ_{i∈g} f_i·σ_i)² )
     margin = grade_blend − umbral
     z      = margin / sigma_blend
-    P_cobro ≈ Φ(z)                                   # CDF normal estándar
+    P_cobro = Φ(z) / Φ(grade/σ)                      # normal truncada en 0
 
-> Caveat: la propagación asume independencia. Las pilas de un mismo bloque
-> colineal NO son independientes; su σ combinada debería tratarse como una sola
-> (mejora pendiente). Para mezclas de pilas distintas la aproximación es válida.
+Propagación por **grupos de correlación**: las pilas de un mismo bloque colineal
+(solo viajaron juntas) comparten la incertidumbre de su ley → dentro del grupo
+la σ suma lineal; entre grupos, en cuadratura. Y la probabilidad de cobro usa la
+normal **truncada en 0** (una ley no puede ser negativa), que corrige el sesgo
+pesimista cuando σ es grande relativa a la ley.
 """
 
 from __future__ import annotations
@@ -83,20 +85,35 @@ def blend_threshold_risk(
     if dmt <= 0:
         return out
 
+    # Grupos de correlación: las pilas de un mismo bloque colineal comparten la
+    # incertidumbre de su ley → dentro del grupo la σ suma LINEAL (correlación
+    # total); entre grupos independientes, en cuadratura. Tratarlas como
+    # independientes subestimaría la σ de la mezcla y volvería optimista la
+    # probabilidad de cobro.
+    groups: dict[object, list] = {}
+    for c in comps:
+        key = c.item.grade_block if c.item.grade_block else ("__solo__", c.item.code)
+        groups.setdefault(key, []).append(c)
+
     for m in PRECIOUS_METALS:
         rule = terms.rule(m)
         if not rule.paid:
             continue
         grade = sum(c.item.grade(m) * c.dry_weight_kg for c in comps) / dmt
         var = sum(
-            (c.dry_weight_kg / dmt) ** 2 * c.item.sigma(m) ** 2 for c in comps
+            (sum((c.dry_weight_kg / dmt) * c.item.sigma(m) for c in grp)) ** 2
+            for grp in groups.values()
         )
         sigma = math.sqrt(var)
         T = _threshold(m, terms)
         margin = grade - T
         if sigma > 0:
             z = margin / sigma
-            p = norm_cdf(z)
+            # Normal TRUNCADA en 0: una ley no puede ser negativa. Con σ grande
+            # relativa a la ley, la normal sin truncar reparte probabilidad en
+            # valores imposibles (<0) y subestima la probabilidad de cobro.
+            #   P(X > T | X ≥ 0) = Φ((g−T)/σ) / Φ(g/σ)
+            p = min(1.0, norm_cdf(z) / max(norm_cdf(grade / sigma), 1e-12))
         else:  # sin incertidumbre conocida: determinístico
             z = math.inf if margin >= 0 else -math.inf
             p = 1.0 if margin >= 0 else 0.0

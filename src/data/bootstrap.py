@@ -24,15 +24,26 @@ def default_inventory(with_stock_only: bool = True) -> list[InventoryItem]:
     """Inventario RAEE con leyes estimadas cargadas (o fallback de demo)."""
     global LAST_LOAD_FALLBACK
     try:
-        from .estimate_grades import apply_estimates_to_inventory, estimate_grades
+        from .estimate_grades import (
+            apply_estimates_to_inventory,
+            estimate_grades,
+            estimate_moisture,
+        )
         from .load_history import load_history
         from .load_inventory import load_raee_inventory
         from .unmeasured_grades import apply_conservative_grades
 
         inv = load_raee_inventory(with_stock_only=with_stock_only)
         names = {it.code: it.name for it in inv}
-        est = estimate_grades(load_history(), names=names)
+        history = load_history()
+        est = estimate_grades(history, names=names)
         inv = apply_estimates_to_inventory(inv, est)
+        # Humedad por pila estimada desde sus lotes históricos (mejor que el 1%
+        # uniforme; con Cu al 3% de umbral, la humedad puede decidir el cobro).
+        moist = estimate_moisture(history)
+        for it in inv:
+            if it.code in moist:
+                it.moisture = moist[it.code]
         # Las pilas sin receta (no estimables) reciben un piso conservador de
         # mercado para que no queden invisibles al optimizador.
         inv = apply_conservative_grades(inv)

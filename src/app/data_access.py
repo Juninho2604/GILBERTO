@@ -123,6 +123,7 @@ def demo_lot(customer_lot: str) -> dict:
         )
         it.grade_sigma = dict(e.sigmas)
         it.grade_tier = dict(e.tiers)
+        it.grade_block = e.block
         items.append(it)
 
     return {

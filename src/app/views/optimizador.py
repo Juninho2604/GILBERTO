@@ -26,7 +26,7 @@ from app.viz3d import LotViz, container_figure
 from domain.models import PRECIOUS_METALS
 from domain.risk import blend_threshold_risk
 from domain.valuation import BlendComponent
-from optimize.optimizer import best_partition
+from optimize.optimizer import best_partition, rotation_plan
 
 _METAL_NOMBRE = {"CU": "cobre", "AU": "oro", "AG": "plata", "PT": "platino", "PD": "paladio"}
 _ROLE = {0: "LOTE RICO", 1: "MIXTO", 2: "RELLENO"}
@@ -100,6 +100,13 @@ def render() -> None:
     if not res.lots:
         st.warning(f"Sin solución (status={res.status}).")
         return
+    if res.status != "Optimal":
+        st.warning(
+            f"El optimizador se detuvo por límite de tiempo (status: "
+            f"**{res.status}**): la división mostrada es válida pero podría no "
+            f"ser la mejor posible. Volvé a correrlo o reducí las pilas.",
+            icon=":material/timer:",
+        )
 
     # --- Aprovechamiento del contenedor (el % manda) ---------------------- #
     gross = sum(l.valuation.gross_metal_total for l in res.lots)
@@ -285,3 +292,53 @@ def render() -> None:
             k_safe=float(st.session_state.get("k_safe", 1.0)),
         )
         completion_section(plan)
+
+    # --- Plan de rotación: todos los envíos hasta agotar el stock --------- #
+    st.markdown("##### Plan de rotación · todo el inventario, envío por envío")
+    st.caption(
+        "Simula los envíos sucesivos hasta rotar todo el stock: cuántos "
+        "contenedores lleva, qué viaja en cada uno, y qué pilas **no salen "
+        "nunca** — mercancía que envejece en el galpón y necesita refuerzo, "
+        "ensayo de laboratorio o venta aparte."
+    )
+    if st.button("Calcular plan de rotación", icon=":material/route:"):
+        with st.spinner("Simulando los envíos hasta agotar el stock…"):
+            st.session_state["rot_plan"] = rotation_plan(
+                items, prices, terms, container_kg=container_kg,
+                k_safe=float(st.session_state.get("k_safe", 1.0)),
+            )
+    rot = st.session_state.get("rot_plan")
+    if rot is not None:
+        if rot.shipments:
+            rrows = [
+                {
+                    "Envío": f"#{s.index}",
+                    "Carga (t)": round(s.total_kg / 1000, 1),
+                    "Aprovechado": f"{s.util_pct:.0f}%",
+                    "Lotes": s.num_lots,
+                    "Pilas": ", ".join(pile_label(c) for c in s.codes[:8])
+                    + ("…" if len(s.codes) > 8 else ""),
+                }
+                for s in rot.shipments
+            ]
+            st.dataframe(pd.DataFrame(rrows), width="stretch", hide_index=True)
+            st.caption(
+                f"**{len(rot.shipments)} envío(s)** para rotar "
+                f"{rot.total_shipped_kg/1000:,.1f} t (≈ "
+                f"{len(rot.shipments) * 3} meses al ritmo actual)."
+            )
+        if rot.stuck:
+            chips = " · ".join(
+                f"{pile_label(c)} ({kg:,.0f} kg)"
+                for c, kg in sorted(rot.stuck.items(), key=lambda x: -x[1])
+            )
+            st.warning(
+                f"**Pilas que no salen en ningún envío** ({sum(rot.stuck.values())/1000:,.1f} t): "
+                f"{chips}. El optimizador las deja porque restan valor tal como "
+                f"están: conviene reforzarlas (ver *Completar*), mandarlas a "
+                f"laboratorio o venderlas aparte antes de que envejezcan.",
+                icon=":material/inventory:",
+            )
+        elif rot.shipments:
+            st.success("Todo el stock rota: ninguna pila queda estancada.",
+                       icon=":material/check_circle:")
