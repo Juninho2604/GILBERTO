@@ -11,13 +11,41 @@ Software que ayuda a **Servicios Megabytes** (reciclaje de chatarra electrónica
 RAEE) a decidir **qué mezcla de materiales mandar en cada contenedor** a la
 refinería (**JX**) para que le **paguen el mayor porcentaje posible** del metal.
 
-**Estado:** funcional y desplegado en producción (con login + HTTPS). Núcleo de
-cálculo validado contra datos reales. Motor de **confianza y riesgo** integrado.
-**59 tests en verde**, ~5.500 líneas.
+**Estado: v1 COMPLETA y desplegada en producción** (login con lockout + HTTPS,
+detrás del nginx del VPS). Núcleo validado contra datos reales; motor de
+confianza y riesgo calibrado con el histórico. **115 tests en verde.**
+
+> **Exclusividad:** el sistema es exclusivo de Servicios Megabytes — no se
+> replica a otros recicladores. Escalar = profundizar con este cliente.
 
 - **Repo / rama de trabajo:** `Juninho2604/GILBERTO` → `claude/new-session-5k4aar`
 - **App en vivo:** `https://147-93-6-70.sslip.io` (login con contraseña)
 - **Stack:** Python · Streamlit · PuLP (MILP) · Plotly (3D) · Docker
+
+### Qué incluye la v1 final (además del núcleo descrito abajo)
+- **Navegación** por barra de módulos en el cuerpo (sin sidebar): Panel ·
+  Inventario · Simulador · Optimizador · Histórico · Bono. Ajustes en popover.
+- **Optimizador**: contenedor de 23 t partido en lotes óptimos + **plano de
+  carga por pallets** (numerados, Muy Rico/Poco Rico/Relleno, alerta bajo
+  umbral) + **completar contenedor** (qué pila comprar y cuántos kg) + **plan de
+  rotación** (envíos sucesivos y pilas estancadas) + status del solver visible.
+- **Histórico**: **carga de liquidaciones nuevas desde la app** (el loop de
+  datos: re-estima leyes al instante, estudio recalculable bajo demanda) y
+  reconciliación del bono contra la liquidación real.
+- **Bono de éxito por envío**: base = solo el metal rescatado del umbral (no el
+  contenedor), 15% al superar 10% de mejora; ledger persistente y reconciliable.
+- **Panel › Evolución del modelo**: fotos de precisión en cada recalculado —
+  "el modelo pasó de ±X% a ±Y%" (argumento de renovación, automático).
+- **Motor calibrado**: CV medidos de lotes puros (Cu 3.2% · Au 12.1% · Ag 15.4%
+  · Pd 18.9%), σ correlacionada por bloque colineal, normal truncada en P_cobro,
+  humedad por pila desde el histórico, margen adaptativo en completar.
+- **Endurecimiento**: lockout de login (5 intentos → 5 min), datos persistentes
+  entre redeploys (volumen `./data`), Docker sin root, backups diarios
+  (`deploy/backup.sh` + cron), logging rotativo en `data/logs/app.log`, aviso
+  fuerte si faltan los datos reales.
+- **Documentos**: `GUIA.md` (recuento + guía de uso + guion de reunión) y
+  `REVISION.md` (auditoría completa: debilidades, valor, vulnerabilidades,
+  escalamiento, opinión).
 
 ---
 

@@ -127,14 +127,17 @@ la memoria calibrada del negocio.
 aumenta el valor del activo de forma automática y visible ("el modelo mejoró su
 error de X% a Y% con tu último envío").
 
-### 3.3 Replicabilidad a otros recicladores
-El dominio (valorización, umbrales, MILP, estimación por regresión) es genérico
-para cualquier reciclador que venda a refinería con deducciones por tonelada. Lo
-específico de Megabytes (términos JX, formato xlsx, textos) está localizado y es
-extraíble a configuración por cliente (§5). Cada cliente nuevo replica la
-licencia con costo marginal bajo.
-**Acción comercial:** cerrar con Megabytes como caso de referencia (con su
-permiso, resultados en %, sin datos), y empaquetar "Aurix para recicladores".
+### 3.3 Exclusividad para Megabytes (decisión tomada)
+**El sistema es exclusivo de este cliente — no se replica a otros recicladores.**
+La exclusividad es en sí un argumento comercial: Megabytes tiene una ventaja
+operativa que su competencia no puede comprar, y eso justifica una mensualidad
+premium y el bono por resultados. El crecimiento del activo va en
+**profundidad**, no en amplitud: cada trimestre el sistema conoce mejor SU
+inventario, SUS términos con JX y SU histórico — un activo a medida que nadie
+más tiene y que vale más cuanto más se usa.
+**Acción comercial:** dejar la exclusividad **escrita en el acuerdo** (de ambos
+lados: OMIA no lo replica; Megabytes mantiene la mensualidad) — es la base para
+sostener y subir el fee con cada capacidad nueva.
 
 ---
 
@@ -193,40 +196,45 @@ En orden de esfuerzo creciente. Lo importante: **el núcleo (dominio, optimizado
 datos) es Python puro sin Streamlit — migra sin cambios.** Las ~2.000 líneas de
 UI son lo único acoplado.
 
-| Etapa | Qué | Esfuerzo | Cuándo conviene |
-|---|---|---|---|
-| **E1 — Producción sólida** | SQLite para inventario+ledger, logging, backup diario, lockout de login, validación de xlsx | ~2 semanas | Ya (es parte de entregar bien la v1) |
-| **E2 — El loop de datos** | Carga de liquidaciones desde la app, re-estimación y rebuild automáticos, reconciliación del bono | 2–3 semanas | Inmediatamente después: es la promesa "se afina solo" |
-| **E3 — Multi-cliente** | Config por tenant (nombre, términos, formato xlsx, metales), Postgres con `tenant_id`, aislamiento de datos | 8–12 semanas | Cuando aparezca el 2º reciclador interesado |
-| **E4 — Plataforma** | FastAPI + React, workers (Celery) para el MILP, roles y auditoría, API pública de inventario/lotes | 4–6 semanas más | Con 3+ clientes o si Megabytes pide multiusuario |
+> **Decisión estratégica (2026-07-01): el sistema es EXCLUSIVO de Megabytes.**
+> No hay camino multi-cliente. Escalar = profundizar con este cliente.
 
-Anti-recomendación explícita: **no** saltar a E3/E4 ahora. Streamlit + un tenant
-es la arquitectura correcta para el tamaño actual del negocio; sobre-ingeniería
-hoy es plata y tiempo que no ve el cliente.
+| Etapa | Qué | Esfuerzo | Estado / cuándo |
+|---|---|---|---|
+| **E1 — Producción sólida** | Ledger y estado persistentes, logging, backup diario, lockout de login, validación de xlsx | ~2 semanas | ✅ hecha (v1.1) |
+| **E2 — El loop de datos** | Carga de liquidaciones desde la app, re-estimación automática, reconciliación del bono, evolución del modelo | 2–3 semanas | ✅ hecha (v1.2 + cadencia) |
+| **E3 — Profundidad Megabytes** | Multiusuario interno (Gilberto + socio + operador, con roles y auditoría de cambios), SQLite para el estado, carga de precios del día automática | 3–4 semanas | Cuando el uso diario lo pida |
+| **E4 — Operación integrada** | FastAPI + front dedicado si crece el uso, API para integrar su administración (facturación, compras), alertas por WhatsApp/mail (envío listo, pila estancada, liquidación pendiente) | 4–6 semanas | Si Megabytes lo pide y lo paga |
+
+Anti-recomendación explícita: **no** adelantar E3/E4. Streamlit + un cliente es
+la arquitectura correcta hoy; cada etapa se activa cuando el uso real la pida —
+y como el sistema es exclusivo, cada una es también una oportunidad de subir la
+mensualidad.
 
 ---
 
-## 6. Mejoras continuas programadas (calendario propuesto)
+## 6. Mejoras continuas programadas (calendario — EJECUTADO)
 
-**v1.1 — próximas 2 semanas (endurecimiento):**
+**v1.1 — endurecimiento ✅ (115 tests en verde al cierre):**
 lockout de login · ledger persistente · aviso de datos de ejemplo · fix de sed ·
-validación de xlsx · `USER app` en Docker · pins de dependencias · logging +
-backup diario.
+validación de xlsx · `USER app` en Docker · volumen de datos persistente ·
+pins de dependencias · logging + backup diario.
 
-**v1.2 — mes 1 (el loop de datos):**
-pantalla "Cargar liquidación" → re-estima leyes → regenera análisis en
-background · reconciliación automática del bono (real vs. proyectado, sesgo
-acumulado) · status/gap del solver visible.
+**v1.2 — el loop de datos ✅:**
+pantalla "Cargar liquidación" en Histórico → re-estima leyes al instante →
+recalcula el estudio bajo demanda desde la app · reconciliación del bono contra
+la liquidación real (ledger con estado) · fusión automática con el histórico.
 
-**v1.3 — mes 2–3 (afinar el motor):**
-σ por bloque colineal (súper-pila) · CV calibrados desde lotes puros · margen
-adaptativo en completar contenedor · humedad por categoría · normal truncada en
-P_cobro · rotación de inventario (qué retener vs. enviar, edad de las pilas).
+**v1.3 — motor fino ✅:**
+σ correlacionada por bloque colineal · CV calibrados desde lotes puros (Cu 3.2%,
+Au 12.1%, Ag 15.4%, Pd 18.9% — la mitad de lo asumido) · margen adaptativo en
+completar contenedor · normal truncada en P_cobro · humedad por pila desde el
+histórico · status del solver visible · plan de rotación (pilas estancadas).
 
-**Cadencia trimestral (alineada al ciclo de envíos, ~1 contenedor/3 meses):**
-tras cada liquidación: recalibrar, medir precisión del modelo vs. real,
-reportar al cliente "el modelo mejoró de X a Y" — ese reporte ES el argumento de
-renovación de la mensualidad.
+**Cadencia trimestral ✅ (automatizada):**
+cada recalculado guarda una foto de precisión y el Panel muestra la evolución —
+"el modelo pasó de ±X% a ±Y% con tus liquidaciones". Ese reporte ES el argumento
+de renovación de la mensualidad, y se genera solo.
 
 ---
 
