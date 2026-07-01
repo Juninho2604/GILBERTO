@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pandas as pd
 import streamlit as st
 
 from app.data_access import default_optimum, history_analysis
@@ -109,12 +110,86 @@ def render() -> None:
             )
 
     st.write("")
+
+    # --- Evolución del modelo (cadencia trimestral) ------------------------ #
+    _render_evolucion(a)
+
+    st.write("")
     st.info(
         "Las leyes son **estimadas** desde el histórico y están a validar con "
         "ensayos reales. Preguntas abiertas (§7) que mueven el óptimo: tamaño "
         "mínimo de lote, si el platino se paga, y si los términos son negociados.",
         icon=":material/info:",
     )
+
+
+def _render_evolucion(a: dict) -> None:
+    """El modelo en el tiempo: cada recalculado del estudio deja una foto y acá
+    se ve si mejora — el argumento medible de que el sistema vale más cada
+    trimestre que se usa."""
+    from data.snapshots import load_snapshots, record_snapshot
+
+    # Baseline automático: la primera visita registra el estado actual.
+    snaps = load_snapshots()
+    if not snaps:
+        record_snapshot(a)
+        snaps = load_snapshots()
+
+    st.markdown("##### Evolución del modelo")
+    if len(snaps) < 2:
+        s = snaps[-1] if snaps else None
+        st.caption(
+            "Primer registro tomado"
+            + (f" ({str(s['timestamp'])[:10]}): error de dinero "
+               f"**±{s['money_fidelity_pct']:.1f}%** con **{s['n_lots']} lotes** "
+               f"y **{s['coverage_covered']}/{s['coverage_stocked']}** pilas con ley. "
+               if s else ". ")
+            + "Cada liquidación nueva que cargues (Histórico) y cada recalculado "
+              "del estudio agregan una foto: acá vas a ver si el modelo mejora."
+        )
+        return
+
+    prev, cur = snaps[-2], snaps[-1]
+    d_fid = cur["money_fidelity_pct"] - prev["money_fidelity_pct"]
+    d_lots = cur["n_lots"] - prev["n_lots"]
+    d_au = cur["err_pct"].get("AU", 0.0) - prev["err_pct"].get("AU", 0.0)
+    e1, e2, e3 = st.columns(3)
+    e1.metric(
+        "Error de dinero (estimado vs. real)",
+        f"±{cur['money_fidelity_pct']:.1f}%",
+        delta=f"{d_fid:+.1f} pts vs. registro anterior",
+        delta_color="inverse",  # menos error = verde
+    )
+    e2.metric(
+        "Error mediano en oro",
+        f"{cur['err_pct'].get('AU', 0.0):.1f}%",
+        delta=f"{d_au:+.1f} pts", delta_color="inverse",
+    )
+    e3.metric(
+        "Lotes que alimentan el modelo",
+        f"{cur['n_lots']}",
+        delta=f"+{d_lots} liquidación(es)" if d_lots > 0 else "sin lotes nuevos",
+        delta_color="off",
+    )
+    if d_fid < 0 or d_au < 0:
+        st.caption(
+            f"**El modelo mejoró con tus datos**: el error pasó de "
+            f"±{prev['money_fidelity_pct']:.1f}% a ±{cur['money_fidelity_pct']:.1f}% "
+            f"entre {str(prev['timestamp'])[:10]} y {str(cur['timestamp'])[:10]}. "
+            f"Se afina solo: cada liquidación cargada lo calibra."
+        )
+    hist = pd.DataFrame([
+        {
+            "Fecha": str(s["timestamp"])[:10],
+            "Lotes": s["n_lots"],
+            "Error $ (%)": s["money_fidelity_pct"],
+            "Error Au (%)": s["err_pct"].get("AU", 0.0),
+            "Error Ag (%)": s["err_pct"].get("AG", 0.0),
+            "Pilas con ley": f"{s['coverage_covered']}/{s['coverage_stocked']}",
+        }
+        for s in snaps[-8:]
+    ])
+    st.dataframe(hist, width="stretch", hide_index=True)
 
 
 def _au_err(a: dict) -> float:

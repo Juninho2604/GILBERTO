@@ -22,6 +22,11 @@ def build(path: Path = OUT) -> Path:
     analysis = analyze_history(default_prices(), default_terms())
     payload = analysis.to_dict()
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    # Foto de la precisión del modelo: el Panel muestra la evolución entre
+    # recalculados ("el modelo pasó de X% a Y% con tus últimas liquidaciones").
+    from data.snapshots import record_snapshot
+
+    record_snapshot(payload)
     return path
 
 

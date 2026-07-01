@@ -28,6 +28,7 @@ htmlcov/
 data/inventory_state.json
 data/bono_ledger.json
 data/history_extra.json
+data/model_snapshots.json
 data/logs/
 
 # Secretos del deploy (contraseña de acceso)
