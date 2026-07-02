@@ -103,7 +103,8 @@ administrar servidor, copias de seguridad y actualizaciones.
 
 ## 7. Plazo de entrega
 
-- Demo de simulación: **ya presentado** y validado contra los envíos reales.
+- **Presentación del modelo completo**: en vivo, operando sobre el inventario y
+  el histórico reales del cliente.
 - Entrega del modelo: **inmediata al aprobar la propuesta** — el desarrollo
   está finalizado, probado y operativo.
 - Segundo pago: con la primera liquidación de la refinería de un envío
