@@ -23,8 +23,8 @@ que la refinería pagó con un desvío de ±3%.
 
 ## 2. Alcance y entregables
 
-El modelo entregado a Servicios Megabytes, C.A. — **desarrollado, probado
-(115 pruebas automáticas) y ya operativo** — incluye:
+El modelo entregable a Servicios Megabytes, C.A. — **desarrollado, probado
+(115 pruebas automáticas) y listo para operar** — incluye:
 
 **Optimización del envío**
 - Simulador de mezclas que replica la fórmula de liquidación de la refinería
